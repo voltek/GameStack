@@ -15,4 +15,5 @@
 local.properties
 
 .obsidian/workspace*
+.obsidian/workspace
 .obsidian/cache

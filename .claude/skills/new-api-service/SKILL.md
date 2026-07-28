@@ -13,6 +13,11 @@ POST https://api.igdb.com/v4/games
 Body: fields id, name, rating; where platforms=48; limit 10;
 ```
 
+IMPORTANT — search does not support sorting: the `search "query";` keyword
+cannot be combined with `sort` in the same query. IGDB returns search results
+ordered by its own relevance ranking. Do not attempt to add `sort` to a query
+that also uses `search` — it will not behave as expected.
+
 ## Construction
 - Interface annotated for Retrofit, using `@POST("{endpoint}")` — never `@GET`.
 - The Apicalypse query string goes in the request body via `@Body` (as plain text/RequestBody,

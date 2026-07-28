@@ -7,6 +7,11 @@ description: Create a complete GameStack feature end-to-end, from Domain models 
 This skill orchestrates the other GameStack skills in the correct dependency order.
 Do not skip steps or reorder them — each layer depends on the previous one.
 
+If the agent has a native task-tracking tool available (e.g., Claude Code's
+TodoWrite/TaskCreate, depending on version), use it to track progress through
+the 8 steps below — this makes the pending human checkpoint (step 5) visible.
+Otherwise, list progress in plain text at each step.
+
 ## Steps
 
 ### 1. Domain models
@@ -25,13 +30,27 @@ the `new-api-service` skill for any new IGDB endpoint.
 ### 4. UseCases
 Invoke the `new-usecase` skill once for each Repository function the feature needs to expose.
 
-### 5. ViewModel
-Invoke the `new-viewmodel` skill, injecting the UseCase(s) created in step 4.
+### 5. Screen prototype
+Generate a visual prototype (Stitch or Claude Design) based on the
+Spec/discovery-feature output.
 
-### 6. Screen
-Invoke the `new-screen` skill, wiring the ViewModel created in step 5.
+STOP HERE. Do not proceed to ViewModel/Screen until the human explicitly
+approves the prototype. Visual/UX judgment is not mechanical — this is a
+Plan-level decision (see CLAUDE.md's Human-in-the-Loop principle), not an
+Implement-level one. The agent proposes, the human decides.
 
-### 7. Tests
+If a project-wide design pass already exists and covers this screen, confirm
+with the human whether that existing design still applies, rather than
+silently reusing or silently regenerating a new one.
+
+### 6. ViewModel
+Invoke the `new-viewmodel` skill, using the approved prototype's fields to
+shape UiState accurately, injecting the UseCase(s) created in step 4.
+
+### 7. Screen
+Invoke the `new-screen` skill, implementing the approved prototype's layout.
+
+### 8. Tests
 `write-tests` is invoked automatically by each skill above as it completes.
 Do not skip or batch this — each skill is responsible for its own test coverage.
 

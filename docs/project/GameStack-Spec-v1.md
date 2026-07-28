@@ -36,10 +36,18 @@ Three lists, managed locally in Room:
 - Backlog (not MVP): possible future third state "LOVED" (double thumbs up,
   Netflix/Prime-style). Trivial to add later since it's an enum.
 
+## App Navigation
+Persistent bottom navigation bar with 3 top-level destinations:
+- **Home** — discovery: popular games + recently interacted games
+- **Search** — dedicated search screen
+- **Library** — the user's 3 personal lists (Playing Now, Want to Play, Completed)
+
+Game Detail is not a top-level destination — reached by tapping a game card
+from any of the three tabs above.
+
 ## Home Screen
 - Most popular games today
 - Games the user has recently interacted with
-- Quick access to the user's personal lists
 - (Optional / deferred to Block 5) AI-based recommendations based on
   user preferences and rating history
 
@@ -68,6 +76,35 @@ Three lists, managed locally in Room:
   when the time comes, Retrofit → Ktor and Room → SQLDelight,
   without touching Domain or UI.
 - **Backlog:** third rating state ("LOVED").
+- **Backlog:** recent search history on the Search screen (would require new
+  local storage for query strings — DataStore, not Room). Search works fully
+  without it; deferred to keep MVP scope tight.
+- **Backlog:** quick-add to list directly from Home/Search game cards (3-dot
+  menu → list picker), without entering Game Detail first. Low cost (reuses
+  existing UserGameRepository logic) but adds UI surface not needed for MVP.
+- **Backlog:** user profile (avatar photo + display name), stored locally only
+  (Room/DataStore) — no IGDB dependency, purely cosmetic personalization.
+  Surfaced during Stitch prototyping (top-right avatar icon in Home mockup),
+  not part of MVP scope.
+- **Backlog:** search filters (genre, platform, etc.) on the Search screen,
+  with a "Clear all filters" action. Surfaced during Stitch prototyping of
+  the empty search state — MVP search is plain text query only, no filters.
+- **Backlog:** in-library search bar (search within the user's own saved
+  games, not IGDB). Low cost — operates on already-fetched local Room data.
+  Surfaced during Stitch prototyping of the Library screen.
+- **Backlog (major architectural decision, not a small addition):** true
+  offline mode — caching IGDB responses locally so the app remains usable
+  without connectivity. Surfaced during Stitch prototyping (Error State
+  originally included a "Go to Offline Mode" link). Unlike other backlog
+  items, this is NOT low-cost: it requires a caching/sync strategy for
+  remote data (separate from the existing Room tables for lists/ratings),
+  decisions on cache invalidation and freshness, and likely a dedicated
+  Repository-layer redesign. Treat as its own future evaluation — comparable
+  in scope to the Retrofit-vs-Ktor decision — not something to bolt on casually.
+- **Backlog:** Light theme. MVP ships dark-only — the project's visual
+  identity (confirmed via Stitch prototyping and the GameStack Core
+  DESIGN.md) is dark-first, matching genre conventions (Steam, Xbox app,
+  Discord). Revisit if a real accessibility/user need arises.
 
 ## Related Documents
 - `CLAUDE.md` — technical/architectural rules for AI agents working on this repo

@@ -1,10 +1,20 @@
 ---
 name: write-tests
 description: Write unit tests for Domain (UseCases), Data (RepositoryImpl, Mappers, DAO, API), and Presentation (ViewModels) layers. Use when asked to write, add, or complete unit tests for GameStack.
+compatibility: Requires `MainDispatcherRule` to exist in `core/testing/` for ViewModel tests.
 ---
 
 ## Testing Stack
 Turbine, MockK, TestDispatcher
+
+## Oracle Problem — what "correct" means
+The source of truth for a test is the Skill or Spec that described the task —
+never the implementation you just wrote. Before writing assertions, restate
+in a comment what the Skill/Spec required, then assert against that, not
+against whatever the generated code currently returns.
+
+Red flag: if a test would still pass after silently breaking the intended
+logic, it's tautological — rewrite it against the actual requirement.
 
 ## Setup by layer
 
@@ -84,3 +94,9 @@ Pattern: `{method or event} should {expected result} when {condition}`
 - Mocks use MockK exclusively (`mockk()`, `every {}`, `verify {}`, `coEvery {}`, `coVerify {}`)
 - No real network or database calls — everything mocked
 - Test names follow the naming convention above
+
+## Pending — Regression pillar
+This skill covers Requirements testing only (new code does what the Skill/Spec
+asked). Regression testing (confirm nothing else broke) is not enforced here —
+it will be automated via a Hook in Block 4, running the affected test suite
+automatically after each agent edit.

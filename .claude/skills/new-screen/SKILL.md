@@ -11,6 +11,14 @@ description: Create a Composable screen that observes a ViewModel following MVI.
   This keeps the Content Composable previewable without a real ViewModel.
 - Use `UiText.asString()` to resolve any text coming from the state/effects.
 - Cover loading, error, and content states explicitly — never leave a state unhandled.
+- If the screen displays a list/collection of items (e.g. Home sections, Search
+  results, Library lists) — NOT a single-item screen like Detail — implement
+  pull-to-refresh:
+  - Add `isRefreshing: Boolean` to `UiState`.
+  - Add a `Refresh` case to `UiEvent`, triggering the same UseCase used for
+    the initial load (no separate "refresh" UseCase needed).
+  - Wrap the list content in Compose's pull-to-refresh composable, bound to
+    `isRefreshing`.
 
 ## Location
 `feature/{name}/presentation/{ScreenName}Screen.kt`
