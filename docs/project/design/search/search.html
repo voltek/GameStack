@@ -1,0 +1,255 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>GameStack - Search</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "error-container": "#93000a",
+                        "on-secondary": "#233144",
+                        "secondary-container": "#3c4a5e",
+                        "surface-container-low": "#131b2e",
+                        "background": "#0b1326",
+                        "on-background": "#dae2fd",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#494454",
+                        "on-tertiary-fixed-variant": "#92002a",
+                        "on-surface-variant": "#cbc3d7",
+                        "on-tertiary-container": "#5b0017",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "inverse-surface": "#dae2fd",
+                        "tertiary-fixed-dim": "#ffb2b7",
+                        "tertiary-fixed": "#ffdadb",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "on-tertiary": "#67001b",
+                        "tertiary": "#ffb2b7",
+                        "on-secondary-container": "#abb9d1",
+                        "surface-container": "#171f33",
+                        "on-primary": "#3c0091",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "surface-container-lowest": "#060e20",
+                        "inverse-on-surface": "#283044",
+                        "on-error": "#690005",
+                        "surface": "#0b1326",
+                        "on-primary-container": "#340080",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-tertiary-fixed": "#40000d",
+                        "tertiary-container": "#ff516a",
+                        "surface-variant": "#2d3449",
+                        "outline": "#958ea0",
+                        "on-primary-fixed": "#23005c",
+                        "surface-dim": "#0b1326",
+                        "primary-fixed": "#e9ddff",
+                        "primary-container": "#a078ff",
+                        "surface-container-highest": "#2d3449",
+                        "primary": "#d0bcff",
+                        "primary-fixed-dim": "#d0bcff",
+                        "surface-bright": "#31394d",
+                        "surface-container-high": "#222a3d",
+                        "surface-tint": "#d0bcff",
+                        "on-primary-fixed-variant": "#5516be",
+                        "secondary": "#b9c7df",
+                        "on-surface": "#dae2fd"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "title-lg": ["Hanken Grotesk"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            user-select: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-[15px] flex justify-between items-center px-4 h-16 w-full border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim font-bold text-2xl" data-icon="sports_esports">sports_esports</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary-fixed-dim tracking-tight">GameStack</h1>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 mb-20 px-4 pb-8 overflow-y-auto mt-2">
+<!-- Sticky Search Bar -->
+<div class="sticky top-[64px] z-40 bg-surface/80 backdrop-blur-md py-1 mb-2">
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+</div>
+<input class="block w-full pl-12 pr-12 py-4 bg-surface-container-highest/50 border-none rounded-2xl text-on-surface placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary/50 transition-all text-body-lg" placeholder="Search for games..." type="text" value="Elden Ring">
+<div class="absolute inset-y-0 right-0 pr-4 flex items-center">
+<button class="p-1 hover:bg-surface-variant rounded-full transition-colors active:scale-90">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="close">close</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Section: Results -->
+<section class="mt-2">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold tracking-tight text-on-surface">Search Results</h2>
+<button class="flex items-center gap-1 text-primary-fixed-dim text-sm font-medium hover:bg-primary/10 px-3 py-1 rounded-full transition-colors border border-primary/20">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                    Filters
+                </button>
+</div>
+<!-- 2-Column Bento Grid for Results -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Game Card 1 -->
+<div class="flex flex-col gap-2 group cursor-pointer active:scale-[0.98] transition-transform">
+<div class="aspect-[3/4] rounded-2xl overflow-hidden relative shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Official cover art for Elden Ring, featuring a dark fantasy knight in detailed armor kneeling against a glowing golden circular sigil. The atmosphere is epic and melancholic, with high contrast lighting and deep shadows. Professional gaming marketing visual style with vibrant gold and deep charcoal tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwgv0M35gb53NhqIUfmNRGsI-MvEtksYCa69IWuR7jsD4MoVrW_ZZX3T_KRWna4GwENS9y3CQug948ETGdGx2WiwydCC0jBTsKhY_hO1bFDehVXqvRo9pxUhIyfdR7E2Q62aNvSxXKvBB3Vq-7SH78N_vtv17pjFewN06C7d1Z3qLCNe6-dW42L0qfGS8rUmel0E8ysO9nBDRQXkHzDwdmuJhtJA8EBQPH_lKGLBOYG0Xrf_kaI9iWF0fSYU1g1WSX0RKTaNySPoU">
+<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">RPG</div>
+</div>
+<div class="px-1">
+<h3 class="font-bold text-on-surface text-sm truncate leading-tight">Elden Ring</h3>
+<p class="text-xs text-on-surface-variant">FromSoftware</p>
+</div>
+</div>
+<!-- Game Card 2 -->
+<div class="flex flex-col gap-2 group cursor-pointer active:scale-[0.98] transition-transform">
+<div class="aspect-[3/4] rounded-2xl overflow-hidden relative shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Official key art for God of War Ragnarok, showing Kratos and Atreus in a snowy, frozen Norse landscape. The scene is dramatic with cool blue tones and warm firelight accents. High-quality cinematic render with intricate details on furs and leather textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQT8Ixa0UgM-NrFWJ4fc5PLfh489KPndi0Z8UF7EQgbcc8EliqTZoLKTsdiwxjLNS8i9KSVhoM_f3CkRiHXdxoQGACaRXXhQavDuAyZG_-doCc4UhVpMEgg7NwLdnJ55ls4wf_V7CtN1VSIIaWynwSV3W2Z-ElfuShi7JG3GiuM5AHL3YfSkQyptHfiszqLzK-B_xjj8q-ikrlaohnrWhdOvaB63jGTQpjaM04_0zLebzZ16IGKfvTGVzQXpDpk86hJk-cf6_EtAs">
+<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Action</div>
+</div>
+<div class="px-1">
+<h3 class="font-bold text-on-surface text-sm truncate leading-tight">God of War Ragnarok</h3>
+<p class="text-xs text-on-surface-variant">Santa Monica Studio</p>
+</div>
+</div>
+<!-- Game Card 3 -->
+<div class="flex flex-col gap-2 group cursor-pointer active:scale-[0.98] transition-transform">
+<div class="aspect-[3/4] rounded-2xl overflow-hidden relative shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Promotional artwork for Starfield, showcasing a futuristic explorer standing before a massive celestial planetary alignment. The style is NASA-punk with clean whites, deep space blues, and warm amber light flares. Cinematic and awe-inspiring sci-fi aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrnAE0LmSf4FBBI7e2JZvdQaMOVr-ruWfja74vXbtDWkcNOqPvUd2-olz8g6dxSJ2UJm7rXzZmvkG_znfBPT1kuLANKxFBq577fhL0p8RjpAiZ_wQwJtSvuY-8c-e4Kgt0hvCBSSU_nuPHwsJIoA8pqWwO61ubIfIYoUrP5oLkxSE0EVpPMG99sg2wJZ1yBRfhjTs_BGzeD7NdMzZXnseAROCDoClXSlPG05UHKlumg7v1hMP__fedIF_it6dzRS_8Aaf4V0SNFQc">
+<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Sci-Fi</div>
+</div>
+<div class="px-1">
+<h3 class="font-bold text-on-surface text-sm truncate leading-tight">Starfield</h3>
+<p class="text-xs text-on-surface-variant">Bethesda</p>
+</div>
+</div>
+<!-- Game Card 4 -->
+<div class="flex flex-col gap-2 group cursor-pointer active:scale-[0.98] transition-transform">
+<div class="aspect-[3/4] rounded-2xl overflow-hidden relative shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Cyberpunk 2077 cinematic game cover featuring the protagonist V in front of a neon-drenched Night City skyline. The color palette is dominated by electric yellow, vibrant cyan, and hot pink. Gritty urban future aesthetic with high saturation and sharp digital details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTYFQOZCu5eS_LZZooktpkcm5pwlWV7tnXD8bsfh9KNpcVTGO0WtcZF_Is_1pzu6kP9varr-_GQUmKKFLd0tx-jMfIxa3GBzHfWomHoqSO0B0CGskg3mRptVFyRn9pk5Y1hj51YdcrZTSIhOT6qS998FL72OvXYiMaCwCzf_LbHkA8FM2bcQAwpKVeAb3fLzYqwcdKf_Z8TuhdoyWq20YIvEfCAn_sYDvYwZ0n0-BVZCedhITqT8rzlgzt65QdhdQ2ipyu2KuAtEM">
+<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Open World</div>
+</div>
+<div class="px-1">
+<h3 class="font-bold text-on-surface text-sm truncate leading-tight">Cyberpunk 2077</h3>
+<p class="text-xs text-on-surface-variant">CD Projekt Red</p>
+</div>
+</div>
+<!-- Game Card 5 -->
+<div class="flex flex-col gap-2 group cursor-pointer active:scale-[0.98] transition-transform">
+<div class="aspect-[3/4] rounded-2xl overflow-hidden relative shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Cover art for Horizon Forbidden West featuring Aloy looking out over a lush overgrown tropical landscape with a giant mechanical machine in the distance. Vibrant greens and bright blues under a warm sun. High-fidelity environmental design with a focus on nature and technology." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMINU17VtHSPWrohtkozpXDdq_rrUlIAOspVd48YttEU-WfArl4tsKAI4yOzBKPYi6EV1M4LEsmQSmULF4m4zYc_1wPBTyjTg_8ECjP7ssUbDDJbEcZ_-iL3Ipie88CBHpRVcwAOwMW1yhtnJ-Qj7ODz6UG2y4_XDQYysCA7juLGVLuYq3pLHFNp9YJlY5z4ySrqiw9iXRD3ObaNUR6FS-POdBQoFNfMVNqGjiYblGWux4dWJNf5HF1DDF0wy5nhjC_m-olAgHOQA">
+<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Adventure</div>
+</div>
+<div class="px-1">
+<h3 class="font-bold text-on-surface text-sm truncate leading-tight">Horizon Forbidden West</h3>
+<p class="text-xs text-on-surface-variant">Guerrilla Games</p>
+</div>
+</div>
+<!-- Game Card 6 (Fixed) -->
+<div class="flex flex-col gap-2 group cursor-pointer active:scale-[0.98] transition-transform">
+<div class="aspect-[3/4] rounded-2xl overflow-hidden relative shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="The Last of Us Part I cover artwork showing Joel and Ellie in a post-apocalyptic overgrown city. The mood is somber and emotional with desaturated greens, earthy browns, and soft natural lighting coming through broken windows. Highly detailed character models and atmospheric textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEjqtGqDG5470nmBHzzh-LbZNZ4jiPoyRmMGR1WpU1gEDnPeSgo5jQwNU7y1W2IOOdb5HoLlAKaHDO30_AViXGN2cpaU-XHwX6aTLyX8Ckr-qSUV1zk9HwvTb-hh5RiuUJomO0Rorgujouy8W3jlnruzl9VW6Q3BZxiDTclL5fYvRs3wGN3J2GN2jlvi-znkkw3D5CGzxvTeFhCzzlXqcnXUC7_c-O2voTdahg_tieQDu-pMj92w7Fnhr-wJtNjqC6jDp-vXxniz4">
+<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Story</div>
+</div>
+<div class="px-1">
+<h3 class="font-bold text-on-surface text-sm truncate leading-tight">The Last of Us Part I</h3>
+<p class="text-xs text-on-surface-variant">Naughty Dog</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-safe bg-surface/80 backdrop-blur-[15px] h-20 z-50">
+<!-- Home Tab (Inactive) -->
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant px-5 py-1 hover:bg-surface-variant/20 rounded-full transition-all duration-150 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<!-- Search Tab (Active) -->
+<a class="flex flex-col items-center justify-center gap-1 bg-primary-container text-on-primary-container rounded-full px-5 py-1 transition-all duration-150 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="search" style="font-variation-settings: &quot;FILL&quot; 1;">search</span>
+<span class="font-label-md text-label-md">Search</span>
+</a>
+<!-- Library Tab (Inactive) -->
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant px-5 py-1 hover:bg-surface-variant/20 rounded-full transition-all duration-150 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+<span class="font-label-md text-label-md">Library</span>
+</a>
+</nav>
+<!-- Micro-interaction Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.querySelector('input[type="text"]');
+            const clearBtn = document.querySelector('button .material-symbols-outlined[data-icon="close"]').parentElement;
+
+            // Simple clear functionality
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchInput.focus();
+            });
+
+            // Smooth header appearance on scroll
+            let lastScroll = 0;
+            const header = document.querySelector('header');
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                if (currentScroll > lastScroll && currentScroll > 100) {
+                    header.style.transform = 'translateY(-100%)';
+                } else {
+                    header.style.transform = 'translateY(0)';
+                }
+                header.style.transition = 'transform 0.3s ease';
+                lastScroll = currentScroll;
+            });
+        });
+    </script>
+
+
+
+
+
+
+</body></html>

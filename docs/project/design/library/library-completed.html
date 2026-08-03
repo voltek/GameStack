@@ -1,0 +1,233 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>GameStack - Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .filled-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for library */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d3449;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-highest": "#2d3449",
+                      "on-surface": "#dae2fd",
+                      "inverse-on-surface": "#283044",
+                      "on-primary": "#4b007e",
+                      "primary-fixed-dim": "#dfb7ff",
+                      "secondary-container": "#3131c0",
+                      "surface-container-high": "#222a3d",
+                      "on-secondary-fixed-variant": "#2f2ebe",
+                      "on-surface-variant": "#d0c2d6",
+                      "secondary-fixed-dim": "#c0c1ff",
+                      "on-tertiary": "#003543",
+                      "on-primary-container": "#41006f",
+                      "on-tertiary-fixed-variant": "#004e60",
+                      "secondary": "#c0c1ff",
+                      "on-tertiary-container": "#002e3a",
+                      "tertiary": "#4cd6ff",
+                      "surface-variant": "#2d3449",
+                      "outline": "#998ca0",
+                      "on-error-container": "#ffdad6",
+                      "on-error": "#690005",
+                      "outline-variant": "#4d4354",
+                      "surface-bright": "#31394d",
+                      "on-primary-fixed-variant": "#6a00b0",
+                      "on-secondary-container": "#b0b2ff",
+                      "surface-container-lowest": "#060e20",
+                      "inverse-primary": "#8821d8",
+                      "on-primary-fixed": "#2d004f",
+                      "primary-container": "#ba6bff",
+                      "tertiary-container": "#009dc1",
+                      "on-secondary-fixed": "#07006c",
+                      "primary": "#dfb7ff",
+                      "on-background": "#dae2fd",
+                      "secondary-fixed": "#e1e0ff",
+                      "surface": "#0b1326",
+                      "surface-dim": "#0b1326",
+                      "surface-tint": "#dfb7ff",
+                      "error": "#ffb4ab",
+                      "on-tertiary-fixed": "#001f28",
+                      "surface-container-low": "#131b2e",
+                      "surface-container": "#171f33",
+                      "tertiary-fixed-dim": "#4cd6ff",
+                      "error-container": "#93000a",
+                      "on-secondary": "#1000a9",
+                      "background": "#0b1326",
+                      "primary-fixed": "#f1daff",
+                      "inverse-surface": "#dae2fd",
+                      "tertiary-fixed": "#b7eaff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "32px",
+                      "base": "8px",
+                      "margin-mobile": "16px",
+                      "container-max": "1280px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Geist"],
+                      "headline-lg-mobile": ["Hanken Grotesk"],
+                      "body-md": ["Inter"],
+                      "title-lg": ["Hanken Grotesk"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "body-lg": ["Inter"],
+                      "label-lg": ["Geist"]
+              },
+              "fontSize": {
+                      "label-sm": ["11px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400"}],
+                      "title-lg": ["22px", {"lineHeight": "28px", "fontWeight": "500"}],
+                      "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400"}],
+                      "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md text-body-md overflow-x-hidden">
+<!-- Top App Bar -->
+<header class="w-full top-0 sticky z-50 bg-surface-container-low dark:bg-surface-container-low shadow-sm flex items-center px-margin-mobile py-base h-16">
+<div class="flex items-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim">GameStack</h1>
+</div>
+</header>
+<main class="flex-1 pb-24 overflow-y-auto">
+<!-- Content Canvas -->
+<div class="max-w-container-max mx-auto px-margin-mobile">
+<!-- Tab Navigation (M3 Style) -->
+<div class="flex w-full mt-4 mb-6 border-b border-outline-variant/20">
+<button class="flex-1 py-4 font-title-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors relative">
+                    Playing Now
+                </button>
+<button class="flex-1 py-4 font-title-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors relative">
+                    Want to Play
+                </button>
+<button class="flex-1 py-4 font-title-lg text-label-lg text-primary font-bold transition-colors relative">
+                    Completed
+                    <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-t-full"></div>
+</button>
+</div>
+<!-- Library List -->
+<section class="space-y-gutter">
+<!-- Game Item 1 -->
+<div class="bg-surface-container/40 hover:bg-surface-container-highest transition-colors rounded-xl p-3 flex items-center gap-4 group cursor-pointer border border-transparent hover:border-primary/20">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Cyberpunk RPG cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdAFMgJbZF8q-ZA3ssK4lnEbgd_gxseQedVCXkZrb5TaM6f6k0F7BtcmosR7cY2zJkQLEnOG0tX06KjMFmJX9GywJ7nFhp6k7w2HbN7Cds4enWoFyK024lRaIUdIV7qvhWDy9GIWqOfTdJ5RN9wMPoQ8HiAWhQ_CNXwL8J9Io9M8Lh5jTcbzhhNlJ7Bkop879Z4ICP1tzelVzNkDlFevI8KHBIQW-nNdD0KIMUu_O-fOC2IlKtcWETWZs3FJHogjCr647j5fhQRf0">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-title-lg text-title-lg truncate text-on-surface">Cyber Nexus: Rebirth</h3><p class="text-label-lg text-on-surface-variant">Completed on Jan 15</p>
+</div>
+<div class="flex items-center pointer-events-none">
+<span class="material-symbols-outlined filled-icon text-primary text-[24px]" style="font-variation-settings: &quot;FILL&quot; 1;">thumb_up</span>
+</div>
+</div>
+<!-- Game Item 2 -->
+<div class="bg-surface-container/40 hover:bg-surface-container-highest transition-colors rounded-xl p-3 flex items-center gap-4 group cursor-pointer border border-transparent hover:border-primary/20">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Atmospheric mountain game cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASeOyKfUktwNqWgOXjDhz3D3MHyLkRS0Z4rhPLTbmBJHYrtSFeGgh8WivAx4-FzOMvKx9-ZrK8Nceu8olrH8Gp58LU6z7vfMQUPAz6V6IRwwja8nAiLPaKF9TMbfBPL9U4W_plEtiw0gCG0VI9up4hgdn1JmMF-dGcTYI8bZaKwDtJ9NmirXJZjeEY5KkQ8AFU65Lwt2m9V4J--a0l1wFNENSry7ZceKsjJpsUj-lGSlkvg58G7FQPPx6Btb-BYyEeDPpTtUwn0ko">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-title-lg text-title-lg truncate text-on-surface">Ethereal Ascent</h3><p class="text-label-lg text-on-surface-variant">Completed on Feb 02</p>
+</div>
+<div class="flex items-center pointer-events-none">
+<span class="material-symbols-outlined filled-icon text-primary text-[24px]" style="font-variation-settings: &quot;FILL&quot; 1;">thumb_up</span>
+</div>
+</div>
+<!-- Game Item 3 -->
+<div class="bg-surface-container/40 hover:bg-surface-container-highest transition-colors rounded-xl p-3 flex items-center gap-4 group cursor-pointer border border-transparent hover:border-primary/20">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Action soldier game cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVK6B1P-c1RMEtq2yIth0jxXwX5W0uL7d749WoWDAJJZFe1bt0pHtcpG-IsQJksFlYVVnYV1vQPU-_M1xxU2KthXYJqYeKAeba3rG_DfjOk_EpXvbMm9WUfdyOeqOUFYnxIB20l56ZZw8IBZTCoAJfEH6eYIuqFBdgkFlJHLm3wf32GIYdUQQ7qeKUbHHfULceTO4ncw4QP3a8ARJ8eslEcclZcYGQnzlQdBRw2CUQkl3Fo91Q8Xfv37q8Zsm8bmifOkUycEN7akg">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-title-lg text-title-lg truncate text-on-surface">Void Vanguard</h3><p class="text-label-lg text-on-surface-variant">Completed on Mar 10</p>
+</div>
+<div class="flex items-center pointer-events-none">
+<span class="material-symbols-outlined filled-icon text-primary text-[24px]" style="font-variation-settings: &quot;FILL&quot; 1;">thumb_up</span>
+</div>
+</div>
+<!-- Game Item 4 -->
+<div class="bg-surface-container/40 hover:bg-surface-container-highest transition-colors rounded-xl p-3 flex items-center gap-4 group cursor-pointer border border-transparent hover:border-primary/20">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Magic crystal fantasy cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjKgoNSOHw_ZCJ5sAoASTcwlDD9qqokpONgOlYMn4MO43Jj9R1kgXwnrOjkgK-1bRUA6Cq8yU4d-pkZyCkXbQIVT5hmb0PI1R6BbegCuI6zn2AFI6YipJPMfN-FMsrgiHU-PmxGOYTT10B0ASmKkW0uMIAI2Tj6UWbreZJKbyM9YKJ7iMT3u6_DN8gvQawvUQ2FxOokeSj5xtMsZoHPqoF0GSnTDuw_SQO-RsJ_7-BBB5Z81elNM7aBpA1o0Fqoy4vV6xgunEnE14">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-title-lg text-title-lg truncate text-on-surface">Mystic Chronicles</h3><p class="text-label-lg text-on-surface-variant">Completed on Apr 22</p>
+</div>
+<div class="flex items-center pointer-events-none">
+<span class="material-symbols-outlined filled-icon text-primary text-[24px]" style="font-variation-settings: &quot;FILL&quot; 1;">thumb_up</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container dark:bg-surface-container shadow-lg flex justify-around items-center h-20 px-4">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-lg text-label-lg">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-lg text-label-lg">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-5 py-1 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined filled-icon" style="font-variation-settings: &quot;FILL&quot; 1;">library_books</span>
+<span class="font-label-lg text-label-lg">Library</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for list items
+        document.querySelectorAll('.cursor-pointer').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                // Potential for adding subtle sound or lighting effect via JS
+            });
+        });
+
+        // Simple scroll behavior for top bar
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                header.classList.add('bg-surface-container');
+                header.classList.remove('bg-surface-container-low');
+            } else {
+                header.classList.remove('bg-surface-container');
+                header.classList.add('bg-surface-container-low');
+            }
+        });
+    </script>
+
+
+</body></html>

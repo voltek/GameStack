@@ -1,0 +1,252 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>GameStack - Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-container-highest": "#2d3449",
+                "on-surface": "#dae2fd",
+                "inverse-on-surface": "#283044",
+                "on-primary": "#4b007e",
+                "primary-fixed-dim": "#dfb7ff",
+                "secondary-container": "#3131c0",
+                "surface-container-high": "#222a3d",
+                "on-secondary-fixed-variant": "#2f2ebe",
+                "on-surface-variant": "#d0c2d6",
+                "secondary-fixed-dim": "#c0c1ff",
+                "on-tertiary": "#003543",
+                "on-primary-container": "#41006f",
+                "on-tertiary-fixed-variant": "#004e60",
+                "secondary": "#c0c1ff",
+                "on-tertiary-container": "#002e3a",
+                "tertiary": "#4cd6ff",
+                "surface-variant": "#2d3449",
+                "outline": "#998ca0",
+                "on-error-container": "#ffdad6",
+                "on-error": "#690005",
+                "outline-variant": "#4d4354",
+                "surface-bright": "#31394d",
+                "on-primary-fixed-variant": "#6a00b0",
+                "on-secondary-container": "#b0b2ff",
+                "surface-container-lowest": "#060e20",
+                "inverse-primary": "#8821d8",
+                "on-primary-fixed": "#2d004f",
+                "primary-container": "#ba6bff",
+                "tertiary-container": "#009dc1",
+                "on-secondary-fixed": "#07006c",
+                "primary": "#dfb7ff",
+                "on-background": "#dae2fd",
+                "secondary-fixed": "#e1e0ff",
+                "surface": "#0b1326",
+                "surface-dim": "#0b1326",
+                "surface-tint": "#dfb7ff",
+                "error": "#ffb4ab",
+                "on-tertiary-fixed": "#001f28",
+                "surface-container-low": "#131b2e",
+                "surface-container": "#171f33",
+                "tertiary-fixed-dim": "#4cd6ff",
+                "error-container": "#93000a",
+                "on-secondary": "#1000a9",
+                "background": "#0b1326",
+                "primary-fixed": "#f1daff",
+                "inverse-surface": "#dae2fd",
+                "tertiary-fixed": "#b7eaff"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "margin-desktop": "32px",
+                "base": "8px",
+                "margin-mobile": "16px",
+                "container-max": "1280px",
+                "gutter": "16px"
+            },
+            "fontFamily": {
+                "label-sm": ["Geist"],
+                "headline-lg-mobile": ["Hanken Grotesk"],
+                "body-md": ["Inter"],
+                "title-lg": ["Hanken Grotesk"],
+                "display-lg": ["Hanken Grotesk"],
+                "headline-lg": ["Hanken Grotesk"],
+                "body-lg": ["Inter"],
+                "label-lg": ["Geist"]
+            },
+            "fontSize": {
+                "label-sm": ["11px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400"}],
+                "title-lg": ["22px", {"lineHeight": "28px", "fontWeight": "500"}],
+                "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400"}],
+                "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0b1326; /* surface color */
+            color: #dae2fd; /* on-surface */
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .violet-glow {
+            box-shadow: inset 0 0 1px 1px rgba(175, 82, 255, 0.2);
+        }
+        .game-card-hover:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md text-body-md pb-24">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-40 bg-surface-container-low dark:bg-surface-container-low shadow-sm flex items-center justify-between px-margin-mobile py-base w-full">
+<div class="flex items-center gap-3">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim">GameStack</h1>
+</div>
+</header>
+<main class="flex-1 px-margin-mobile md:px-margin-desktop mt-6 max-w-container-max mx-auto w-full">
+<!-- Section Header -->
+<div class="mb-4">
+
+<!-- Material 3 TabRow -->
+<div class="flex border-b border-outline-variant overflow-x-auto no-scrollbar">
+<button class="flex-1 pb-3 px-4 text-primary font-bold border-b-[3px] border-primary transition-colors font-title-lg text-label-lg whitespace-nowrap text-center">Playing Now</button>
+<button class="flex-1 pb-3 px-4 text-on-surface-variant hover:text-on-surface transition-colors font-title-lg text-label-lg whitespace-nowrap text-center">Want to Play</button>
+<button class="flex-1 pb-3 px-4 text-on-surface-variant hover:text-on-surface transition-colors font-title-lg text-label-lg whitespace-nowrap text-center">Completed</button>
+</div>
+</div>
+<!-- Vertical Game List -->
+<div class="flex flex-col gap-3">
+<!-- Item 1: Elden Ring -->
+<div class="glass-card rounded-xl p-3 flex items-center gap-4 game-card-hover group cursor-pointer transition-all duration-300 hover:bg-surface-container-high">
+<div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border border-white/5">
+<img class="w-full h-full object-cover" data-alt="Cover art for Elden Ring, featuring a tarnished knight in intricate golden armor kneeling in a dark, atmospheric environment. Glowing golden particles swirl around him. The aesthetic is epic fantasy with a deep, moody color palette of gold, charcoal, and embers. High detail and cinematic lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOuAlz7Jqad18EXWl3TeMzBLpeEXmn_gpTJ8ojCA00lSNzXF5sS1ZYPwz9vQKSBoWNKt9ncdRXc1QHXfJJFTwA4Yo4qjFWfaMZ-36s68vObhJvCiTD4URhf9V9v5ccP4zQuO3yJ9JUgW9WpE1VuZk-MJx2F7Iz9kTwMR3DMpE0wht5nEdTaJ4DUFu-jqfnq8UOf-1u_9AhCpX15JdNl-APwo5UjSatHwEarVRFi7FAUbWSzdhIyNC3Y1hZijmuxJO1Ki6CokHsgso">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-title-lg text-body-lg text-on-surface truncate group-hover:text-primary transition-colors">Elden Ring</h3>
+</div>
+<div class="flex gap-1 ml-2">
+<button class="p-2 rounded-full hover:bg-primary/20 text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: &quot;FILL&quot; 1;">thumb_up</span>
+</button>
+</div>
+</div>
+<!-- Item 2: Final Fantasy XVI -->
+<div class="glass-card rounded-xl p-3 flex items-center gap-4 game-card-hover group cursor-pointer transition-all duration-300 hover:bg-surface-container-high">
+<div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border border-white/5">
+<img class="w-full h-full object-cover" data-alt="Cover art for Final Fantasy XVI, showcasing a dramatic profile of Clive Rosfield with glowing facial markings. A massive Phoenix summon flares in the background with intense orange and violet magical energy. The visual style is high-fidelity RPG fantasy with sharp contrast and vibrant particle effects." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqF9qhrFg9Cs4fv8_QWeKxwSwjp1KxnEyLZvYqKaGQ1NBvCKYPzRAXEuC0KXzXethQAJ9lPfZk3bk1YyznrfCVHRn4GMQCQMvBQ0cCusqLeB6xq5xqQvpjj_e8nqF9PlsCDibS5dgptayd9n5dGPugy6wf6aGGaNEjk4qv-gEsdUzCMcHw1S92zhCToP7e0aFyVoNbV6FwJjbEwfSpbcD0nffZxdpineBZ_iZUXcY_M2Rie2bjjdTAt_ruj0k1OCXWEWpwfTlZzlQ">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-title-lg text-body-lg text-on-surface truncate group-hover:text-primary transition-colors">Final Fantasy XVI</h3>
+</div>
+<div class="flex gap-1 ml-2">
+<button class="p-2 rounded-full hover:bg-primary/20 text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: &quot;FILL&quot; 1;">thumb_up</span>
+</button>
+</div>
+</div>
+<!-- Item 3: Starfield -->
+<div class="glass-card rounded-xl p-3 flex items-center gap-4 game-card-hover group cursor-pointer transition-all duration-300 hover:bg-surface-container-high">
+<div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border border-white/5">
+<img class="w-full h-full object-cover" data-alt="Space-themed cover art for Starfield, featuring an astronaut looking out into a vast galaxy with a colorful nebula. Deep blues, vibrant purples, and bright star clusters dominate the scene. The aesthetic is futuristic and exploratory, with clean tech details on the space suit." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0SHOy74mb4_KVsPwNPHrNAY9Zlulf97sd-tleWa-XsA0vrgV7OigSt4sKv05uFUwDY9n2L0kDvoifQm6cNwcP43Y6PymbP2Irg0Fx8ehjldyUXEkks4JHgrfyA0GYV99UYnFqcHcnWbL0f3a9fP8ccfTRkCev62POkun_eMkS8_1QTL6XUYJrBy0p1KoSKUNy-XiC-xOVWwSNwKLW5nkgdze4oJRKXGQDXBHr7Etvat3L_fCvseI6sVDYT9VLBbSjW_Ia-NiulzU">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-title-lg text-body-lg text-on-surface truncate group-hover:text-primary transition-colors">Starfield</h3>
+</div>
+<div class="flex gap-1 ml-2">
+<button class="p-2 rounded-full hover:bg-error/20 text-error transition-colors active:scale-90">
+<span class="material-symbols-outlined text-[24px]">thumb_down</span>
+</button>
+</div>
+</div>
+<!-- Item 4: Cyberpunk 2077 -->
+<div class="glass-card rounded-xl p-3 flex items-center gap-4 game-card-hover group cursor-pointer transition-all duration-300 hover:bg-surface-container-high">
+<div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border border-white/5">
+<img class="w-full h-full object-cover" data-alt="Cyberpunk 2077 Phantom Liberty cover art, showing a dark urban cityscape of Night City with neon red and yellow lighting. The protagonist V is silhouetted against a futuristic holographic display. Gritty, high-tech noir aesthetic with deep shadows and sharp neon accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5eYSi38HvpJySlZE6QeDjvOMMcFdH6sI7iCzlP3WTuQ_OBsywbDvAPSJh9lk5J-u9UUxWsaPvWpK0PoazfILRGjFXlfhSkmlCuckTZTOh7aONPP9gl8lDarV7GowNcEUvf7KL4aHFADyFqbO5BFmPvewPXUuHOVQ91uXLVUPVOzwu5D0BlQ7gET6WVSTrVFcifR9guGswGQGvXeDYh_tFBArSBcDyNtFIXX6xPXlJBoMNwlqTfsh6guHJgzATIadjDxqYXW64kf4">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-title-lg text-body-lg text-on-surface truncate group-hover:text-primary transition-colors">Cyberpunk 2077</h3>
+</div>
+<div class="flex gap-1 ml-2">
+<button class="p-2 rounded-full hover:bg-primary/20 text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: &quot;FILL&quot; 1;">thumb_up</span>
+</button>
+</div>
+</div>
+<!-- Item 5: Armored Core VI -->
+<div class="glass-card rounded-xl p-3 flex items-center gap-4 game-card-hover group cursor-pointer transition-all duration-300 hover:bg-surface-container-high">
+<div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border border-white/5">
+<img class="w-full h-full object-cover" data-alt="Cover art for Armored Core VI Fires of Rubicon, featuring a massive industrial mech robot standing in a desolate, ash-covered wasteland. A faint red glow emanates from the mech's core. The style is gritty mechanical realism with a muted palette of grays, steel, and glowing embers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCI0Fn3rDFwKU9DYX1dsXuIRZeHYnvxykHdjbfluS0Lg_sa-afR0OaFIvk9nQlhFuRhMSASkeWbB4GceQ29xoeeqijJctvU7BKNopjvC9MSBca38n2fWjMSHSixUqdEQFhUn4xf2pKYz4WDCidvYVQ8wH1N7YGTCR1zLbcVpjysqaz9QquGVbAEEN0ha5ns8TyHazCxpnqbCgOMhvhqMD2eeqgbVCvsJDdFKoM22uC4xoQtjDFrzFVWbqmTQHbpeJsy-0qQJcUETL0">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-title-lg text-body-lg text-on-surface truncate group-hover:text-primary transition-colors">Armored Core VI</h3>
+</div>
+<div class="flex gap-1 ml-2">
+<button class="p-2 rounded-full hover:bg-primary/20 text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: &quot;FILL&quot; 1;">thumb_up</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container dark:bg-surface-container shadow-lg flex justify-around items-center h-20 px-4 w-full">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors rounded-xl px-4 py-2" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-lg text-label-lg">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors rounded-xl px-4 py-2" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-lg text-label-lg">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">library_books</span>
+<span class="font-label-lg text-label-lg">Library</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for ratings
+        document.querySelectorAll('.material-symbols-outlined').forEach(icon => {
+            if (icon.innerText === 'thumb_up' || icon.innerText === 'thumb_down') {
+                icon.parentElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isFilled = icon.style.fontVariationSettings.includes("'FILL' 1");
+                    icon.style.fontVariationSettings = isFilled ? "'FILL' 0" : "'FILL' 1";
+                });
+            }
+        });
+    </script>
+
+
+</body></html>

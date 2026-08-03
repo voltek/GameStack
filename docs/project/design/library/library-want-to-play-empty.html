@@ -1,0 +1,195 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>GameStack - Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800&amp;family=Geist:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#2d3449",
+                        "on-surface": "#dae2fd",
+                        "inverse-on-surface": "#283044",
+                        "on-primary": "#4b007e",
+                        "primary-fixed-dim": "#dfb7ff",
+                        "secondary-container": "#3131c0",
+                        "surface-container-high": "#222a3d",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "on-surface-variant": "#d0c2d6",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "on-tertiary": "#003543",
+                        "on-primary-container": "#41006f",
+                        "on-tertiary-fixed-variant": "#004e60",
+                        "secondary": "#c0c1ff",
+                        "on-tertiary-container": "#002e3a",
+                        "tertiary": "#4cd6ff",
+                        "surface-variant": "#2d3449",
+                        "outline": "#998ca0",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "outline-variant": "#4d4354",
+                        "surface-bright": "#31394d",
+                        "on-primary-fixed-variant": "#6a00b0",
+                        "on-secondary-container": "#b0b2ff",
+                        "surface-container-lowest": "#060e20",
+                        "inverse-primary": "#8821d8",
+                        "on-primary-fixed": "#2d004f",
+                        "primary-container": "#ba6bff",
+                        "tertiary-container": "#009dc1",
+                        "on-secondary-fixed": "#07006c",
+                        "primary": "#dfb7ff",
+                        "on-background": "#dae2fd",
+                        "secondary-fixed": "#e1e0ff",
+                        "surface": "#0b1326",
+                        "surface-dim": "#0b1326",
+                        "surface-tint": "#dfb7ff",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed": "#001f28",
+                        "surface-container-low": "#131b2e",
+                        "surface-container": "#171f33",
+                        "tertiary-fixed-dim": "#4cd6ff",
+                        "error-container": "#93000a",
+                        "on-secondary": "#1000a9",
+                        "background": "#0b1326",
+                        "primary-fixed": "#f1daff",
+                        "inverse-surface": "#dae2fd",
+                        "tertiary-fixed": "#b7eaff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Geist"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "title-lg": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "label-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400"}],
+                        "title-lg": ["22px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+            -webkit-tap-highlight-color: transparent;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b1326;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d3449;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-background selection:bg-primary/30 min-h-screen flex flex-col overflow-hidden">
+<!-- Top App Bar -->
+<header class="w-full top-0 sticky z-40 bg-surface-container-low/80 backdrop-blur-md shadow-sm flex items-center justify-between px-4 h-16">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">sports_esports</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">GameStack</h1>
+</div>
+</header>
+<!-- Library Tabs (Material 3 TabRow) -->
+<nav class="flex w-full bg-surface-container-low border-b border-outline-variant/30">
+<button class="flex-1 py-3.5 text-center text-on-surface-variant font-label-lg transition-colors hover:text-on-surface relative">
+        Playing Now
+    </button>
+<button class="flex-1 py-3.5 text-center text-primary font-bold font-label-lg relative">
+        Want to Play
+        <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
+</button>
+<button class="flex-1 py-3.5 text-center text-on-surface-variant font-label-lg transition-colors hover:text-on-surface relative">
+        Completed
+    </button>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col items-center justify-center px-6 pb-24">
+<!-- Empty State Component (Pattern from Search Screen_18) -->
+<div class="max-w-md w-full text-center space-y-6 animate-in fade-in duration-700 slide-in-from-bottom-4">
+<!-- Large Icon Container -->
+<div class="relative inline-flex items-center justify-center w-32 h-32 rounded-full bg-surface-container-low shadow-sm">
+<div class="absolute inset-0 bg-primary/10 blur-3xl rounded-full"></div>
+<span class="material-symbols-outlined text-[84px] text-primary relative z-10" style="font-variation-settings: 'wght' 300;">bookmark</span>
+</div>
+<!-- Typography Content -->
+<div class="space-y-2 relative z-10">
+<h2 class="text-2xl font-bold text-on-surface tracking-tight font-headline-lg-mobile">Want to Play</h2>
+<p class="text-on-surface-variant font-body-lg leading-relaxed max-w-sm mx-auto">
+                No games added yet
+            </p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container/90 backdrop-blur-lg border-t border-outline-variant/20 flex justify-around items-center h-20 px-2 pb-safe">
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant px-5 py-1 hover:bg-surface-variant/20 rounded-full transition-all duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant px-5 py-1 hover:bg-surface-variant/20 rounded-full transition-all duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-sm">Search</span>
+</a>
+<!-- ACTIVE TAB: Library -->
+<a class="flex flex-col items-center justify-center gap-1 bg-secondary-container text-on-secondary-container rounded-full px-6 py-1.5 active:scale-95 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">library_books</span>
+<span class="font-label-sm font-bold">Library</span>
+</a>
+</nav>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tab switching visual simulation
+        const tabs = document.querySelectorAll('nav:not(.fixed) button');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => {
+                    t.classList.remove('text-primary', 'font-bold');
+                    t.classList.add('text-on-surface-variant');
+                    const indicator = t.querySelector('div');
+                    if (indicator) indicator.remove();
+                });
+                tab.classList.remove('text-on-surface-variant');
+                tab.classList.add('text-primary', 'font-bold');
+                const indicator = document.createElement('div');
+                indicator.className = 'absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full';
+                tab.appendChild(indicator);
+            });
+        });
+    });
+</script>
+</body></html>

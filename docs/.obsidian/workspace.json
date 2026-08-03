@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "skills/new-repository-impl.md",
+                "file": "project/DRIFT-CHECKLIST.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "new-repository-impl"
+              "title": "DRIFT-CHECKLIST"
             }
           }
         ]
@@ -185,6 +185,10 @@
   },
   "active": "576e20d0c1c1343c",
   "lastOpenFiles": [
+    "project/DESIGN.md",
+    "project/design/home/home.png",
+    "project/design/detail/detail.png",
+    "skills/new-repository-impl.md",
     "skills/new-api-service.md",
     "project/GameStack-Spec-v1.md",
     "skills/new-feature.md",

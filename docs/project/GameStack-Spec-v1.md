@@ -60,7 +60,7 @@ from any of the three tabs above.
 - Hilt — dependency injection
 - Coil — image loading
 - Navigation Compose (Safe-type routes)
-- Material3 (Material You) — Dark and Light themes required
+- Material3 (Material You) — Dark theme only for MVP (see Explicitly Deferred)
 
 ## Data Sources
 - **IGDB API** (read-only): game info, images, trailers, community rating.
@@ -108,6 +108,8 @@ from any of the three tabs above.
 
 ## Related Documents
 - `CLAUDE.md` — technical/architectural rules for AI agents working on this repo
-- `.claude/skills/` — reusable procedures (new-feature, new-mapper,
-  new-repository-interface, new-repository-impl, new-api-service,
-  new-usecase, new-viewmodel, new-screen, write-tests)
+- `.claude/skills/` — reusable procedures (project-scaffold, discovery-feature,
+  new-feature, new-mapper, new-repository-interface, new-repository-impl,
+  new-api-service, new-usecase, new-viewmodel, new-screen, write-tests)
+- `docs/project/DESIGN.md` — visual design system (colors, typography, spacing)
+- `docs/project/DRIFT-CHECKLIST.md` — manual audit checklist against CLAUDE.md Tier 1 rules

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#8B5CF6",
+                        "on-primary": "#FFFFFF",
+                        "primary-container": "#4C1D95",
+                        "on-primary-container": "#E9D5FF",
+                        surface: "#121214",
+                        "on-surface": "#FFFFFF",
+                        "surface-variant": "#2A2A2E",
+                        "on-surface-variant": "#C4C4C4",
+                        outline: "#444446"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "display": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Public Sans"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .error-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md flex justify-between items-center px-4 h-16">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="sports_esports">sports_esports</span>
+<h1 class="text-xl font-bold text-primary tracking-tight">GameStack</h1>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-grow flex flex-col items-center justify-center px-6 pt-16 pb-20 relative">
+<!-- Background Atmospheric Element -->
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] opacity-10" style="background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(18, 18, 20, 0) 70%);">
+</div>
+</div>
+<!-- Error Content Card -->
+<div class="z-10 flex flex-col items-center text-center max-w-md w-full error-shake">
+<!-- Icon Container -->
+<div class="mb-8 p-6 rounded-full bg-primary/10 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-8xl" data-icon="error_outline">error_outline</span>
+</div>
+<!-- Typography -->
+<h2 class="text-3xl font-extrabold text-on-surface tracking-tight mb-4 leading-tight">
+                Something went wrong
+            </h2>
+<p class="text-on-surface-variant text-lg leading-relaxed mb-10 px-4">
+                We're having trouble loading your games. Please check your connection and try again.
+            </p>
+<!-- Action Button -->
+<button class="group relative flex items-center justify-center gap-2 bg-primary text-on-primary font-semibold py-4 px-12 rounded-full hover:scale-[1.02] active:scale-95 transition-all duration-200 overflow-hidden" id="retryButton">
+<span class="material-symbols-outlined text-xl group-hover:rotate-180 transition-transform duration-500" data-icon="refresh">refresh</span>
+<span>Retry</span>
+<div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-safe bg-surface/90 backdrop-blur-md z-50 h-20 border-t border-outline/10">
+<!-- Home Tab -->
+<button class="flex flex-col items-center justify-center gap-1 min-w-[64px] active:scale-90 transition-all duration-150">
+<div class="bg-primary-container text-on-primary-container rounded-full px-5 py-1 mb-1">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+</div>
+<span class="text-xs font-medium text-on-surface">Home</span>
+</button>
+<!-- Search Tab -->
+<button class="flex flex-col items-center justify-center gap-1 min-w-[64px] text-on-surface-variant hover:text-on-surface active:scale-90 transition-all duration-150">
+<div class="px-5 py-1 mb-1">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</div>
+<span class="text-xs font-medium">Search</span>
+</button>
+<!-- Library Tab -->
+<button class="flex flex-col items-center justify-center gap-1 min-w-[64px] text-on-surface-variant hover:text-on-surface active:scale-90 transition-all duration-150">
+<div class="px-5 py-1 mb-1">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+</div>
+<span class="text-xs font-medium">Library</span>
+</button>
+</nav>
+<script>
+        document.getElementById('retryButton').addEventListener('click', function() {
+            const btn = this;
+            const icon = btn.querySelector('.material-symbols-outlined');
+            
+            btn.classList.add('opacity-75');
+            icon.style.animation = 'spin 1s linear infinite';
+            
+            setTimeout(() => {
+                icon.style.animation = '';
+                btn.classList.remove('opacity-75');
+                
+                const card = document.querySelector('.error-shake');
+                card.style.animation = 'none';
+                void card.offsetWidth; 
+                card.style.animation = 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both';
+            }, 1000);
+        });
+    </script>
+</body></html>

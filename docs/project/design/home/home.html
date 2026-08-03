@@ -1,0 +1,217 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>GameStack - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#e8ddff",
+                        "outline": "#958ea0",
+                        "secondary": "#cebdff",
+                        "on-primary-container": "#340080",
+                        "on-error-container": "#ffdad6",
+                        "secondary-container": "#4f319c",
+                        "primary-fixed-dim": "#d0bcff",
+                        "inverse-on-surface": "#2e3037",
+                        "on-secondary-container": "#bea8ff",
+                        "on-surface": "#e1e2eb",
+                        "background": "#10131a",
+                        "primary-fixed": "#e9ddff",
+                        "on-tertiary-fixed": "#1e0e4e",
+                        "on-secondary": "#381385",
+                        "surface": "#10131a",
+                        "on-secondary-fixed": "#21005e",
+                        "tertiary": "#ccbeff",
+                        "surface-container-highest": "#32353c",
+                        "on-secondary-fixed-variant": "#4f319c",
+                        "surface-container": "#1d2026",
+                        "surface-bright": "#363940",
+                        "tertiary-container": "#9587cc",
+                        "inverse-primary": "#6d3bd7",
+                        "surface-dim": "#10131a",
+                        "tertiary-fixed-dim": "#ccbeff",
+                        "surface-container-high": "#272a31",
+                        "surface-variant": "#32353c",
+                        "primary-container": "#a078ff",
+                        "outline-variant": "#494454",
+                        "surface-container-lowest": "#0b0e14",
+                        "on-tertiary-fixed-variant": "#4a3d7c",
+                        "tertiary-fixed": "#e7deff",
+                        "primary": "#d0bcff",
+                        "surface-container-low": "#191c22",
+                        "on-tertiary-container": "#2c1f5c",
+                        "on-background": "#e1e2eb",
+                        "surface-tint": "#d0bcff",
+                        "on-primary-fixed": "#23005c",
+                        "error-container": "#93000a",
+                        "inverse-surface": "#e1e2eb",
+                        "on-surface-variant": "#cbc3d7",
+                        "on-error": "#690005",
+                        "on-tertiary": "#332664",
+                        "on-primary": "#3c0091",
+                        "on-primary-fixed-variant": "#5516be",
+                        "error": "#ffb4ab",
+                        "secondary-fixed-dim": "#cebdff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "gutter-grid": "16px",
+                        "padding-card": "16px",
+                        "margin-page": "16px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Roboto Flex"],
+                        "body-lg": ["Roboto Flex"],
+                        "display-lg": ["Roboto Flex"],
+                        "label-lg": ["Roboto Flex"],
+                        "title-lg": ["Roboto Flex"],
+                        "headline-lg-mobile": ["Roboto Flex"],
+                        "label-md": ["Roboto Flex"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "0px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400" }],
+                        "display-lg": ["57px", { "lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500" }],
+                        "title-lg": ["22px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "0px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg text-body-lg min-h-screen flex flex-col pb-20">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-background flex items-center px-margin-page h-16 z-40">
+<span class="material-symbols-outlined text-primary text-3xl mr-3" style="font-variation-settings: &quot;FILL&quot; 1;">sports_esports</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">GameStack</h1>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col gap-stack-lg pt-4">
+<!-- Recently Interacted Carousel -->
+<section class="pl-margin-page flex flex-col gap-stack-sm">
+<h2 class="font-title-lg text-title-lg text-on-surface">Recently Interacted</h2>
+<div class="flex overflow-x-auto no-scrollbar gap-stack-md pr-margin-page snap-x snap-mandatory">
+<!-- Card 1 -->
+<div class="w-[42vw] md:w-48 flex-shrink-0 snap-start">
+<div class="relative w-full aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-lg shadow-black/40">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="A high-octane racing game cover art featuring a sleek, futuristic sports car drifting through a neon-lit cyber-city at night. The lighting is dramatic, emphasizing speed and deep shadows. The color palette aligns with a 'Cyber-Corporate' theme: deep navy backgrounds with vibrant violet and electric blue neon accents. The mood is energetic, intense, and polished." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNwLO_3yud-SZLGhOFxceLmFUZ-D4REic6oxPTNN7P9AsP-5r5AzmgR2_nv6cVIZ5YjSGQUp3XD6nTm-4E8cHPajKrFLeSAlWDZNacFvuNVQQipUPf9pbNT_J9kujRMcNpGhcF49Ui9_B9cla3VeGjfTlMkzEk_HShKrKQVCegocHpmC-5OUk12T2TllJ6craYXYdgAT0BBUEJk71obZAOYv56UD4CegpTq7m3nCASoVKgkw6QqY4tMz2aqQ63PsrEja61QC0-_QI">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-3 w-full">
+<span class="inline-block bg-surface-container/80 backdrop-blur-sm text-primary font-label-md text-label-md px-2 py-0.5 rounded text-[10px] mb-1 border border-outline-variant/30">Racing</span>
+<h3 class="font-label-lg text-label-lg text-on-surface line-clamp-1">Neon Drift V</h3>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="w-[42vw] md:w-48 flex-shrink-0 snap-start">
+<div class="relative w-full aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-lg shadow-black/40">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="An atmospheric sci-fi RPG cover art showing a lone astronaut standing before a massive, glowing purple portal on an alien world. The scene is dominated by deep space blacks and rich violet luminescence, fitting the 'Cyber-Corporate' aesthetic. The lighting is cinematic, casting long shadows. The mood is mysterious, expansive, and immersive." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeaUBTIcKCZVCnBNBukBvD4Qh26BOsC1bMUvxGT0kg-ab9x0Cc5Muj7pucS5sV1-Qnnb8KeECDl-hVeqsLMI9ZKqmUgH6mJlGg8jw8yY4cmCdEfJJoEv-KZXWR2iqpLT5awnel50_wp8YVmP6INsjv1YqkuI8eyJXxCTYGs9UJxILuavpIPhXulgP_fw7YXMd4xRK0rfvPOu2qooFX4aeCJV7VrfjyVvjQZYUEBHY_ygvUtaQJPGhN9bP7Wxm5ERA0DBhRH_7vp2w">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-3 w-full">
+<span class="inline-block bg-surface-container/80 backdrop-blur-sm text-primary font-label-md text-label-md px-2 py-0.5 rounded text-[10px] mb-1 border border-outline-variant/30">RPG</span>
+<h3 class="font-label-lg text-label-lg text-on-surface line-clamp-1">Stellar Void</h3>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="w-[42vw] md:w-48 flex-shrink-0 snap-start">
+<div class="relative w-full aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-lg shadow-black/40">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="Action game cover art featuring a close-up of a high-tech mech suit helmet with a glowing visor reflecting a battle scene. The overall tone is dark and gritty, utilizing deep metallic grays and blacks, contrasted by sharp, vibrant violet and stark white light sources. The mood is tense and combat-ready, matching a high-end gaming UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA471dOTWJ-kmouYcfxfbLcvr1XkU7Xazdz-KrTxogbnhRIOmzP3Lxwy9vie-1rc0T8IjKvRj4OYn9XOHdOX8jWqDpTEkF0Ley7ENOqOa02rW9oW1vTL546AWoT_l-75YmYAcUO5hHVlhNttF7xgbVgZqmQKkwSb5nbcfQU_4IxN_9vhbOJm-jHRfcZO8isd2TXEOeqj023s6gVXRFcJ8USIJfdeLX2BARHbe8TNPxaNOor31cykWsXUl0b1DxKY5bzLUNJk1YY7kQ">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-3 w-full">
+<span class="inline-block bg-surface-container/80 backdrop-blur-sm text-primary font-label-md text-label-md px-2 py-0.5 rounded text-[10px] mb-1 border border-outline-variant/30">Action</span>
+<h3 class="font-label-lg text-label-lg text-on-surface line-clamp-1">Mech Strike</h3>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Popular Today Carousel -->
+<section class="pl-margin-page flex flex-col gap-stack-sm mt-8">
+<h2 class="font-title-lg text-title-lg text-on-surface">Popular Today</h2>
+<div class="flex overflow-x-auto no-scrollbar gap-stack-md pr-margin-page snap-x snap-mandatory">
+<!-- Card 1 -->
+<div class="w-[42vw] md:w-48 flex-shrink-0 snap-start">
+<div class="relative w-full aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-lg shadow-black/40">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="Fantasy adventure game art depicting a highly detailed, glowing ethereal sword plunged into a dark stone pedestal. The surrounding environment is a deep, shadowy cavern illuminated only by the sword's vibrant violet and blue magical aura. The style is hyper-realistic and polished, suited for a premium dark-mode interface. The mood is epic and mystical." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9-X0oNTalwDbbP2AOO0QNilsalgYpuegT-H2HJk9p6khfVGiA1Ss0SDOffmREEpjxwx0PkQ_lHriALWgZNlQZttlv7zbITiuPpjZmP51yDR9QxZvEEkS2_rf5M055YDIXpIV274q1EJuBiZYY4Fxl7Dg6UrTbx4PwLmVoz6SW1Mjyo9tRt_ibjhyrR5PkOXmrSUYEDm9z3W_9t_2EnVh8QDneqQM9TP4WRLDmOed99csM5-a1LH6-CQQLpTavvc0eE44tPiCNE90">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-3 w-full">
+<span class="inline-block bg-surface-container/80 backdrop-blur-sm text-primary font-label-md text-label-md px-2 py-0.5 rounded text-[10px] mb-1 border border-outline-variant/30">Adventure</span>
+<h3 class="font-label-lg text-label-lg text-on-surface line-clamp-1">Ethereal Blade</h3>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="w-[42vw] md:w-48 flex-shrink-0 snap-start">
+<div class="relative w-full aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-lg shadow-black/40">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="Tactical shooter game cover showing a squad of specialized operatives silhouetted against a futuristic cityscape at dusk. The palette is dominated by deep indigo and midnight blues, with stark contrast from neon streetlights and tactical laser sights. The aesthetic is gritty yet clean and systematic, matching a dark cyber-corporate theme. The mood is focused and intense." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDytd0svyXmVmWBAsgxzyf0vmvGMYhxW8w0Xle5d47T0XdPq_EmFAjjU4Wykf6OgKKy4azjU3uGdfnCdxhE3ua4LlNfNGhQ8uBK8XqmC_zadjizEEDL8i0H-qgQWRb7vw6_5KvZO7wzI8uAZSLD8mxR14yHxOJzGcM4ZM0Te1WzSYciOHOalNo1bmj3i2DnZlZI7l_pfV0z5BX7aohzr2ajeSC1UTyJy-xZc1DK6As_8atoJglvtqJQFyokkUn9JKBYa7odvjDHJzw">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-3 w-full">
+<span class="inline-block bg-surface-container/80 backdrop-blur-sm text-primary font-label-md text-label-md px-2 py-0.5 rounded text-[10px] mb-1 border border-outline-variant/30">Shooter</span>
+<h3 class="font-label-lg text-label-lg text-on-surface line-clamp-1">Shadow Ops</h3>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="w-[42vw] md:w-48 flex-shrink-0 snap-start">
+<div class="relative w-full aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-lg shadow-black/40">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="Puzzle game abstract art featuring intricate, interlocking metallic gears and crystal structures floating in a dark void. The lighting highlights the crisp edges of the geometries, utilizing a stark contrast between deep blacks and bright, glowing purple highlights. The style is pristine, systematic, and visually captivating, perfect for a dark-mode UI. The mood is intellectual and calm." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6humtUrOnPursq0j39Lgmj0peOECyPy_Ves0yzJQuPDxWX-qgZBwATcjsCk59H5hZExKIrTNGGA5dvJECYbnA7i_bNshKy8bDc2a4kY8HufWJ-DCB-cPLaRUPVVJarmkt7HSO7o71Xg3d-ityOw9Qe2ICfuHs6dO2hvnSHITZpnHacV_Rb-rjXmYCYw54TGADZvMagnJXpSANSrvhXfx2ilIacnZL6Nz7dbCnJ45-P1vRwX_0AE70nV_y-5G1qO7ix4pzgs0pDrY">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-3 w-full">
+<span class="inline-block bg-surface-container/80 backdrop-blur-sm text-primary font-label-md text-label-md px-2 py-0.5 rounded text-[10px] mb-1 border border-outline-variant/30">Puzzle</span>
+<h3 class="font-label-lg text-label-lg text-on-surface line-clamp-1">Enigma Core</h3>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 h-20 bg-surface-container flex justify-around items-center px-4 shadow-sm md:hidden"><a href="#" class="flex flex-col items-center justify-center gap-1 flex-1 h-full text-on-surface"><div class="flex flex-col items-center justify-center gap-1 px-4 py-1 bg-primary-container rounded-full text-on-primary-container">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+    <span class="font-label-md text-label-md">Home</span>
+</div></a>
+<a href="#" class="flex flex-col items-center justify-center gap-1 flex-1 h-full text-on-surface-variant">
+    <div class="relative flex items-center justify-center w-16 h-8 rounded-full">
+        <span class="material-symbols-outlined">search</span>
+    </div>
+    <span class="font-label-md text-label-md">Search</span>
+</a>
+<a href="#" class="flex flex-col items-center justify-center gap-1 flex-1 h-full text-on-surface-variant">
+    <div class="relative flex items-center justify-center w-16 h-8 rounded-full">
+        <span class="material-symbols-outlined">video_library</span>
+    </div>
+    <span class="font-label-md text-label-md">Library</span>
+</a></nav>
+
+
+
+
+</body></html>

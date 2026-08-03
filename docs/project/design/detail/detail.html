@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Game Detail - Elden Ring</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#D0BCFF",
+                        "on-primary": "#381E72",
+                        "primary-container": "#4F378B",
+                        "on-primary-container": "#EADDFF",
+                        secondary: "#CCC2DC",
+                        "on-secondary": "#332D41",
+                        "secondary-container": "#4A4458",
+                        "on-secondary-container": "#E8DEF8",
+                        tertiary: "#EFB8C8",
+                        "on-tertiary": "#492532",
+                        "tertiary-container": "#633B48",
+                        "on-tertiary-container": "#FFD8E4",
+                        error: "#F2B8B5",
+                        "on-error": "#601410",
+                        "error-container": "#8C1D18",
+                        "on-error-container": "#F9DEDC",
+                        background: "#141218",
+                        "on-background": "#E6E0E9",
+                        surface: "#141218",
+                        "on-surface": "#E6E0E9",
+                        "surface-variant": "#49454F",
+                        "on-surface-variant": "#CAC4D0",
+                        outline: "#938F99",
+                        "outline-variant": "#49454F",
+                        "primary-fixed": "#EADDFF",
+                        "primary-fixed-dim": "#D0BCFF",
+                    },
+                    fontFamily: {
+                        headline: ["Public Sans"],
+                        display: ["Public Sans"],
+                        body: ["Public Sans"],
+                        label: ["Public Sans"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            font-family: theme('fontFamily.body');
+        }
+        .hero-gradient {
+            background: linear-gradient(to top, rgba(20, 18, 24, 1) 0%, rgba(20, 18, 24, 0) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="dark bg-background text-on-background min-h-screen pb-24">
+<!-- App Bar -->
+<header class="fixed top-0 w-full z-50 transition-colors duration-300 bg-transparent py-4 px-4 flex items-center justify-between" id="topAppBar">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface/50 backdrop-blur-md text-on-surface hover:bg-surface-variant/50 active:scale-95 transition-all">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<!-- Headline omitted as requested by prompt logic to just have back button, but using the JSON structural guide -->
+</header>
+<!-- Main Content -->
+<main>
+<!-- Hero Section -->
+<div class="relative w-full h-[442px] sm:h-[530px]">
+<img class="w-full h-full object-cover absolute inset-0" data-alt="A sweeping, cinematic wide shot of a dark fantasy landscape in a video game setting. A vast, glowing golden tree dominates the horizon against a dramatic, moody sky. In the foreground, a lone armored knight on horseback looks towards the tree. The color palette is rich with deep shadows, glowing golds, and muted earthy tones, creating an epic and mysterious atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmT3etKu7W5mOf11KK2puOcR2xdfauUre9y1M6cT_yrX2X1ptJl7Oyol3iyzg19ILcfiFMAA82jygnMwZL805m8m5rFnMts4DPFATwPcaCm7D774QadvlliLwOMhF1t4O65MExit3EGo1N5veG4d5pG2AgNzJnMhJOtN5WNXdWwTEtSFCklFV8KDQ5CyWCmpaMwq1X2oBqRGUnBcPRgoeOqBWG_pfQ9TjQ1TqPb43hTnxnXeyFqw_LceS_60bIgIeqRnPJQmiCI9Q"/>
+<div class="absolute inset-0 hero-gradient"></div>
+<div class="absolute bottom-0 left-0 w-full p-6 flex items-end justify-between">
+<h1 class="text-4xl sm:text-5xl font-bold font-headline text-on-background tracking-tight">Elden Ring</h1>
+<div class="flex items-center gap-2 bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label font-bold">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>94</span>
+</div>
+</div>
+</div>
+<!-- Content Container -->
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-8">
+<!-- Action Row -->
+<div class="flex items-center gap-4 border-b border-surface-variant pb-6">
+<div class="flex bg-surface-variant/30 rounded-full overflow-hidden">
+<button class="px-4 py-3 flex items-center justify-center hover:bg-surface-variant/50 transition-colors text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">thumb_up</span>
+</button>
+<div class="w-px bg-outline-variant my-2"></div>
+<button class="px-4 py-3 flex items-center justify-center hover:bg-surface-variant/50 transition-colors text-on-surface-variant hover:text-error">
+<span class="material-symbols-outlined">thumb_down</span>
+</button>
+</div>
+<button class="flex-1 bg-primary text-on-primary rounded-full py-3 px-6 font-label font-medium flex items-center justify-center gap-2 hover:bg-primary-fixed-dim transition-colors active:scale-[0.98]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                    Add to List
+                </button>
+</div>
+<!-- Trailer -->
+<section class="space-y-3">
+<h2 class="text-xl font-headline font-semibold text-on-background">Official Trailer</h2>
+<div class="relative w-full aspect-video rounded-2xl overflow-hidden group cursor-pointer border border-surface-variant">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A dramatic close-up still from a dark fantasy video game cinematic. A menacing warrior clad in ornate, tarnished armor with a flowing crimson cape stands amidst a battlefield of ruins. The lighting is harsh and directional, emphasizing the metallic textures and the grim, determined expression hidden beneath a stylized helmet. The scene is full of tension and high-stakes action." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6TIx5iVZ7IVoK5eDN1umKqCNCM7Ty0hAMc4EnWd40o1KNtkufBDUlb3DEzr_xuGl-ZPfYbWlV5F4R_mjZPkMJNwMG4b3rySy-i3TstejLF0Rx6SigGsg96rwaUId0hTcZUKqIhGd7nhZEhm6a7oT-GFSEMOsPp_ysLeuEIk-bSKzw-lxGGwo40gmQ1wFaomcrGJoE9Mt0msHWCW3mi2hNf_3MjWPAGyOxFecOSR74uavEz_WAtGDrsWIarsTRJLwqEmIEVeNGnY4"/>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/30 transition-colors">
+<div class="w-16 h-16 bg-primary/90 text-on-primary rounded-full flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Description -->
+<section class="space-y-2">
+<h2 class="text-xl font-headline font-semibold text-on-background">About</h2>
+<p class="text-on-surface-variant leading-relaxed font-body">
+                    Rise, Tarnished, and be guided by grace to brandish the power of the Elden Ring and become an Elden Lord in the Lands Between. A vast world where open fields with a variety of situations and huge dungeons with complex and three-dimensional designs are seamlessly connected. As you explore, the joy of discovering unknown and overwhelming threats await you, leading to a high sense of accomplishment.
+                </p>
+<button class="text-primary font-label font-medium hover:underline">Read more</button>
+</section>
+<!-- Purchase Links -->
+<section class="space-y-4">
+<h2 class="text-xl font-headline font-semibold text-on-background">Available On</h2>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<a class="flex items-center gap-3 p-4 rounded-xl border border-outline-variant hover:border-primary hover:bg-surface-variant/20 transition-colors group" href="#">
+<div class="w-10 h-10 bg-[#00439C] rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">sports_esports</span>
+</div>
+<div>
+<p class="font-label font-medium text-on-surface group-hover:text-primary transition-colors">PlayStation Store</p>
+<p class="text-sm text-on-surface-variant">$59.99</p>
+</div>
+</a>
+<a class="flex items-center gap-3 p-4 rounded-xl border border-outline-variant hover:border-primary hover:bg-surface-variant/20 transition-colors group" href="#">
+<div class="w-10 h-10 bg-[#107C10] rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">sports_esports</span>
+</div>
+<div>
+<p class="font-label font-medium text-on-surface group-hover:text-primary transition-colors">Xbox Store</p>
+<p class="text-sm text-on-surface-variant">$59.99</p>
+</div>
+</a>
+<a class="flex items-center gap-3 p-4 rounded-xl border border-outline-variant hover:border-primary hover:bg-surface-variant/20 transition-colors group" href="#">
+<div class="w-10 h-10 bg-[#171A21] rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">desktop_windows</span>
+</div>
+<div>
+<p class="font-label font-medium text-on-surface group-hover:text-primary transition-colors">Steam</p>
+<p class="text-sm text-on-surface-variant">$59.99</p>
+</div>
+</a>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation (from JSON, suppressed based on Semantic Shell Mandate as this is a detail screen) -->
+<!-- However, to satisfy the specific prompt request "Use {{DATA:COMPONENTS:COMPONENTS_26}} for the top bar and bottom nav patterns", I will include it. -->
+<nav class="fixed bottom-0 w-full z-50 h-20 bg-surface/80 dark:bg-surface/80 backdrop-blur-[15px] border-t-0 shadow-none flex justify-around items-center px-2 pb-safe">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/20 dark:hover:bg-surface-variant/10 rounded-full active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label text-xs">Home</span>
+</a>
+<!-- Search -->
+<a class="flex flex-col items-center justify-center gap-1 bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-full px-5 py-1 hover:bg-surface-variant/20 dark:hover:bg-surface-variant/10 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">search</span>
+<span class="font-label text-xs">Search</span>
+</a>
+<!-- Library -->
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/20 dark:hover:bg-surface-variant/10 rounded-full active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">library_books</span>
+<span class="font-label text-xs">Library</span>
+</a>
+</nav>
+<script>
+        // Scroll effect for Top App Bar
+        const appBar = document.getElementById('topAppBar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                appBar.classList.replace('bg-transparent', 'bg-surface/90');
+                appBar.classList.add('backdrop-blur-md', 'border-b', 'border-surface-variant/50');
+            } else {
+                appBar.classList.replace('bg-surface/90', 'bg-transparent');
+                appBar.classList.remove('backdrop-blur-md', 'border-b', 'border-surface-variant/50');
+            }
+        });
+    </script>
+</body></html>
