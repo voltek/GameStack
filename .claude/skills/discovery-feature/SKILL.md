@@ -47,6 +47,10 @@ A feature-scoped Spec draft with this structure:
 - Data: new or reused
 - Pending / Open Questions
 
+Append this as a new section to the project's master Spec file — do not
+create a separate spec file per feature. One source of truth avoids the
+same drift risk that multiple scattered documents would create.
+
 ## Quality criteria
 - The "touches existing systems" answer is explicit — never left ambiguous,
   since this determines blast radius.

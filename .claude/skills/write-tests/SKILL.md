@@ -79,6 +79,13 @@ viewModel.uiEffect.test {
 - Sad: UseCase failure updates UiState to error and/or sends UiEffect (Snackbar)
 - Also test: every UiEvent has at least one corresponding test
 
+### Interceptor
+- Happy: request headers are correctly added (e.g. Client-ID, Authorization)
+- Sad: if the token source fails, the expected fallback must be explicitly
+  defined and tested (e.g. request proceeds unauthenticated vs. fails
+  outright) — don't leave this undefined.
+- No Android framework needed — plain JVM unit test, not instrumented.
+
 ## Naming convention
 Test function names use backticks with natural language, describing behavior:
 

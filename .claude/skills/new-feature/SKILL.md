@@ -14,6 +14,14 @@ Otherwise, list progress in plain text at each step.
 
 ## Steps
 
+### 0. Confirm scope is clear (conditional)
+Check if the feature's scope is already unambiguous from the product Spec
+(`docs/project/GameStack-Spec-v1.md`) and, if applicable, an existing
+approved design reference (`docs/project/design/{screen-name}/`). If yes
+— e.g. Home, Search, Library, Detail are already fully specced and
+designed — skip directly to step 1. If genuine ambiguity remains (a newer,
+less-defined feature idea), invoke the `discovery-feature` skill first.
+
 ### 1. Domain models
 Create the pure domain model(s) needed for this feature.
 Location: `core/domain/model/` if shared, `feature/{name}/domain/model/` if feature-specific.
@@ -39,6 +47,10 @@ approves the prototype. Visual/UX judgment is not mechanical — this is a
 Plan-level decision (see CLAUDE.md's Human-in-the-Loop principle), not an
 Implement-level one. The agent proposes, the human decides.
 
+Note for the human: consider running this entire skill in Claude Code's
+Plan Mode — it enforces this pause mechanically (read-only until you
+approve), rather than relying solely on the agent following this instruction.
+
 If a project-wide design pass already exists and covers this screen, confirm
 with the human whether that existing design still applies, rather than
 silently reusing or silently regenerating a new one.
@@ -50,7 +62,14 @@ shape UiState accurately, injecting the UseCase(s) created in step 4.
 ### 7. Screen
 Invoke the `new-screen` skill, implementing the approved prototype's layout.
 
-### 8. Tests
+### 8. Navigation wiring
+Register the new screen in the root navigation graph (built by
+`project-scaffold`, if one exists): add its type-safe route, and wire up
+the navigation call from wherever it's launched (e.g. tapping a game card
+navigates to Detail with the gameId as a typed argument). A screen built
+but never wired into navigation is unreachable — do not skip this step.
+
+### 9. Tests
 `write-tests` is invoked automatically by each skill above as it completes.
 Do not skip or batch this — each skill is responsible for its own test coverage.
 
