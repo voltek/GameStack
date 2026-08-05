@@ -5,18 +5,25 @@ description: Create a ViewModel following the MVI pattern for a GameStack screen
 
 ## Construction
 - Annotated with `@HiltViewModel`, constructor injected with the required UseCase(s) via `@Inject`.
-- Defines three contracts (see CLAUDE.md's MVI Contract conventions):
+- Defines three contracts — full rules in CLAUDE.md, Architecture →
+  "MVI Contract conventions":
   - `UiState` — data class exposed as `StateFlow`, private `MutableStateFlow` backing it.
     Use a sealed class only when states are truly mutually exclusive, otherwise use data classes.
   - `UiEvent` — sealed class with all actions the UI can send.
   - `UiEffect` — sealed class for one-shot events, exposed via `Channel`/`receiveAsFlow()`.
+
+  All three go in `feature/{name}/presentation/{ScreenName}Contract.kt`, not in
+  the ViewModel file — see Location below.
 - Single public entry point: `fun handleEvent(event: UiEvent)`, using a `when` to route to
   private handler functions.
 - Use `.update { }` on the StateFlow to mutate state immutably.
 - Use `UiText` (never raw strings) for any text exposed in UiState or UiEffect.
 
 ## Location
-`feature/{feature-name}/presentation/{ScreenName}ViewModel.kt`
+- ViewModel: `feature/{feature-name}/presentation/{ScreenName}ViewModel.kt`
+- Contracts: `feature/{feature-name}/presentation/{ScreenName}Contract.kt`
+  (all three in one file — the one-class-per-file exception in CLAUDE.md,
+  Code Conventions → Tier 2)
 
 ## Naming convention
 `{ScreenName}ViewModel`, `{ScreenName}UiState`, `{ScreenName}UiEvent`, `{ScreenName}UiEffect`

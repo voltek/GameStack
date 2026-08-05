@@ -1,6 +1,6 @@
 ---
 name: discovery-feature
-description: Asks a series of guided questions to turn a vague feature idea into a feature-scoped Spec draft, aware of existing project architecture. Use when adding a new feature to an existing project (not for starting a new project — see the `discovery` skill for that).
+description: Asks a series of guided questions to turn a vague feature idea into a feature-scoped Spec draft, aware of existing project architecture. Use when adding a feature to a project that already has a Spec and a CLAUDE.md — not for defining a brand-new project from zero.
 compatibility: Requires the target project to have a CLAUDE.md (or equivalent Constitution document).
 ---
 
@@ -33,9 +33,13 @@ why you're asking beyond the standard list, so it's clear this is a deliberate
 addition, not an inconsistent process.
 
 ## When to stop
-- Stop once there's enough clarity to move directly to Work Decomposition
-  (invoking `new-feature`). Unlike project-level discovery, there is no
-  Technical Blueprinting phase here — the project's architecture already exists.
+- Stop once there's enough clarity to move directly to implementation
+  (invoking `new-feature`). There is no architecture/blueprinting phase here —
+  the project's stack and layering already exist and are governed by CLAUDE.md.
+  This skill decides *what* the feature is, never *how* it's built.
+- Do not use this skill for the four MVP screens (Home, Search, Library,
+  Detail): they are already fully specced and have approved designs. Running
+  discovery on them re-opens settled decisions.
 
 ## Result
 A feature-scoped Spec draft with this structure:
