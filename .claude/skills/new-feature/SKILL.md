@@ -9,8 +9,8 @@ Do not skip steps or reorder them — each layer depends on the previous one.
 
 If the agent has a native task-tracking tool available (e.g., Claude Code's
 TodoWrite/TaskCreate, depending on version), use it to track progress through
-the 8 steps below — this makes the pending human checkpoint (step 5) visible.
-Otherwise, list progress in plain text at each step.
+the 10 steps below (0–9) — this makes the pending human checkpoint (step 5)
+visible. Otherwise, list progress in plain text at each step.
 
 ## Steps
 
@@ -31,9 +31,14 @@ Invoke the `new-repository-interface` skill. Make sure both read and write funct
 are included if the feature needs both.
 
 ### 3. Repository implementation
-Invoke the `new-repository-impl` skill. This step internally creates the required
-DTOs/Entities, invokes `new-mapper` for any Entity/DTO → Domain conversion, and uses
-the `new-api-service` skill for any new IGDB endpoint.
+Invoke the `new-repository-impl` skill. This step internally:
+- creates the required DTOs, and invokes `new-room-dao` for any local storage
+  (Entity, DAO, TypeConverters, Database registration);
+- invokes `new-mapper` for each Data/Domain conversion — `toDomain()` on the read
+  path, `toEntity()` on the write path;
+- invokes `new-api-service` for any new IGDB endpoint;
+- invokes `new-hilt-module` to bind the Impl to its interface and provide anything
+  new it depends on. A Repository that isn't bound compiles nowhere — do not defer this.
 
 ### 4. UseCases
 Invoke the `new-usecase` skill once for each Repository function the feature needs to expose.
@@ -44,8 +49,14 @@ Spec/discovery-feature output.
 
 STOP HERE. Do not proceed to ViewModel/Screen until the human explicitly
 approves the prototype. Visual/UX judgment is not mechanical — this is a
-Plan-level decision (see CLAUDE.md's Human-in-the-Loop principle), not an
+Plan-level decision (CLAUDE.md → "Human-in-the-Loop principle"), not an
 Implement-level one. The agent proposes, the human decides.
+
+Note: the four MVP screens (Home, Search, Library, Detail) already have approved
+exports in `docs/project/design/`, and the shared loading/empty/error states in
+`docs/project/design/states/`. If this feature is one of those, the approval
+already happened — confirm the existing design still applies rather than
+generating a new prototype (see the paragraph below).
 
 Note for the human: consider running this entire skill in Claude Code's
 Plan Mode — it enforces this pause mechanically (read-only until you

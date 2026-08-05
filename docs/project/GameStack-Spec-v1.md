@@ -60,7 +60,8 @@ from any of the three tabs above.
 - Hilt — dependency injection
 - Coil — image loading
 - Navigation Compose (Safe-type routes)
-- Material3 (Material You) — Dark theme only for MVP (see Explicitly Deferred)
+- Material3 — Dark theme only for MVP (see Explicitly Deferred). No dynamic
+  color: the palette is fixed in DESIGN.md so the brand violet always wins.
 
 ## Data Sources
 - **IGDB API** (read-only): game info, images, trailers, community rating.
@@ -70,8 +71,26 @@ from any of the three tabs above.
 - **Room** (local, read/write): user lists and personal ratings.
   Never synced back to IGDB.
 
+## Roadmap Phases ("Block N")
+Several documents reference development phases by number. Only the phases
+actually referenced somewhere are defined — do not infer meaning for any other
+block number; an undefined reference is a documentation gap to report, not to
+guess at.
+
+- **Block 4 — Loop Engineering.** Harness/tooling work, not product: automating
+  what is currently a manual review pass. Two pending deliverables, both already
+  referenced elsewhere: (1) a Hook running the affected test suite after each
+  agent edit — the regression pillar `write-tests` explicitly does not cover;
+  (2) an automated drift checker implementing `DRIFT-CHECKLIST.md`.
+- **Block 5 — AI-powered recommendations.** Product feature; see below.
+
 ## Explicitly Deferred
 - **Block 5:** AI-powered game recommendations based on user history (Room data).
+- **Instrumented tests (`androidTest/`).** Everything currently tested runs on
+  the JVM. Real-SQLite DAO tests, Room migration tests, and Compose UI tests need
+  a device/emulator and are deferred. Consequence to keep in mind: a wrong `@Query`
+  or a missing migration passes every existing test and fails on device. Revisit
+  before the first release that has real users with data to lose.
 - **Future:** KMP migration. The Data layer is architected for it —
   when the time comes, Retrofit → Ktor and Room → SQLDelight,
   without touching Domain or UI.
@@ -110,6 +129,10 @@ from any of the three tabs above.
 - `CLAUDE.md` — technical/architectural rules for AI agents working on this repo
 - `.claude/skills/` — reusable procedures (project-scaffold, discovery-feature,
   new-feature, new-mapper, new-repository-interface, new-repository-impl,
-  new-api-service, new-usecase, new-viewmodel, new-screen, write-tests)
+  new-api-service, new-room-dao, new-hilt-module, new-usecase, new-viewmodel,
+  new-screen, write-tests). CLAUDE.md's "Available Skills" section is the
+  authoritative list — if these two disagree, that is drift.
+- `docs/project/design/` — approved Stitch exports (HTML + PNG) per screen,
+  plus `design/states/` for the shared loading/empty/error states
 - `docs/project/DESIGN.md` — visual design system (colors, typography, spacing)
 - `docs/project/DRIFT-CHECKLIST.md` — manual audit checklist against CLAUDE.md Tier 1 rules

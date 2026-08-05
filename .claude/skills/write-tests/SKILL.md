@@ -1,11 +1,31 @@
 ---
 name: write-tests
-description: Write unit tests for Domain (UseCases), Data (RepositoryImpl, Mappers, DAO, API), and Presentation (ViewModels) layers. Use when asked to write, add, or complete unit tests for GameStack.
+description: Write unit tests for Domain (UseCases), Data (RepositoryImpl, Mappers, Interceptors), and Presentation (ViewModels) layers. Use when asked to write, add, or complete unit tests for GameStack.
 compatibility: Requires `MainDispatcherRule` to exist in `core/testing/` for ViewModel tests.
 ---
 
 ## Testing Stack
 Turbine, MockK, TestDispatcher
+
+## Scope — JVM unit tests only
+Everything this skill writes goes under `test/` and runs on the JVM via
+`./gradlew test`: no emulator, no Robolectric, no real database or network.
+That boundary is what keeps the suite fast enough to gate every change
+(CLAUDE.md, Testing Stack → Tier 1).
+
+**DAOs are therefore not tested directly here.** A `@Dao` interface has no
+behavior of its own — Room generates the implementation at compile time, and
+exercising it needs real SQLite (an instrumented `androidTest/` suite, currently
+backlog). What this skill covers instead:
+- Repository tests with a **mocked DAO** — proving the Repository calls the right
+  DAO function with the right arguments, and handles what comes back.
+- Write-path mapper tests with an enum round trip — proving TypeConverters and
+  column mapping line up (see `new-mapper`).
+
+Be honest about the residual gap: a wrong `@Query` string or a missing migration
+will pass every test in this project and fail on device. Don't write a mocked
+"DAO test" that appears to cover this — it would be tautological (see the Oracle
+Problem below) and would hide the gap rather than flag it.
 
 ## Oracle Problem — what "correct" means
 The source of truth for a test is the Skill or Spec that described the task —
@@ -21,9 +41,9 @@ logic, it's tautological — rewrite it against the actual requirement.
 ### Domain (UseCases)
 No special setup needed. Test directly with `runTest`.
 
-### Data (Repository, Mappers, DAO, API)
+### Data (Repository, Mappers, Interceptors)
 No special setup needed for Mappers (pure functions).
-For Repository/DAO tests involving Flow, use `runTest`.
+For Repository tests involving Flow, use `runTest` with a mocked DAO/API service.
 
 ### Presentation (ViewModels)
 Use the project's `MainDispatcherRule` (located in `core/testing/`)
@@ -80,18 +100,23 @@ viewModel.uiEffect.test {
 - Also test: every UiEvent has at least one corresponding test
 
 ### Interceptor
-- Happy: request headers are correctly added (e.g. Client-ID, Authorization)
-- Sad: if the token source fails, the expected fallback must be explicitly
-  defined and tested (e.g. request proceeds unauthenticated vs. fails
-  outright) — don't leave this undefined.
+- Happy: both `Client-ID` and `Authorization: Bearer {token}` are added to the
+  outgoing request.
+- Sad: when the token source fails, `AuthInterceptor` throws `IOException` and the
+  request does **not** proceed — assert the throw, and assert `chain.proceed()` was
+  never called. This behavior is decided, not open: see CLAUDE.md, Data Sources.
 - No Android framework needed — plain JVM unit test, not instrumented.
+
+### Mapper (write path)
+- Round trip: `domainModel.toEntity().toDomain()` returns the original model,
+  including nullable enum fields (rating unset, list status unset).
 
 ## Naming convention
 Test function names use backticks with natural language, describing behavior:
 
 ```kotlin
 fun `invoke should return success flow with games list when repository is successful`()
-fun `onEvent OnGameClicked should send NavigateToGameDetails effect`()
+fun `handleEvent OnGameClicked should send NavigateToGameDetail effect`()
 ```
 
 Pattern: `{method or event} should {expected result} when {condition}`
@@ -102,8 +127,12 @@ Pattern: `{method or event} should {expected result} when {condition}`
 - No real network or database calls — everything mocked
 - Test names follow the naming convention above
 
-## Pending — Regression pillar
-This skill covers Requirements testing only (new code does what the Skill/Spec
-asked). Regression testing (confirm nothing else broke) is not enforced here —
-it will be automated via a Hook in Block 4, running the affected test suite
-automatically after each agent edit.
+## Known gaps (deliberate, not oversights)
+- **Regression pillar.** This skill covers Requirements testing only (new code
+  does what the Skill/Spec asked). Regression testing (confirm nothing else
+  broke) is not enforced here — it will be automated via a Hook that runs the
+  affected suite after each agent edit. Scheduled for Block 4 — Loop Engineering
+  (defined in CLAUDE.md → Pending/Roadmap).
+- **Real persistence.** No test in this project touches real SQLite; see
+  "Scope" above. An instrumented `androidTest/` suite covering DAO queries and
+  Room migrations is backlog (Spec → Explicitly Deferred).

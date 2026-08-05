@@ -26,6 +26,8 @@ Create (empty at this stage — no subfolders per feature yet):
 - `core/presentation/`
 - `ui/theme/`
 - `feature/`
+- `navigation/` — only if CLAUDE.md documents a navigation structure
+  (see "Root navigation" below)
 
 In the test source set (not main):
 - `core/testing/` — for shared test utilities like `MainDispatcherRule`.
@@ -34,7 +36,9 @@ In the test source set (not main):
 - `Application` class annotated `@HiltAndroidApp`, registered in the manifest.
 - Do not create empty/placeholder Hilt modules (e.g. Network/Database modules)
   yet — bindings should be created later, when a real one is actually needed
-  by feature work, not guessed in advance.
+  by feature work, not guessed in advance. That later work is owned by the
+  `new-hilt-module` skill, so "later" has a defined home rather than being
+  improvised ad hoc.
 
 ## Theme
 Read the project's `docs/project/DESIGN.md` — it contains the real color,
@@ -43,14 +47,39 @@ values; every color and font must come from that file.
 
 Create in `ui/theme/`:
 - `Color.kt` — all colors from DESIGN.md's `colors` section
-- `Type.kt` — Typography mapped to Material3 text roles (displayLarge,
-  headlineLarge, bodyLarge, etc.) using DESIGN.md's `typography` section
+- `Type.kt` — Typography mapped to Material3 text roles, using DESIGN.md's
+  `typography` section and its documented role mapping (see below)
 - `Shape.kt` — corner radius values from DESIGN.md's `rounded` section
 - `Theme.kt` — the app's Theme Composable, named after the project
   (e.g. `{ProjectName}Theme`), wrapping MaterialTheme.
 
-Check the project's CLAUDE.md for whether it requires Dark-only, Light-only,
-or both themes — do not assume either. Build exactly what's documented there.
+### Units — DESIGN.md is authored in web units
+Design tokens typically arrive in `px`/`rem` (the export format of design tools).
+Android needs `dp`/`sp`. Convert, don't copy:
+- `rem` → `dp` at **1rem = 16dp** (0.25rem = 4dp, 0.75rem = 12dp, 1.5rem = 24dp)
+- `px` → `dp` for dimensions, `sp` for font sizes and line heights
+- Spacing tokens already given in px map 1:1 to dp
+
+### Fonts
+If DESIGN.md names font families, they must be bundled as resources in
+`res/font/` — a `fontFamily` string alone renders as the system default and the
+mismatch is easy to miss. Download the licensed font files, add them, and
+reference via `FontFamily(Font(R.font.{name}, ...))`. Prefer variable fonts
+with `FontVariation.Settings(FontVariation.weight(n))` when the design calls for
+several weights of one family, so one file covers all of them.
+
+### Incomplete token sets
+A design export rarely defines all ~15 M3 text roles. Map the roles DESIGN.md
+does define; for the rest, leave the M3 default rather than inventing values.
+If DESIGN.md's prose references a token its own token block doesn't define,
+that's a documentation gap — surface it and ask, don't guess a value.
+
+### Theme mode and dynamic color
+Check the project's CLAUDE.md for whether it requires Dark-only, Light-only, or
+both themes, and whether dynamic color (Material You wallpaper theming) is
+allowed — do not assume any of these. Build exactly what's documented. Note that
+dynamic color and a fixed brand palette are mutually exclusive in practice: if
+CLAUDE.md pins the palette to DESIGN.md, do not add a `dynamicColor` parameter.
 
 ## MainDispatcherRule
 Create in `core/testing/MainDispatcherRule.kt` (test source set) — the
@@ -127,8 +156,10 @@ before any secret exists, prevents an accidental leak later.
 ## Quality criteria
 - All dependencies use the latest verified stable version — not a remembered one.
 - Theme colors/typography/shapes come exclusively from DESIGN.md — no invented values.
-- Theme mode (dark/light/both) matches exactly what the project's CLAUDE.md
-  specifies — never assumed.
+- Every font family named in DESIGN.md has an actual file in `res/font/`.
+- All design tokens are converted to `dp`/`sp` — no raw `rem`/`px` values in code.
+- Theme mode (dark/light/both) and dynamic-color policy match exactly what the
+  project's CLAUDE.md specifies — never assumed.
 - Root navigation is only implemented if CLAUDE.md documents one — never invented.
 - Before considering this skill complete, run `./gradlew build`. Do not report
   success if the build fails — surface the error and fix it, or ask for help
