@@ -99,8 +99,12 @@ Test must cover:
 - Empty list: empty or null list from DTO/Entity produces emptyList() in domain model
 - Write path (`toEntity()`): every Domain field lands on the correct Entity
   column, and enum fields survive the round trip (`toEntity().toDomain()`
-  returns the original Domain model) — this is what catches a TypeConverter
-  or column mismatch before it reaches the database.
+  returns the original Domain model). Be precise about what this proves: it
+  exercises the mapper's own field assignments only — `toEntity()`/`toDomain()`
+  are plain Kotlin functions and never call Room's registered `@TypeConverter`,
+  so this round trip cannot catch a converter that's wrong, missing, or not
+  registered on the `@Database` class. That's a separate test — see
+  `new-room-dao` → TypeConverters and `write-tests` → "TypeConverter".
 
 ## Naming conventions
 - File: `{DtoOrEntityClassName}Mapper.kt` — named after the Data-layer type in

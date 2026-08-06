@@ -50,6 +50,11 @@ conversion (`new-mapper`), or the DI bindings (`new-hilt-module`).
   document the fallback (return `null`, treating the value as unset).
 - Location: `core/data/local/converter/`, registered via `@TypeConverters` on
   the `@Database` class.
+- **Test the converter functions directly** (`write-tests` → "TypeConverter"):
+  call `toRating()`/`fromRating()` etc. as plain JVM function calls, asserting
+  the round trip and the unrecognized-string fallback. This is not covered by
+  a mapper round-trip test — `toEntity()`/`toDomain()` never call the
+  registered converter, they just move values between fields.
 
 ## Database
 
@@ -79,7 +84,8 @@ consumed by Home, Library and Detail.
 ## Steps
 1. Create or extend the Entity.
 2. Create or extend the DAO.
-3. Add TypeConverters for any enum or non-primitive column.
+3. Add TypeConverters for any enum or non-primitive column, with a direct
+   unit test for each (round trip + unrecognized-string fallback).
 4. Register the Entity and DAO on the Database, bumping `version` if the schema
    changed.
 5. Invoke `new-hilt-module` to provide the Database and DAO instances.
@@ -93,5 +99,7 @@ consumed by Home, Library and Detail.
   (e.g. stamping `completedAt`) belong to the Repository, per CLAUDE.md.
 - Testing: DAOs are not unit-tested in this project (they need real SQLite —
   see `write-tests` → Scope). Coverage comes from Repository tests with a mocked
-  DAO plus the mapper round-trip test. Do not write a mocked DAO test that only
-  asserts the mock — it proves nothing.
+  DAO, the mapper round-trip test, and a **direct test per TypeConverter** —
+  the only one of the three that actually exercises the converter function
+  itself. Do not write a mocked DAO test that only asserts the mock — it
+  proves nothing.

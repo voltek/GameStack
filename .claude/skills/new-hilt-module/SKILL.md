@@ -25,7 +25,7 @@ Name modules after **what they represent**, never a catch-all "CommonModule" or
 | Module | Owns |
 |---|---|
 | `NetworkModule` | OkHttp clients, Retrofit instances, API services, the AuthRepository binding |
-| `DatabaseModule` | The Room Database, DAOs, and their bindings |
+| `DatabaseModule` (PENDING — not yet created) | The Room Database, DAOs, and their bindings. Create this file the first time `new-room-dao` needs a Database/DAO binding — do not assume it already exists. |
 
 Extend an existing module when the new binding belongs to its concern; create a
 new one when it clearly doesn't. Hilt's graph is flat, so a dependency provided
