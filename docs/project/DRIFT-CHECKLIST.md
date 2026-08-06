@@ -60,8 +60,7 @@
 - [ ] Does any ViewModel expose a public entry point other than `handleEvent()`?
 
 ## Data Sources
-- [ ] Does the IGDB API service use `@POST` with a plain-text Apicalypse body
-      everywhere — or has a `@GET`/`@Query` endpoint been introduced by mistake?
+- [ ] Does any IGDB endpoint use @GET or @Query instead of @POST with a plain-text Apicalypse body?
 - [ ] Does any IGDB endpoint declare `Client-ID`/`Authorization` as `@Header`
       parameters, or does any UseCase/ViewModel fetch a token manually?
       `AuthInterceptor` is the only place either may happen.
@@ -117,3 +116,6 @@ useful history for understanding recurring patterns.
 | 2026-08-04 | Skills referenced undefined concepts (Human-in-the-Loop, MVI contracts, Block 4, Self-Healing Loop, `discovery` skill) | Doc updated — all four defined in CLAUDE.md/Spec; the fifth reference removed |
 | 2026-08-04 | Room/DAO, Hilt modules and interceptors had no owning Skill | Skills added — `new-room-dao`, `new-hilt-module` |
 | 2026-08-04 | Type/Shape/unit mappings decided in code but recorded nowhere | Doc updated — DESIGN.md now carries both mapping tables and the rem→dp rule |
+| 2026-08-05 | `Type.kt` implemented 7 of the 9 token→role rows DESIGN.md now defines — `titleMedium`/`titleSmall` were missing, so `title-md`/`title-sm` (the card-title styles) silently fell back to M3 defaults in Inter rather than Hanken Grotesk | Code fixed — both roles added with DESIGN.md's values |
+| 2026-08-05 | `AuthRepositoryImpl.getValidAccessToken()` chained `runCatching{}.map{}.also{}` to perform the cache assignment — the exact shape CLAUDE.md → Code Conventions → Tier 3 names ("a chain performing a side effect, e.g. a cache assignment") | Code fixed — cache write extracted to a named `token` variable and a plain assignment |
+| 2026-08-05 | Hilt visibility rule ("keep it private if nothing outside the module injects it") collided with the `@Singleton` rule: applied literally to `NetworkModule`'s OkHttp/Retrofit providers it would have created one client per consumer, since scope applies to bindings and not to functions | Doc updated — code was right; `new-hilt-module` and CLAUDE.md now carve out the exception and state the real dividing line (would a duplicate instance be harmful) |

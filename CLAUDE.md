@@ -309,7 +309,10 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
 - In Hilt modules specifically, beyond the duplication rule above: only
   expose a value via `@Provides`/`@Binds` if something outside this module
   genuinely needs to inject it directly; otherwise keep it private to avoid
-  unnecessarily widening the DI graph.
+  unnecessarily widening the DI graph. Exception: anything that must be
+  `@Singleton` stays a binding even if only same-module consumers inject it —
+  scope applies to bindings, not to functions, so a private helper would
+  silently create one instance per call site. See `new-hilt-module`.
 - If a dependency is genuinely needed by multiple modules, extract it to
   its own appropriately-named module (e.g. `SerializationModule` for
   `Json`) — Hilt's graph is flat, not hierarchical, so any module can

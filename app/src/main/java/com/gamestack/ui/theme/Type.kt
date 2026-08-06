@@ -76,6 +76,20 @@ val Typography = Typography(
         fontSize = 22.sp,
         lineHeight = 28.sp
     ),
+    titleMedium = TextStyle(
+        fontFamily = HankenGrotesk,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.15.sp
+    ),
+    titleSmall = TextStyle(
+        fontFamily = HankenGrotesk,
+        fontWeight = FontWeight.Medium,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp
+    ),
     bodyLarge = TextStyle(
         fontFamily = Inter,
         fontWeight = FontWeight.Normal,

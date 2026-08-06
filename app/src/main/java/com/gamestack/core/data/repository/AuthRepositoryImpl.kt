@@ -25,10 +25,12 @@ class AuthRepositoryImpl @Inject constructor(
                 clientSecret = BuildConfig.IGDB_CLIENT_SECRET
             )
         }.map { response ->
-            CachedToken(
+            val token = CachedToken(
                 accessToken = response.accessToken,
                 expiresAtMillis = System.currentTimeMillis() + response.expiresIn * 1_000L
-            ).also { cachedToken = it }.accessToken
+            )
+            cachedToken = token
+            token.accessToken
         }
     }
 
