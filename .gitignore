@@ -14,6 +14,6 @@
 .cxx
 local.properties
 
-.obsidian/workspace*
-.obsidian/workspace
-.obsidian/cache
+docs/.obsidian/workspace*
+docs/.obsidian/workspace
+docs/.obsidian/cache
