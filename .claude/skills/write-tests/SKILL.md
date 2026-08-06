@@ -19,8 +19,13 @@ exercising it needs real SQLite (an instrumented `androidTest/` suite, currently
 backlog). What this skill covers instead:
 - Repository tests with a **mocked DAO** — proving the Repository calls the right
   DAO function with the right arguments, and handles what comes back.
-- Write-path mapper tests with an enum round trip — proving TypeConverters and
-  column mapping line up (see `new-mapper`).
+- Write-path mapper tests with an enum round trip — proving the *mapper's own*
+  field-to-field mapping is consistent (see `new-mapper`). This does NOT exercise
+  Room's registered `@TypeConverter` — `toEntity()`/`toDomain()` never call it.
+- Direct `@TypeConverter` tests — plain JVM calls against the converter object's
+  functions (`GameRatingConverters.fromRating(...)`, `.toRating(...)`, etc.), no
+  Room/SQLite involved. This is what actually proves a converter is correct,
+  registered, and matches the mapper (see "TypeConverter" below).
 
 Be honest about the residual gap: a wrong `@Query` string or a missing migration
 will pass every test in this project and fail on device. Don't write a mocked
@@ -109,7 +114,19 @@ viewModel.uiEffect.test {
 
 ### Mapper (write path)
 - Round trip: `domainModel.toEntity().toDomain()` returns the original model,
-  including nullable enum fields (rating unset, list status unset).
+  including nullable enum fields (rating unset, list status unset). Proves the
+  mapper's internal consistency only — see "TypeConverter" below for what
+  actually exercises Room's converter.
+
+### TypeConverter
+- Happy: call the `@TypeConverter` function directly (not through Room) —
+  enum → stored string → enum returns the original value. No `@Database`,
+  no SQLite, no instrumentation needed: it's a plain function call.
+- Sad: an unrecognized stored string returns the documented fallback (`null`,
+  per `new-room-dao`) instead of throwing.
+- This is the test that actually catches a converter storing the wrong
+  representation (e.g. ordinal instead of name) — the mapper round trip above
+  cannot, because it never calls this function.
 
 ## Naming convention
 Test function names use backticks with natural language, describing behavior:
@@ -135,4 +152,8 @@ Pattern: `{method or event} should {expected result} when {condition}`
   (defined in CLAUDE.md → Pending/Roadmap).
 - **Real persistence.** No test in this project touches real SQLite; see
   "Scope" above. An instrumented `androidTest/` suite covering DAO queries and
-  Room migrations is backlog (Spec → Explicitly Deferred).
+  Room migrations is backlog (Spec → Explicitly Deferred). `@TypeConverter`s
+  are the exception — they're plain JVM functions and ARE directly unit-tested
+  (see "TypeConverter" above); what remains untested pre-instrumentation is
+  Room actually invoking them at runtime (registration on `@Database`) and the
+  `@Query`/migration surface.

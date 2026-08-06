@@ -25,7 +25,7 @@ Name modules after **what they represent**, never a catch-all "CommonModule" or
 | Module | Owns |
 |---|---|
 | `NetworkModule` | OkHttp clients, Retrofit instances, API services, the AuthRepository binding |
-| `DatabaseModule` | The Room Database, DAOs, and their bindings |
+| `DatabaseModule` (PENDING — not yet created) | The Room Database, DAOs, and their bindings. Create this file the first time `new-room-dao` needs a Database/DAO binding — do not assume it already exists. |
 
 Extend an existing module when the new binding belongs to its concern; create a
 new one when it clearly doesn't. Hilt's graph is flat, so a dependency provided
@@ -63,6 +63,19 @@ the `Json` converter factory in `NetworkModule` is the reference case: used
 only to build the Retrofit instances in that same file, so it is private rather
 than a binding (CLAUDE.md, Code Conventions → Tier 3).
 
+**Exception — anything that must be `@Singleton` stays a binding**, even when
+only consumers inside the same module inject it. Scoping is a property of the
+DI graph: a private helper function is re-executed at every call site, so
+demoting a `@Singleton @Provides` to a private function silently produces one
+instance per consumer. `NetworkModule`'s two `OkHttpClient`s and two `Retrofit`s
+are exactly this case — nothing outside the module injects them, but each must
+be a single shared instance (the OkHttp connection pool and thread pool are the
+whole point of reusing a client). Keep them as `@Provides @Singleton`.
+
+The dividing line is whether a duplicate instance would be harmful, not whether
+the value escapes the module. `Json` is cheap and stateless, so a second one
+costs nothing and it can be private; an `OkHttpClient` is neither.
+
 If two modules both need a helper, extract it to its own named module rather
 than duplicating it or widening one module's responsibility.
 
@@ -80,7 +93,8 @@ unless the isolation is obvious.
 - No `@Provides` for a class that is already constructor-injectable.
 - Every duplicated type has a qualifier on **all** of its instances.
 - Room Database and network clients are `@Singleton`.
-- No binding exposed that nothing outside the module injects.
+- No unscoped binding exposed that nothing outside the module injects — those
+  become private helpers. `@Singleton` ones stay bindings (see Visibility).
 - Hilt errors surface at compile time: run `./gradlew build` (not just `test`)
   after adding bindings — a missing binding or duplicate provider fails KSP
   codegen, and unit tests alone won't catch it.
