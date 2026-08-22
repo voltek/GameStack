@@ -1,0 +1,109 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>GameStack | Search Initial State</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#D0BCFF",
+                        "on-primary": "#381E72",
+                        "primary-container": "#4F378B",
+                        "on-primary-container": "#EADDFF",
+                        secondary: "#CCC2DC",
+                        "on-secondary": "#332D41",
+                        surface: "#1C1B1F",
+                        "on-surface": "#E6E1E5",
+                        "on-surface-variant": "#CAC4D0",
+                        "surface-variant": "#49454F",
+                        "surface-container-highest": "#36343B",
+                        outline: "#938F99",
+                        "primary-fixed-dim": "#D0BCFF"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #1C1B1F;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+        .font-title-lg { font-size: 1.375rem; line-height: 1.75rem; font-weight: 400; }
+        .text-title-lg { font-size: 1.375rem; line-height: 1.75rem; }
+        .font-headline-lg-mobile { font-size: 2rem; line-height: 2.5rem; }
+        .font-label-md { font-size: 0.75rem; line-height: 1rem; font-weight: 500; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-[15px] flex justify-between items-center px-4 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-2xl" data-icon="sports_esports">sports_esports</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim tracking-tight">GameStack</h1>
+</div>
+</header>
+<!-- Search bar: present and empty, showing only its placeholder -->
+<div class="fixed top-16 w-full z-40 bg-surface px-4 pt-4 pb-2">
+<div class="flex items-center gap-3 bg-surface-container-highest rounded-lg h-14 px-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+<span class="text-on-surface-variant font-body">Search for games…</span>
+</div>
+</div>
+<!-- Main Content: Initial (idle) State Canvas -->
+<main class="flex-grow flex items-center justify-center px-6 pt-32 flex-col">
+<div class="max-w-md w-full text-center space-y-6">
+<!-- Large Icon Container -->
+<div class="relative inline-flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/10 blur-3xl rounded-full"></div>
+<span class="material-symbols-outlined text-[84px] text-primary relative z-10" data-icon="search">search</span>
+</div>
+<!-- Typography Content -->
+<div class="space-y-2 relative z-10">
+<h2 class="text-2xl font-bold text-on-surface tracking-tight">Search for games</h2>
+<p class="text-on-surface-variant font-body leading-relaxed max-w-sm mx-auto">
+                    Find games by title to see their details and add them to your library.
+                </p>
+</div>
+<!-- No action button: the search field above is the only next step -->
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-safe bg-surface/80 dark:bg-surface/80 backdrop-blur-[15px] z-50 h-20">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/20 dark:hover:bg-surface-variant/10 rounded-full active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<!-- Search (ACTIVE) -->
+<a class="flex flex-col items-center justify-center gap-1 bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-full px-5 py-1 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="search" style="font-variation-settings: &quot;FILL&quot; 1;">search</span>
+<span class="font-label-md text-label-md">Search</span>
+</a>
+<!-- Library -->
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/20 dark:hover:bg-surface-variant/10 rounded-full active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+<span class="font-label-md text-label-md">Library</span>
+</a>
+</nav>
+</body></html>

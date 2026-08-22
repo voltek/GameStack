@@ -43,6 +43,63 @@ class SearchViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
     }
 
+    // Regression: reverting to the previously searched text must also cancel the
+    // job scheduled for the intermediate query, or that job lands later and paints
+    // results for text the field no longer shows.
+    @Test
+    fun `handleEvent OnQueryChanged should cancel a pending search when the query reverts to the last searched one`() =
+        runTest {
+            coEvery { searchGamesUseCase(any()) } returns Result.success(listOf(sampleGame))
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zel"))
+            advanceDebounce()
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zeld"))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zel"))
+            advanceDebounce()
+
+            coVerify(exactly = 0) { searchGamesUseCase("zeld") }
+            coVerify(exactly = 1) { searchGamesUseCase("zel") }
+            assertEquals("zel", viewModel.uiState.value.query)
+            assertFalse(viewModel.uiState.value.isLoading)
+        }
+
+    // Regression: cancelling an in-flight refresh by clearing the query left
+    // isRefreshing stuck true, so the pull-to-refresh indicator spun forever.
+    @Test
+    fun `handleEvent OnClearQuery should reset isRefreshing when a refresh is in flight`() =
+        runTest {
+            coEvery { searchGamesUseCase("Elden Ring") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("Elden Ring"))
+            advanceDebounce()
+
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            viewModel.handleEvent(SearchUiEvent.OnClearQuery)
+            advanceDebounce()
+
+            val state = viewModel.uiState.value
+            assertFalse(state.isRefreshing)
+            assertFalse(state.isLoading)
+            assertTrue(state.games.isEmpty())
+        }
+
+    // Regression: the error card stayed on screen for the whole debounce window
+    // of the next keystroke, because errorMessage outlived the failed search.
+    @Test
+    fun `handleEvent OnQueryChanged should clear errorMessage as soon as a new query starts debouncing`() =
+        runTest {
+            coEvery { searchGamesUseCase("Elden") } returns Result.failure(RuntimeException("network down"))
+            coEvery { searchGamesUseCase("Elden Ring") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("Elden"))
+            advanceDebounce()
+            assertNotNull(viewModel.uiState.value.errorMessage)
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("Elden Ring"))
+
+            val state = viewModel.uiState.value
+            assertNull(state.errorMessage)
+            assertTrue(state.isLoading)
+        }
+
     // Spec: query text updates immediately, independent of the debounced search.
     @Test
     fun `handleEvent OnQueryChanged should update query immediately`() = runTest {

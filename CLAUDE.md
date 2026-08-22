@@ -232,6 +232,16 @@ UI and ViewModel communicate:
   snackbars), exposed via `Channel` + `receiveAsFlow()`. Never put a one-shot
   event in UiState: state replays on recomposition/rotation, so a navigation
   or snackbar modeled as state fires twice.
+  The `Channel` **queues** anything sent while the screen is not collecting —
+  that is deliberate (a snackbar raised during a config change must survive),
+  and it is why the alternative, `SharedFlow(replay = 0)`, is not used here:
+  it would silently drop those instead. The cost of queueing is that a
+  *duplicated* effect is not merely handled twice, it is replayed when the user
+  returns to the screen. So the invariant is at the source: **one user intent
+  must emit exactly one effect.** Wrap navigation callbacks in
+  `rememberSingleClick` (`core/presentation/`), sharing one wrapper per list so
+  two different items cannot fire back to back. Do not "fix" a duplicated effect
+  by changing the Channel — that trades a visible bug for a silent one.
 
 All three live together in `feature/{name}/presentation/{ScreenName}Contract.kt`
 — this is the one-class-per-file exception (1) below. The ViewModel exposes a

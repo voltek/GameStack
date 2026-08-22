@@ -21,6 +21,12 @@ It is NOT:
   building the Search feature, matching the approved `docs/project/design/search/`
   mockup. Distinct from search filters (letting the user filter results by
   genre/platform), which remains backlog — see Explicitly Deferred.
+- The screen has four states, not three. Before any query is typed it shows an
+  **initial state** ("Search for games" + guidance), not a blank canvas; then
+  loading, results, or "No Results Found". The initial state was missing from
+  the original mockups — surfaced by code review of the Search PR, which found
+  the screen rendering an empty grid on first open — and is now specified in
+  `docs/project/design/search/search-initial.html`.
 
 ### Game Detail
 - Name, description

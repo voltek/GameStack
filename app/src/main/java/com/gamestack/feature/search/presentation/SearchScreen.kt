@@ -56,6 +56,7 @@ import coil3.compose.AsyncImage
 import com.gamestack.R
 import com.gamestack.core.domain.model.Game
 import com.gamestack.core.presentation.UiText
+import com.gamestack.core.presentation.rememberSingleClick
 import com.gamestack.core.presentation.components.MessageState
 import com.gamestack.core.presentation.components.ShimmerPlaceholder
 import com.gamestack.ui.theme.GameStackTheme
@@ -95,6 +96,9 @@ private fun SearchContent(
         focusManager.clearFocus()
         keyboardController?.hide()
     }
+    // One wrapper for the whole grid, so a repeat tap on the same card *and* two
+    // quick taps on different cards both emit a single navigation effect.
+    val onGameClicked = rememberSingleClick<Int> { onEvent(SearchUiEvent.OnGameClicked(it)) }
 
     Column(modifier = modifier.fillMaxSize()) {
         SearchBar(
@@ -138,9 +142,21 @@ private fun SearchContent(
                     onAction = { onEvent(SearchUiEvent.OnRefresh) }
                 )
 
-                uiState.isLoading -> SearchLoadingGrid()
+                // A refresh with nothing to keep on screen (e.g. Retry after a
+                // failed first search) shows the skeleton too — otherwise it
+                // falls through to "No Results Found" for the whole request,
+                // which reads as an answer rather than as work in progress.
+                uiState.isLoading || (uiState.isRefreshing && uiState.games.isEmpty()) ->
+                    SearchLoadingGrid()
 
-                uiState.games.isEmpty() && uiState.query.isNotBlank() -> MessageState(
+                uiState.query.isBlank() -> MessageState(
+                    icon = Icons.Filled.Search,
+                    title = stringResource(R.string.search_initial_title),
+                    description = stringResource(R.string.search_initial_description),
+                    modifier = Modifier.imePadding()
+                )
+
+                uiState.games.isEmpty() -> MessageState(
                     icon = Icons.Filled.SearchOff,
                     title = stringResource(R.string.search_empty_title),
                     description = stringResource(R.string.search_empty_description),
@@ -149,7 +165,7 @@ private fun SearchContent(
                     onAction = { onEvent(SearchUiEvent.OnGoToLibraryClicked) }
                 )
 
-                else -> SearchResultsGrid(games = uiState.games, onGameClicked = { onEvent(SearchUiEvent.OnGameClicked(it)) })
+                else -> SearchResultsGrid(games = uiState.games, onGameClicked = onGameClicked)
             }
         }
     }

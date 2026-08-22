@@ -53,19 +53,33 @@ class SearchViewModel @Inject constructor(
 
         val trimmedQuery = query.trim()
 
+        // Cancel before deciding anything else: whatever is pending was scheduled
+        // for a query the user has since changed, so it must never land — even on
+        // the paths below that start no new search of their own.
+        searchJob?.cancel()
+
         if (trimmedQuery.isEmpty()) {
-            searchJob?.cancel()
             lastSearchedQuery = ""
-            _uiState.update { it.copy(games = emptyList(), isLoading = false, errorMessage = null) }
+            _uiState.update {
+                it.copy(
+                    games = emptyList(),
+                    isLoading = false,
+                    isRefreshing = false,
+                    errorMessage = null
+                )
+            }
             return
         }
 
         // Same effective query as the last one actually searched (e.g. only
-        // whitespace was added/removed) — nothing new to search for.
-        if (trimmedQuery == lastSearchedQuery) return
+        // whitespace was added/removed) — nothing new to search for, and the
+        // results already on screen are the right ones.
+        if (trimmedQuery == lastSearchedQuery) {
+            _uiState.update { it.copy(isLoading = false) }
+            return
+        }
 
-        searchJob?.cancel()
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         searchJob = viewModelScope.launch {
             delay(SearchDebounceMillis)
             lastSearchedQuery = trimmedQuery
