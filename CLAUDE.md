@@ -93,6 +93,11 @@ drift returns.
   it (Documentation completeness rule). Never code now, docs next commit.
 - **Read `git status` in full before committing.** Untracked source files are
   invisible to `git add -u` and silently break the build for everyone else.
+- **Before pushing, `git fetch` and reconcile with `origin/main`.** Rebase or
+  merge if the branch is behind. If local `main` is ahead of `origin/main`,
+  push it first, or the PR will carry commits that have nothing to do with it.
+  Divergence in either direction is a problem — check both, not just
+  "am I behind".
 
 ### Tier 2 — Configurable within a defined range
 - Branch naming: `feature/{name}`, `fix/{name}`, `chore/{name}`, `docs/{name}`.
@@ -107,6 +112,13 @@ drift returns.
   (Commits before 2026-08-22 predate this convention — do not rewrite them.)
 - Open a PR when a branch is ready for review. The body states what changed, why,
   and how it was verified (gate output, emulator/device check).
+- Run `/code-review` on any PR touching app code before asking for a merge;
+  doc-only or chore-only PRs may skip it. Every finding is either fixed or
+  dismissed with a stated reason in the PR thread — a review whose findings are
+  silently dropped is worse than none, because it looks like coverage. If a
+  finding exposes code/doc drift, log it in DRIFT-CHECKLIST's Resolution log per
+  the Self-Healing Loop. The gate is mechanical and the review is semantic: on
+  PR #3 the gate passed while six real defects were still in the diff.
 
 ### Tier 3 — Suggested
 - Commit as you go, not in one blob at the end. A feature that reaches completion
