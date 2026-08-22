@@ -16,6 +16,11 @@ It is NOT:
 
 ### Search
 - Search games by name via the IGDB API.
+- Each result shows the game's cover, name, primary genre, and developer
+  (IGDB's `genres` and `involved_companies` fields) — confirmed as part of
+  building the Search feature, matching the approved `docs/project/design/search/`
+  mockup. Distinct from search filters (letting the user filter results by
+  genre/platform), which remains backlog — see Explicitly Deferred.
 
 ### Game Detail
 - Name, description
@@ -44,6 +49,12 @@ Persistent bottom navigation bar with 3 top-level destinations:
 
 Game Detail is not a top-level destination — reached by tapping a game card
 from any of the three tabs above.
+
+Each tab remembers where you were. Opening a Game Detail from a tab keeps that
+tab selected, and leaving the tab and coming back returns you to exactly where
+you left off — including to an open Game Detail, not the tab's starting screen.
+Back from a Game Detail returns to the list it was opened from; Back from a
+non-Home tab returns to Home.
 
 ## Home Screen
 - Most popular games today
@@ -108,6 +119,15 @@ guess at.
 - **Backlog:** search filters (genre, platform, etc.) on the Search screen,
   with a "Clear all filters" action. Surfaced during Stitch prototyping of
   the empty search state — MVP search is plain text query only, no filters.
+  **Evaluate an explicit search/apply button together with this**, not before:
+  results currently arrive on their own via the debounce, so a search button
+  today would be a false affordance (tapping it changes nothing visible), and
+  the keyboard's IME "Search" key already covers "I'm done typing". Filters are
+  what make an explicit action real — it would apply a pending filter set rather
+  than re-run a search that already ran. Deciding it as one piece also avoids
+  the in-field icon-slot conflict: leading is a decorative magnifier, trailing
+  is the Clear (X) button, and both are occupied exactly when a search button
+  would matter.
 - **Backlog:** in-library search bar (search within the user's own saved
   games, not IGDB). Low cost — operates on already-fetched local Room data.
   Surfaced during Stitch prototyping of the Library screen.
@@ -124,14 +144,31 @@ guess at.
   identity (confirmed via Stitch prototyping and the GameStack Core
   DESIGN.md) is dark-first, matching genre conventions (Steam, Xbox app,
   Discord). Revisit if a real accessibility/user need arises.
+- **Backlog:** real backdrop blur (glassmorphism) for the genre chip on
+  `GameCard` (Search/Home results), which currently uses flat semi-transparent
+  color (`Color.DarkGray.copy(alpha = 0.6f)`) instead of blurring the cover
+  image behind it — a native Compose limitation (no built-in backdrop-filter).
+  Evaluate the Haze library (chrisbanes/haze) when this is addressed, and only
+  as a single holistic pass — not one new library per individual case. Scope
+  note: `TopAppBar` and `BottomNavBar` were evaluated for the same treatment
+  and excluded — both currently render on solid/opaque `colorScheme.surface`,
+  not transparency, so there's no flat-transparency problem for blur to solve
+  there.
+- **Backlog:** Open Source Licenses screen (Settings/About) listing every
+  third-party library and its license (Apache 2.0 for Haze, OFL for fonts,
+  and anything else added later). Real requirement before publishing to the
+  Play Store, not before — no Settings/About screen exists yet in MVP scope.
 
 ## Related Documents
 - `CLAUDE.md` — technical/architectural rules for AI agents working on this repo
-- `.claude/skills/` — reusable procedures (project-scaffold, discovery-feature,
-  new-feature, new-mapper, new-repository-interface, new-repository-impl,
-  new-api-service, new-room-dao, new-hilt-module, new-usecase, new-viewmodel,
-  new-screen, write-tests). CLAUDE.md's "Available Skills" section is the
-  authoritative list — if these two disagree, that is drift.
+- `.claude/skills/` — reusable procedures (discovery-feature, new-feature,
+  new-mapper, new-repository-interface, new-repository-impl, new-api-service,
+  new-room-dao, new-hilt-module, new-usecase, new-viewmodel, new-screen,
+  write-tests). CLAUDE.md's "Available Skills" section is the authoritative
+  list — if these two disagree, that is drift.
+- `docs/project/retired-skills/` — Skills that have been withdrawn from
+  `.claude/skills/`, kept as a record of how the project was built. Not
+  invocable. Currently: `project-scaffold`.
 - `docs/project/design/` — approved Stitch exports (HTML + PNG) per screen,
   plus `design/states/` for the shared loading/empty/error states
 - `docs/project/DESIGN.md` — visual design system (colors, typography, spacing)

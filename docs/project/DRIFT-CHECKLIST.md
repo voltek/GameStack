@@ -53,6 +53,14 @@
       (e.g. business rules, direct data transformation)?
 - [ ] Does the bottom navigation have anything other than exactly 3 destinations,
       or has Detail been promoted into it?
+- [ ] Is `Detail` registered once at top level instead of inside every tab's
+      nested graph, or does any bottom nav item / `navigateToBottomNavDestination()`
+      call target a tab's screen route instead of its `*Graph` route? Either one
+      breaks per-tab back stacks (Detail leaks across tabs, no tab selected).
+- [ ] Does any navigation code call `NavController.currentBackStack`? It is
+      `@RestrictTo` library-group API and fails the `lint` gate.
+- [ ] Does any suspend function build a `Result` with `runCatching`? It swallows
+      `CancellationException`, reporting a cancelled coroutine as a real failure.
 - [ ] Are any `UiState`/`UiEvent`/`UiEffect` types declared outside their screen's
       `{ScreenName}Contract.kt`?
 - [ ] Is any one-shot event (navigation, snackbar) modeled in `UiState` instead of
@@ -94,7 +102,9 @@ this checklist's own past drift.
 - [ ] Does any document reference a component, Skill, principle, or "Block N"
       that isn't defined anywhere or marked `(PENDING — not yet defined)`?
 - [ ] Does CLAUDE.md's "Available Skills" list match the actual contents of
-      `.claude/skills/`, and the Spec's copy of that list?
+      `.claude/skills/`, and the Spec's copy of that list? (Retired Skills are
+      listed separately in CLAUDE.md and archived under
+      `docs/project/retired-skills/` — they must not appear as invocable.)
 - [ ] Does DESIGN.md's prose reference a token its own token block doesn't define,
       or state a value that contradicts it (colors, radii, type roles)?
 - [ ] Did a recent implementation decision (a fallback, a mapping, a naming rule)
@@ -121,3 +131,8 @@ useful history for understanding recurring patterns.
 | 2026-08-05 | Hilt visibility rule ("keep it private if nothing outside the module injects it") collided with the `@Singleton` rule: applied literally to `NetworkModule`'s OkHttp/Retrofit providers it would have created one client per consumer, since scope applies to bindings and not to functions | Doc updated — code was right; `new-hilt-module` and CLAUDE.md now carve out the exception and state the real dividing line (would a duplicate instance be harmful) |
 | 2026-08-06 | `write-tests` and `new-mapper` claimed the write-path mapper round trip (`toEntity().toDomain()`) "proves TypeConverters line up" — false: those functions never call Room's registered `@TypeConverter`, so a wrong/unregistered converter would pass every existing test (found via Codex PR review on #2) | Doc updated — claim corrected in both Skills; added a direct, JVM-only `@TypeConverter` test (round trip + fallback) as its own coverage step in `new-room-dao` and `write-tests`, closing the actual gap instead of just disclosing it |
 | 2026-08-06 | `new-hilt-module`'s "Current modules" table listed `DatabaseModule` as already existing; no `core/data/di/DatabaseModule.kt` exists in the repo (found via Codex PR review on #2) | Doc updated — marked `DatabaseModule (PENDING — not yet created)` per CLAUDE.md's Documentation completeness rule, with a note to create it on the first Room-backed binding |
+| 2026-08-06 | Building the Search feature required deciding whether result cards show genre/developer per game — a product-level detail the Spec's one-line MVP scope for Search never recorded, though the approved mockup already showed it | Doc updated — Spec's Search section now states result cards show cover/name/genre/developer, sourced from IGDB `genres`/`involved_companies`, and distinguishes this from the still-backlog search filters |
+| 2026-08-22 | `project-scaffold` was deleted from `.claude/skills/` while CLAUDE.md, the Spec, `new-feature` and `new-hilt-module` still referenced it as invocable | Doc updated — deletion kept (a once-per-project Skill only adds a dead option to the listing), content archived at `docs/project/retired-skills/project-scaffold.md`, CLAUDE.md gained a "Retired skills" entry, and the remaining references were reworded to past tense. Note for the record: the original motivation was token cost, which is largely a non-issue — Claude Code loads only a Skill's name and description up front, so an unused Skill costs about one line; the real justification is keeping dead options out of the listing |
+| 2026-08-22 | The same rationale for `try`/`catch` over `runCatching` was written out in full in two RepositoryImpls, and the navigation structure rationale was duplicated between CLAUDE.md and code comments — the exact duplication CLAUDE.md → Tier 3 forbids, guaranteeing the copies drift | Both — doc updated and code fixed. The generalizable rule moved to CLAUDE.md (Architecture → Tier 1) and `new-repository-impl`; code comments shrank to one-line pointers. Rule of thumb recorded by example: a rule that applies to future code lives in CLAUDE.md plus its Skill and gets a pointer in code; rationale for one non-obvious line stays in the code; never both |
+| 2026-08-22 | CLAUDE.md's Git workflow was the only section with no Tier markers, named a "build/tests/lint gate" it never defined, and said nothing about branching, untracked files, or PRs — gaps that produced a real near-miss (untracked `ApicalypseRequestBody.kt` would have been dropped by `git add -u`) and a whole feature left uncommitted | Doc updated — section rewritten with Tier 1/2/3, the gate defined as all three Gradle commands green, plus branch naming, Conventional Commits (adopted 2026-08-22; earlier commits deliberately not rewritten), a light PR rule, and an explicit "read `git status` in full" step |
+| 2026-08-22 | Neither CLAUDE.md nor the Spec said how the bottom nav back stack works, so `Detail` had been implemented as a top-level sibling of the tabs. It got swept into the tabs' `saveState`/`restoreState` without belonging to any tab: leaving a tab from a Detail and returning restored the Detail under no selected tab, and the workaround for it used `NavController.currentBackStack` — `@RestrictTo` API that made `./gradlew lint` fail with a `RestrictedApi` **Error** | Both — code fixed and docs updated. Code: each tab is now a nested graph (`HomeGraph`/`SearchGraph`/`LibraryGraph`) with `Detail` registered inside every one via a shared `NavGraphBuilder` helper, restoring the canonical `popUpTo(findStartDestination){saveState}` + `restoreState` idiom and removing the restricted-API workaround. Docs: CLAUDE.md → Architecture now specifies the structure and every intended back-stack behavior; the Spec's App Navigation section states the user-facing half (a tab restores where you left it, Detail included). Decision approved by the human as a plan-level choice |

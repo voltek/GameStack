@@ -74,9 +74,10 @@ shape UiState accurately, injecting the UseCase(s) created in step 4.
 Invoke the `new-screen` skill, implementing the approved prototype's layout.
 
 ### 8. Navigation wiring
-Register the new screen in the root navigation graph (built by
-`project-scaffold`, if one exists): add its type-safe route, and wire up
-the navigation call from wherever it's launched (e.g. tapping a game card
+Register the new screen in `navigation/`: add its type-safe route to
+`Destination`, and place the `composable<>` inside the correct tab's nested
+graph (CLAUDE.md, Architecture → Navigation structure). Then wire up the
+navigation call from wherever it's launched (e.g. tapping a game card
 navigates to Detail with the gameId as a typed argument). A screen built
 but never wired into navigation is unreachable — do not skip this step.
 

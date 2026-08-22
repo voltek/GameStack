@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.gamestack.R
@@ -24,10 +23,13 @@ private data class BottomNavItem(
     val icon: ImageVector
 )
 
+// Each item targets its tab's *graph*, not the screen inside it — that's the
+// unit Navigation saves and restores per tab. `selected` below then matches via
+// `hierarchy`, so a Detail opened from a tab keeps that tab highlighted.
 private val BottomNavItems = listOf(
-    BottomNavItem(Destination.Home, R.string.nav_home, Icons.Filled.Home),
-    BottomNavItem(Destination.Search, R.string.nav_search, Icons.Filled.Search),
-    BottomNavItem(Destination.Library, R.string.nav_library, Icons.Filled.VideoLibrary)
+    BottomNavItem(Destination.HomeGraph, R.string.nav_home, Icons.Filled.Home),
+    BottomNavItem(Destination.SearchGraph, R.string.nav_search, Icons.Filled.Search),
+    BottomNavItem(Destination.LibraryGraph, R.string.nav_library, Icons.Filled.VideoLibrary)
 )
 
 @Composable
@@ -42,15 +44,7 @@ fun GameStackBottomNavBar(navController: NavHostController) {
 
             NavigationBarItem(
                 selected = selected,
-                onClick = {
-                    navController.navigate(item.destination) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
+                onClick = { navController.navigateToBottomNavDestination(item.destination) },
                 icon = { Icon(imageVector = item.icon, contentDescription = label) },
                 label = { Text(label) }
             )

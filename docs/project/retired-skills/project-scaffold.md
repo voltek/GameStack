@@ -1,7 +1,20 @@
+# Retired skill — project-scaffold
+
+> **Retired 2026-08-22.** This is not an active Skill and is not in
+> `.claude/skills/` — it is kept here as the record of how GameStack was
+> bootstrapped. Do not invoke it: it assumes an empty project with no
+> architecture set up, which has not been true since the initial scaffold.
+>
+> Why it was retired: it runs exactly once per project and had already run for
+> GameStack. Leaving it in the Skills listing offered an agent something it
+> should never pick, for no benefit. Retiring it is about keeping the listing
+> free of dead options, not about saving tokens — Claude Code only loads a
+> skill's name and description up front, so an unused Skill costs about one line.
+>
+> The original content follows verbatim.
+
 ---
-name: project-scaffold
-description: Bootstraps a new, empty Android project — dependencies, folder skeleton, Hilt setup, Theme (from DESIGN.md), and core testing/presentation utilities. Use ONCE, only when the project is new/empty and has no architecture set up yet.
----
+
 
 ## Dependencies
 - Compose BOM

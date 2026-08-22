@@ -4,7 +4,9 @@ import com.gamestack.core.data.remote.api.IgdbApiService
 import com.gamestack.core.data.remote.api.TwitchAuthApiService
 import com.gamestack.core.data.remote.interceptor.AuthInterceptor
 import com.gamestack.core.data.repository.AuthRepositoryImpl
+import com.gamestack.core.data.repository.GamesRepositoryImpl
 import com.gamestack.core.domain.repository.AuthRepository
+import com.gamestack.core.domain.repository.GamesRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -27,6 +29,9 @@ abstract class NetworkModule {
 
     @Binds
     abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
+
+    @Binds
+    abstract fun bindGamesRepository(impl: GamesRepositoryImpl): GamesRepository
 
     companion object {
 

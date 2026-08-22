@@ -74,17 +74,46 @@ drift returns.
 ## Commands
 - Build: `./gradlew build`
 - Unit tests: `./gradlew test`
+  - Single class: `./gradlew testDebugUnitTest --tests "com.gamestack.Foo"`.
+    Plain `test` is a lifecycle task and rejects `--tests`.
 - Lint: `./gradlew lint`
 
 ## Git workflow
-- Commit at logical checkpoints — after a Skill completes and the build is
-  verified green (e.g. after `project-scaffold`, after a feature's full
-  `new-feature` flow, after a standalone piece like AuthRepository).
-  Use a short, descriptive message (e.g. "Add AuthRepository with token
-  caching and auto-refresh").
-- `git commit` freely once the build/tests/lint gate passes.
-- Always ask before `git push` — commits stay local and reversible; push
-  goes to the remote and is less easily undone.
+
+### Tier 1 — Immutable
+- **Always ask before `git push`, and before opening a PR.** Commits are local
+  and reversible; a push is not, and a PR is outward-facing.
+- **Never `--no-verify`; never force-push a branch that has already been pushed.**
+- **The gate is all three green:** `./gradlew build`, `./gradlew test`,
+  `./gradlew lint`. A lint *Error* fails the gate; warnings do not. `git commit`
+  freely once it passes.
+- **Never commit directly to `main`** — branch first.
+- **Code and its documentation land in the same commit.** A commit that changes
+  an architectural rule carries its CLAUDE.md/Spec/DRIFT-CHECKLIST update with
+  it (Documentation completeness rule). Never code now, docs next commit.
+- **Read `git status` in full before committing.** Untracked source files are
+  invisible to `git add -u` and silently break the build for everyone else.
+
+### Tier 2 — Configurable within a defined range
+- Branch naming: `feature/{name}`, `fix/{name}`, `chore/{name}`, `docs/{name}`.
+- One branch per unit of work. A refactor that exists *only because of* a feature
+  (e.g. navigation restructured so Detail belongs to a tab) belongs on that
+  feature's branch — it cannot be built or tested independently of it.
+- Commit messages follow **Conventional Commits**: `type(scope): imperative
+  summary`, lowercase, no trailing period. Types in use: `feat`, `fix`,
+  `refactor`, `docs`, `chore`, `test`. Scope is the feature or layer
+  (`search`, `auth`, `nav`) and is optional for repo-wide changes.
+  Example: `feat(search): search IGDB games with results, empty and error states`.
+  (Commits before 2026-08-22 predate this convention — do not rewrite them.)
+- Open a PR when a branch is ready for review. The body states what changed, why,
+  and how it was verified (gate output, emulator/device check).
+
+### Tier 3 — Suggested
+- Commit as you go, not in one blob at the end. A feature that reaches completion
+  entirely uncommitted forces a choice between one unreviewable commit and
+  inventing a history that never existed.
+- Keep unrelated housekeeping (IDE files, ignore rules, asset corrections) in
+  their own commits so a feature's history stays readable.
 
 ---
 
@@ -145,6 +174,13 @@ within a single app module.
 ### Tier 1 — Immutable
 - UI never accesses the Repository directly — always via UseCase through the ViewModel.
 - Repositories contain no business logic — they only coordinate data sources.
+- **Never build a `Result` with `runCatching` around a suspend call.** It catches
+  `Throwable`, `CancellationException` included, so a coroutine that was merely
+  cancelled (a superseded debounce, a ViewModel clearing) comes back as
+  `Result.failure` and surfaces to the user as a real error. Use `try`/`catch`
+  that rethrows `CancellationException` before catching `Exception`. This is not
+  a style preference: it produced a visible bug where every cancelled Search
+  flashed the error screen before the next results landed.
 - Domain models never import Retrofit, Room, or Android types (only allowed
   external dependency: `javax.inject` for Hilt).
 - Never use LiveData — only StateFlow and Flow.
@@ -157,6 +193,30 @@ within a single app module.
   (3-5 destinations of equal importance, reachable from anywhere). Detail is
   NOT a bottom nav destination — it's reached from a game card in any of
   the three, not a top-level tab. High cost to change once built — ask first.
+- **Navigation structure — one nested graph per tab.** Each tab is a nested
+  graph (`HomeGraph`/`SearchGraph`/`LibraryGraph`) whose start destination is
+  that tab's screen, and `Detail` is registered *inside every tab graph* via the
+  shared `NavGraphBuilder.gameDetailDestination()` helper — never once at top
+  level. That is what gives each tab its own back stack. It does not add a
+  fourth tab: the graphs are structure, the tabs are still exactly three.
+  Consequences, all intended:
+  - A Detail belongs to the tab that opened it: that tab stays selected while
+    Detail is on screen, and Back from Detail returns to that tab's own screen.
+  - Switching tabs saves the originating tab's whole stack (Detail included) and
+    restores it on return — coming back to a tab lands you exactly where you
+    left it, **including on an open Detail**. Returning to a tab deliberately
+    does not reset it to its root.
+  - Back from a non-start tab goes to Home, then exits the app. This is standard
+    Android bottom nav behavior, not a defect — do not "fix" it.
+  - Bottom nav items and `navigateToBottomNavDestination()` always target a
+    `*Graph` route, never the screen inside it; targeting the screen stops the
+    tab's back stack from being the unit that gets saved and restored.
+  - Never use `NavController.currentBackStack` — it is `@RestrictTo`
+    library-group API and fails the `lint` gate. If tab switching appears to
+    need it, the graph structure is wrong, not the API.
+
+  Registering `Detail` once at top level instead is what previously let it leak
+  across tabs — it would reappear under an unrelated tab with no tab selected.
 
 ### MVI Contract conventions (Tier 1)
 Every screen defines exactly three contract types, and they are the only way
@@ -326,8 +386,6 @@ This project uses Claude Code Skills for repeatable procedures. Prefer invoking
 these over improvising the same task differently each time:
 
 **Setup / planning**
-- `project-scaffold` — bootstraps an empty project (deps, folders, Hilt, Theme,
-  test utilities). Runs ONCE per project; already done for GameStack.
 - `discovery-feature` — turns a vague feature idea into a Spec section. Only
   needed when scope is genuinely ambiguous; the MVP screens are already specced.
 
@@ -347,6 +405,13 @@ these over improvising the same task differently each time:
 If a task doesn't map to any Skill above, that's a coverage gap worth naming:
 do the work, then say so, so the gap can be closed deliberately rather than
 by improvising the same task differently every time.
+
+**Retired skills** — kept as a record, not invocable, not in `.claude/skills/`:
+- `project-scaffold` — bootstrapped this project (deps, folder skeleton, Hilt,
+  Theme, core test utilities). Ran once, at the start; retired 2026-08-22 because
+  a once-per-project skill has nothing left to do here and only added a dead
+  option to the listing. Archived at
+  `docs/project/retired-skills/project-scaffold.md`.
 
 ## Pending / Roadmap
 

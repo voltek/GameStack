@@ -15,8 +15,8 @@ concrete type — `@Inject constructor` alone is enough (e.g. `AuthInterceptor`,
 UseCases, ViewModels with `@HiltViewModel`). Adding a redundant `@Provides` for
 these widens the graph for nothing.
 
-`project-scaffold` deliberately creates no modules up front; this skill owns
-their creation, at the moment a real binding is needed.
+The initial project scaffold deliberately created no modules up front; this
+skill owns their creation, at the moment a real binding is needed.
 
 ## Choosing the module
 Name modules after **what they represent**, never a catch-all "CommonModule" or
