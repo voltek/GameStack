@@ -192,7 +192,8 @@ to keep:
   asking for it.
 - **Hand the captures over; do not make the human retake them.** The device pass
   already produced screenshots. Save them somewhere stable outside the repo
-  (`~/Pictures/GameStack/pr-{n}/`, named for what they show — a scratchpad or
+  (`~/Documents/GameStack/screenshots/pr-{n}/`, alongside the other out-of-repo
+  artifacts for this project — named for what they show; a scratchpad or
   `%TEMP%` path gets cleaned), give the paths in chat when the PR is opened, and
   say plainly that the PR needs them dragged in **before** it is merged. An agent
   that verified on device and then let the human go hunting for a screenshot
@@ -340,8 +341,11 @@ to keep:
   production change (`git stash push -- <file>`), run that test alone, confirm it
   fails *and that the message describes the bug* — a failure from a compile error
   or an NPE is red for the wrong reason — then restore. Doing it the other way
-  round (test first, watch it fail, then fix) gets this for free. State in the
-  commit that it was verified; nine defects in Search were found by review after
+  round (test first, watch it fail, then fix) gets this for free. **When the fix
+  is a redesign the old code no longer compiles against, stashing cannot work** —
+  it would fail for the wrong reason. Break the fix instead: mutate one line the
+  new test claims to cover, and confirm exactly that test fails. State in the
+  commit which method was used; nine defects in Search were found by review after
   the gate passed green, so "the tests pass" is not by itself evidence of
   anything. See `write-tests` for the recipe.
 
@@ -570,6 +574,9 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
   needing more belongs in the owning Skill with a one-line pointer — and treat
   **15% comment lines in a file** as a smoke alarm worth looking at, not a hard
   limit. Both numbers are heuristics; the three questions are the actual rule.
+  The percentage is meaningless below ~50 lines — one justified 5-line comment
+  puts a 30-line contract file over 15% — so read it as a signal on substantial
+  files and judge short ones by the block bound and the questions alone.
 
   This is a known LLM failure mode, not a hypothetical: models narrate design
   decisions into comments, and the words are free to produce and costly to read.
