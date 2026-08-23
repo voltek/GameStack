@@ -229,8 +229,7 @@ writing and maintaining the PR body, review rounds, and merging.
 - Retrofit + Kotlinx.serialization — networking (see Data Sources for the
   Apicalypse-specific constraint).
 - Navigation Compose with Safe-type routes.
-- Material3 — Dark theme only for MVP. Light theme is backlog (see
-  Pending/Roadmap) — do not build a Light ColorScheme now.
+- Material3 — Dark theme only for MVP. Light theme is backlog (see the Spec) — do not build a Light ColorScheme now.
 - **No dynamic color (Material You wallpaper-based theming).** The palette is
   the fixed one in DESIGN.md. Dynamic color would let the OS override the
   violet that carries the "Stack" brand identity, and would make DESIGN.md
@@ -572,31 +571,3 @@ by improvising the same task differently every time.
   option to the listing. Archived at
   `docs/project/retired-skills/project-scaffold.md`.
 
-## Pending / Roadmap
-
-**About "Block N":** the numbering comes from the development phases this
-project is being built in, and several documents reference it. Only the phases
-actually referenced somewhere are defined — here and, in product terms, in the
-Spec's "Roadmap Phases" section. Do not infer meaning for an undefined block
-number; if a document references one that isn't defined in either place, that
-is a documentation gap to report, not to guess at.
-
-- **Block 4 — Loop Engineering** (harness work, not product): automate what is
-  currently manual review — regression-test verification, running the affected
-  suite after each edit, and a drift checker. Design notes, priority order and
-  the shapes already ruled out: `docs/project/BLOCK-4.md`.
-- **Block 5 — AI-powered recommendations** based on user history (Room).
-- Future: KMP migration. Data layer prepared for it — Retrofit → Ktor,
-  Room → SQLDelight, without touching Domain or UI.
-- Future (backlog, not MVP): extend `GameRating` from binary (LIKED/DISLIKED)
-  to a third "LOVED" state (Netflix/Prime-style double thumbs up).
-  Trivial to add later since it's an enum — do not build now.
-- Future (backlog, tooling): consider adopting OpenSpec as an active
-  change-tracking layer alongside CLAUDE.md, IF the project grows beyond
-  solo development (team context) or manual tracking via Skills becomes
-  a real pain point. Not worth the added infrastructure at current scale.
-- Future (backlog): Light theme ColorScheme. Project design identity
-  (established via Stitch prototyping and GameStack Core DESIGN.md) is
-  dark-first, matching gaming apps like Steam/Xbox/Discord. Not worth
-  building a parallel Light ColorScheme now — revisit only if there's a
-  real accessibility or user need.

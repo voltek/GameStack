@@ -87,8 +87,7 @@ screenshot wasted the one part only the human can finish.
 ### Never overwrite an open PR body wholesale
 `gh pr edit --body` replaces everything, including screenshots the human dragged
 in. Read the current body first and change only what needs changing, or add a
-comment instead. This already destroyed an uploaded screenshot minutes after
-asking for it (Resolution log, 2026-08-22).
+comment instead — this has already destroyed one (Resolution log, 2026-08-22).
 
 ## 4. Reviews
 - **Run `/code-review` on any PR that changes compiled behaviour.** The criterion
@@ -136,9 +135,9 @@ Check which commit a bot review ran against before trusting it; it pins to a SHA
 and may already be stale. Re-request with `@codex review` after pushing fixes.
 
 ## 5. Before merging, re-read the PR body
-A PR open for days describes what was *proposed*, not what was done. PR #5's body
-still described a snackbar that the branch had deleted. Update it surgically —
-never `--body` wholesale if the human has added screenshots or text.
+A PR open for days describes what was *proposed*, not what was done — a body
+naming a mechanism the branch went on to delete has happened here already. Update
+it surgically; never `--body` wholesale if the human has added screenshots or text.
 
 ## 6. Merge
 **`Create a merge commit` is the default.** The branch's commits are curated and

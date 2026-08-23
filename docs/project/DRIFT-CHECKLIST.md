@@ -13,8 +13,8 @@
 > document is what's outdated. Log which direction was chosen below.
 >
 > Future: this checklist becomes the logic for an automated checker (Hook /
-> validator subagent) in Block 4 — Loop Engineering (defined in CLAUDE.md →
-> Pending/Roadmap).
+> validator subagent) in Block 4 — Loop Engineering
+> (`docs/project/BLOCK-4.md`).
 
 ---
 

@@ -224,7 +224,7 @@ Android setup is awkward and slow — but it is the same question asked at scale
   does what the Skill/Spec asked). Regression testing (confirm nothing else
   broke) is not enforced here — it will be automated via a Hook that runs the
   affected suite after each agent edit. Scheduled for Block 4 — Loop Engineering
-  (defined in CLAUDE.md → Pending/Roadmap).
+  (`docs/project/BLOCK-4.md`).
 - **Real persistence.** No test in this project touches real SQLite; see
   "Scope" above. An instrumented `androidTest/` suite covering DAO queries and
   Room migrations is backlog (Spec → Explicitly Deferred). `@TypeConverter`s

@@ -127,10 +127,10 @@ block number; an undefined reference is a documentation gap to report, not to
 guess at.
 
 - **Block 4 — Loop Engineering.** Harness/tooling work, not product: automating
-  what is currently a manual review pass. Two pending deliverables, both already
-  referenced elsewhere: (1) a Hook running the affected test suite after each
-  agent edit — the regression pillar `write-tests` explicitly does not cover;
-  (2) an automated drift checker implementing `DRIFT-CHECKLIST.md`.
+  what is currently a manual review pass. Three pending deliverables — automating
+  the regression-test verification, running the affected suite after each agent
+  edit, and a drift checker. Priority order, design notes and the shapes already
+  ruled out: `docs/project/BLOCK-4.md`.
 - **Block 5 — AI-powered recommendations.** Product feature; see below.
 
 ## Explicitly Deferred
@@ -200,6 +200,10 @@ guess at.
   the deferral expires before the first Play Store release — Google publishes
   accessibility expectations, and retrofitting semantics across a finished UI is
   a rewrite rather than an addition.
+- **Backlog (tooling):** consider adopting OpenSpec as an active change-tracking
+  layer alongside CLAUDE.md, IF the project grows beyond solo development or
+  manual tracking via Skills becomes a real pain point. Not worth the added
+  infrastructure at current scale.
 - **Backlog:** Light theme. MVP ships dark-only — the project's visual
   identity (confirmed via Stitch prototyping and the GameStack Core
   DESIGN.md) is dark-first, matching genre conventions (Steam, Xbox app,

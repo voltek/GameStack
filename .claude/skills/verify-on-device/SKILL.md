@@ -44,12 +44,12 @@ MSYS_NO_PATHCONV=1 "$ADB" shell cat /sdcard/d.xml | tr '>' '\n' | grep -oE 'text
 screen**.
 
 > The dump contains only the app window, never the IME. It reports as visible
-> controls that the keyboard is actually covering. This cost real debugging time
-> once: taps aimed from dump coordinates landed on keyboard keys.
-> `dumpsys input_method` is unreliable on this AVD for the same question.
+> controls that the keyboard is actually covering, so taps aimed from dump
+> coordinates land on keyboard keys. `dumpsys input_method` is unreliable on
+> this AVD for the same question.
 
 **Close every verification with at least one screenshot.** The dump cannot find
-what nobody thought to assert, and three of the Search bugs were purely visual.
+what nobody thought to assert, and a purely visual defect is the common case.
 
 ## Cover every state the screen declares
 Initial, loading, content, empty, error — plus the keyboard raised if there is a

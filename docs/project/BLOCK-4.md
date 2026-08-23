@@ -1,7 +1,7 @@
 # Block 4 — Loop Engineering
 
 Harness work, not product: automating what is currently a manual review pass.
-CLAUDE.md → Pending/Roadmap names this block in one line and points here; the
+The Spec's Roadmap Phases section names this block in one line and points here; the
 design notes live here because they are notes about work not yet done, not rules
 constraining work being done now.
 
