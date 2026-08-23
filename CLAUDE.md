@@ -532,6 +532,30 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
   in that same file (e.g. a private data class configuring a static list of
   items for that Composable) — it has no meaning or reuse outside that context.
 
+- **Comments carry the *why*, never the *what* and never the *history*.** Three
+  questions before leaving one:
+  1. Does it restate what the code already says? Delete it.
+  2. Is it about *how we got here* rather than *what to do here*? That belongs in
+     the commit message and DRIFT-CHECKLIST's Resolution log, both of which this
+     project already maintains. Writing it in both places is duplication, and the
+     copy in the code is the one nobody updates.
+  3. Would it become false if someone refactored correctly? Then it is a
+     chronicle, not a constraint — delete it or rewrite it as the constraint.
+
+  Prefer encoding the *why* as a name, a type, or a **test**: a test named
+  `should cancel an in-flight search immediately when the query changes` states
+  the invariant *and fails when it breaks*, which no comment can do.
+
+  **Bounds:** no comment block longer than 4 lines in production code — anything
+  needing more belongs in the owning Skill with a one-line pointer — and treat
+  **15% comment lines in a file** as a smoke alarm worth looking at, not a hard
+  limit. Both numbers are heuristics; the three questions are the actual rule.
+
+  This is a known LLM failure mode, not a hypothetical: models narrate design
+  decisions into comments, and the words are free to produce and costly to read.
+  `SearchViewModel.kt` reached 25% and `SingleClick.kt` 35%, one sediment layer
+  per review round, while every other file in the project sat between 5% and 9%.
+
 ### Tier 3 — Suggested, can be challenged with justification
 - Mapper file naming pattern (`{Name}Mapper.kt`) — consistency preference,
   not a structural requirement.
