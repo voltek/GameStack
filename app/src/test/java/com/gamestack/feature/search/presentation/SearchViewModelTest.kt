@@ -315,6 +315,33 @@ class SearchViewModelTest {
             assertFalse(viewModel.uiState.value.isRefreshing)
         }
 
+    // Regression: marking a query as searched at dispatch time made that flag lie
+    // whenever the request was later cancelled. Typing a character and deleting it
+    // while the first search was still in flight left the restored query matching
+    // the flag, so no search restarted and the screen kept the empty state.
+    @Test
+    fun `handleEvent OnQueryChanged should search again when the first request was cancelled before returning`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } coAnswers {
+                delay(IN_FLIGHT_MILLIS)
+                Result.success(listOf(sampleGame))
+            }
+            coEvery { searchGamesUseCase("zeldax") } returns Result.success(emptyList())
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            // Past the debounce: "zelda" has reached the UseCase but has not returned.
+            testDispatcher.scheduler.advanceTimeBy(PAST_DEBOUNCE_MILLIS)
+
+            // A different character cancels that request, then is deleted again.
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zeldax"))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            assertEquals(listOf(sampleGame), viewModel.uiState.value.games)
+            assertFalse(viewModel.uiState.value.isLoading)
+            coVerify(exactly = 2) { searchGamesUseCase("zelda") }
+        }
+
     private companion object {
         // Longer than the ViewModel's debounce, which is private to its file.
         const val PAST_DEBOUNCE_MILLIS = 500L

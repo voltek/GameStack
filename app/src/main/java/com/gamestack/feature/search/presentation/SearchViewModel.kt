@@ -39,10 +39,10 @@ class SearchViewModel @Inject constructor(
     // job was started for tells them apart.
     private var searchJobQuery: String? = null
 
-    // Trimmed value of the last query actually dispatched to the UseCase (via
-    // debounce or refresh) — lets onQueryChanged tell "user added/removed
-    // leading/trailing whitespace" apart from "the effective search text
-    // changed", without altering what's shown in the text field itself.
+    // Trimmed value of the query whose results are currently on screen — set on
+    // success only (see performSearch). Lets onQueryChanged tell "user
+    // added/removed leading/trailing whitespace" apart from "the effective
+    // search text changed", without altering what the text field shows.
     private var lastSearchedQuery: String = ""
 
     fun handleEvent(event: SearchUiEvent) {
@@ -115,7 +115,6 @@ class SearchViewModel @Inject constructor(
             // A refresh is an explicit user action, so it runs immediately; a
             // keystroke waits out the debounce.
             if (!isRefresh) delay(SearchDebounceMillis)
-            lastSearchedQuery = query
             performSearch(query, isRefresh)
             searchJobQuery = null
         }
@@ -126,6 +125,12 @@ class SearchViewModel @Inject constructor(
 
         searchGamesUseCase(query)
             .onSuccess { games ->
+                // Recorded only now, not at dispatch: it answers "which query do
+                // the results on screen belong to". A request that was cancelled
+                // or failed never produced results, so claiming it as searched
+                // would let a later identical query skip the search entirely and
+                // leave stale or empty content on screen.
+                lastSearchedQuery = query
                 _uiState.update {
                     it.copy(games = games, isLoading = false, isRefreshing = false, errorMessage = null)
                 }
