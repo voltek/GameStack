@@ -115,7 +115,11 @@ change does not need this pass.
 ### Tier 1 — Immutable
 - **Always ask before `git push`, and before opening a PR.** Commits are local
   and reversible; a push is not, and a PR is outward-facing.
-- **Never `--no-verify`; never force-push a branch that has already been pushed.**
+- **Never `--no-verify`.**
+- **Never force-push `main`, nor any branch another person may have pulled, and
+  never bare `--force` anywhere.** `--force` overwrites whatever is on the remote
+  without checking. A bounded exception for cleaning your own unreviewed feature
+  branch is defined in Tier 2 below; nothing outside that exception is allowed.
 - **The gate is all three green:** `./gradlew build`, `./gradlew test`,
   `./gradlew lint`. A lint *Error* fails the gate; warnings do not. `git commit`
   freely once it passes.
@@ -190,16 +194,30 @@ change does not need this pass.
     intermediate states that never existed and never passed the gate, so
     `git bisect` can land on a commit that does not build, and the grouping of
     what was reviewed together is lost.
-- **History is cleaned before the first push, or not at all** — Tier 1 forbids
-  force-pushing a pushed branch, so that window closes permanently. Before
-  pushing, a branch is clean when: every commit message names a change worth
-  finding later (no `wip`, `fix`, `address review`); every commit passes the gate
-  on its own; no commit exists only to correct an earlier commit *on this same
-  branch* (that is a fixup — fold it in with `git commit --amend` or
-  `git reset --soft`); and nothing is added and then removed within the branch.
-  Note `git rebase -i` is unavailable in this environment. This is the honest
-  reason squash-merge exists as a fallback: it is the only remaining remedy once
-  a messy branch has been pushed.
+- **A branch is clean when** every commit message names a change worth finding
+  later (no `wip`, `fix`, `address review`); every commit passes the gate on its
+  own; no commit exists only to correct an earlier commit *on this same branch*
+  (that is a fixup — fold it in); and nothing is added and then removed within
+  the branch. Clean it with `git commit --amend` or `git reset --soft` and
+  recommit; `git rebase -i` is unavailable in this environment.
+- **Force-push is allowed to clean your own feature branch, and only until it has
+  been reviewed.** Use `git push --force-with-lease`, never bare `--force`:
+  with-lease refuses to write if the remote moved since your last `fetch`, so it
+  cannot silently overwrite anything you have not seen.
+  - **The window closes at the first review, not at the first push.** Once the
+    Codex bot or `/code-review` has commented, rewriting commits breaks the
+    anchor for those threads — they go outdated or hang off a SHA that no longer
+    exists. That review history is worth more than a tidy log: on PR #3 it is
+    what caught two defects that the gate passed.
+  - After that point the only remedy for a messy branch is `Squash and merge`,
+    with the cost described above. Cleaning early is what keeps the merge commit
+    (and with it `blame` and `bisect`) as the default.
+  - This is deliberately a conditional rule where an absolute one would be easier
+    to obey. It is accepted because the risk the absolute version guards against
+    — overwriting work someone else holds — does not exist in a solo repo, while
+    its cost (losing a whole branch's granularity over one clumsy commit) is
+    permanent and recurring. The condition is cheap to check: does the PR have
+    review comments yet?
 
 ### Tier 3 — Suggested
 - Commit as you go, not in one blob at the end. A feature that reaches completion
