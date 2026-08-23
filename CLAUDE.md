@@ -164,6 +164,12 @@ change does not need this pass.
   body's edit box on the web** — GitHub uploads them to its own CDN. Never commit
   emulator captures to the repo; only design references under
   `docs/project/design/` are versioned, and those can be linked by URL.
+- **Never overwrite a PR body wholesale once it is open.** `gh pr edit --body`
+  replaces everything, including screenshots the human dragged in and any text
+  they added — GitHub's own edit history is then the only way back. Read the
+  current body first and change only what needs changing, or add a comment
+  instead. This already destroyed an uploaded screenshot on PR #5, minutes after
+  asking for it.
 - **Hand the captures over; do not make the human retake them.** The device pass
   already produced screenshots. Save them somewhere stable outside the repo
   (`~/Pictures/GameStack/pr-{n}/`, named for what they show — a scratchpad or
@@ -196,7 +202,13 @@ change does not need this pass.
   an automated reviewer almost always finds *something*. **Stopping rule:** a
   round that produces only design or style suggestions is the signal to merge. A
   round that produces a real defect earns another round.
-- **Automated review is an advisor, not a gatekeeper.** The blocking gate is
+- **`/code-review` is run by the human — the agent cannot invoke it.** So the
+  agent's job is to *ask for it and wait*, never to tick that box or excuse it.
+  Do not confuse it with the GitHub bot: they are different reviewers, and the
+  bot's quota says nothing about whether `/code-review` has run. That exact
+  confusion was written into PR #5's body to justify skipping it.
+- **Automated review is an advisor, not a gatekeeper.** This applies to the
+  GitHub bot, not to `/code-review`. The blocking gate is
   `build`/`test`/`lint` plus `/code-review`. If the bot is unavailable — quota
   exhausted, service down — merge anyway; an external quota must not decide
   whether work ships. Request it **once per PR, when the PR is ready**, not after
