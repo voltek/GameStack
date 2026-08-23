@@ -212,10 +212,10 @@ private fun RefreshErrorBanner(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onErrorContainer,
-            // The Snackbar this replaced was announced on display; a Row is not,
-            // so a TalkBack user would keep reading a list with no cue it is
-            // stale. Declared on the Text rather than the Row so the announcement
-            // carries the message and the Retry button stays separately focusable.
+            // A Row is not announced on appearance, so without this a TalkBack
+            // user keeps reading a list with no cue that it is stale. Declared on
+            // the Text and not the Row because merging the Row's descendants to
+            // carry the message would absorb the Retry button's own focus.
             modifier = Modifier
                 .weight(1f)
                 .semantics { liveRegion = LiveRegionMode.Polite }

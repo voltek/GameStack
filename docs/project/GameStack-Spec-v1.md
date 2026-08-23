@@ -155,6 +155,15 @@ guess at.
   decisions on cache invalidation and freshness, and likely a dedicated
   Repository-layer redesign. Treat as its own future evaluation — comparable
   in scope to the Retrofit-vs-Ktor decision — not something to bolt on casually.
+- **Backlog (low priority for now, but with a deadline):** accessibility. MVP
+  does not target it — no TalkBack pass, no large-font or contrast audit, no
+  touch-target review. Accessibility findings from code review are non-blocking
+  while this holds. Two limits on the deferral, both in CLAUDE.md → Accessibility:
+  a change may not *remove* an affordance that already worked (replacing a
+  Material component with a hand-built one is where this happens silently), and
+  the deferral expires before the first Play Store release — Google publishes
+  accessibility expectations, and retrofitting semantics across a finished UI is
+  a rewrite rather than an addition.
 - **Backlog:** Light theme. MVP ships dark-only — the project's visual
   identity (confirmed via Stitch prototyping and the GameStack Core
   DESIGN.md) is dark-first, matching genre conventions (Steam, Xbox app,
