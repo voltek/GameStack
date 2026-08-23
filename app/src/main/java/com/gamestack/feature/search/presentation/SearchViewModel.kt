@@ -7,13 +7,12 @@ import com.gamestack.core.presentation.UiText
 import com.gamestack.feature.search.domain.usecase.SearchGamesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -50,18 +49,17 @@ class SearchViewModel @Inject constructor(
     private val typedQuery = MutableStateFlow("")
     private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    // Three operators replace what used to be hand-written bookkeeping across
+    // Two operators replace what used to be hand-written bookkeeping across
     // several nullable fields, and with it a whole class of defects:
     //  - distinctUntilChanged after trim: a whitespace-only edit is not a new
     //    query, so it neither restarts a search nor disturbs one in flight.
-    //  - debounce: drops whatever was still pending when a newer request
-    //    arrives, so a refresh supersedes a keystroke that never got dispatched.
-    //  - mapLatest: cancels the search already running when a newer one starts,
-    //    so no stale response can land after the query moved on.
+    //  - mapLatest: a newer request cancels whatever the previous one was doing,
+    //    whether that was waiting out its debounce or already awaiting a
+    //    response.
     // Nothing here records "which query was already searched"; every earlier
     // version of this class did, and every one of them eventually disagreed with
     // what was actually on screen.
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val searchPipeline = merge(
         typedQuery
             .map { it.trim() }
@@ -70,9 +68,15 @@ class SearchViewModel @Inject constructor(
         refreshRequests
             .map { SearchRequest(query = typedQuery.value.trim(), isRefresh = true) }
     )
-        .debounce { it.debounceMillis }
         .mapLatest { request ->
-            // An empty query still travels the pipeline: reaching mapLatest is
+            // The wait lives here rather than in a debounce() operator upstream.
+            // An operator would hold the new request for its own timeout while
+            // the previous search kept running, so a response for text the user
+            // had already changed could still land — showing settled results, or
+            // flashing the error card, for the whole debounce window. Inside
+            // mapLatest the new request cancels the running one first, then waits.
+            delay(request.debounceMillis)
+            // An empty query still travels the pipeline: reaching this point is
             // what cancels any search still running for the text just deleted.
             if (request.query.isNotEmpty()) performSearch(request.query, request.isRefresh)
         }
@@ -110,6 +114,9 @@ class SearchViewModel @Inject constructor(
                     // Optimistic, so the skeleton appears while the debounce runs
                     // rather than 400ms into the wait.
                     isLoading = true,
+                    // Typing supersedes a refresh, and mapLatest cancels it, so
+                    // its coroutine will never reset this flag itself.
+                    isRefreshing = false,
                     // Cleared here so a failure from the query being replaced
                     // cannot outlive it and hide the results that do arrive.
                     errorMessage = null
@@ -124,6 +131,11 @@ class SearchViewModel @Inject constructor(
 
     private fun onRefresh() {
         if (_uiState.value.query.isBlank()) return
+        // Set here, not in performSearch: PullToRefreshBox reads this flag
+        // synchronously when the pull is released and retracts the indicator if
+        // it is still false, so leaving it to a coroutine hop makes the spinner
+        // visibly bounce back and re-appear on every pull.
+        _uiState.update { it.copy(isRefreshing = true) }
         refreshRequests.tryEmit(Unit)
     }
 

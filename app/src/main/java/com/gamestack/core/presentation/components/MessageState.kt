@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.SearchOff
@@ -43,6 +45,12 @@ fun MessageState(
     Column(
         modifier = modifier
             .fillMaxSize()
+            // Centred and roughly 280dp tall, so in landscape or with the
+            // keyboard raised the available height drops below the content and a
+            // non-scrollable column clips symmetrically — putting the CTA
+            // off-screen with no way to reach it. Scrolling keeps it reachable;
+            // the min height constraint survives, so short content stays centred.
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

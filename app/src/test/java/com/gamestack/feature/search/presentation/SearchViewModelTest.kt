@@ -375,9 +375,64 @@ class SearchViewModelTest {
             coVerify(exactly = 2) { searchGamesUseCase("zelda") }
         }
 
+    // Regression: with the debounce in an operator upstream of mapLatest, a new
+    // keystroke waited out its own 400ms before cancelling anything, so the
+    // previous request stayed alive and its response could still land — painting
+    // settled results (or flashing the error card) for text already replaced.
+    @Test
+    fun `handleEvent OnQueryChanged should cancel an in-flight search immediately when the query changes`() =
+        runTest {
+            coEvery { searchGamesUseCase("zel") } coAnswers {
+                delay(RESPONSE_MILLIS)
+                Result.success(listOf(sampleGame))
+            }
+            // Stubbed only because runTest drains pending work after the body.
+            coEvery { searchGamesUseCase("zeld") } returns Result.success(emptyList())
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zel"))
+            // Debounce elapsed: "zel" is on the network, its response still due.
+            testDispatcher.scheduler.advanceTimeBy(PAST_DEBOUNCE_MILLIS)
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zeld"))
+            // Well past when the "zel" response would have arrived, and still
+            // short of the new query's own debounce.
+            testDispatcher.scheduler.advanceTimeBy(RESPONSE_MILLIS * 2)
+
+            assertTrue(viewModel.uiState.value.games.isEmpty())
+            assertTrue(viewModel.uiState.value.isLoading)
+        }
+
+    // Regression: isRefreshing was only set once performSearch ran, a coroutine
+    // hop later, and nothing reset it when typing superseded the refresh — so the
+    // pull indicator spun on top of the shimmer grid until the next search ended.
+    @Test
+    fun `handleEvent OnQueryChanged should stop the refresh indicator when typing supersedes a refresh`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } coAnswers {
+                delay(IN_FLIGHT_MILLIS)
+                Result.success(listOf(sampleGame))
+            }
+            // Stubbed only because runTest drains pending work after the body.
+            coEvery { searchGamesUseCase("zeldax") } returns Result.success(emptyList())
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+
+            // Synchronous with the pull, not one coroutine hop later.
+            assertTrue(viewModel.uiState.value.isRefreshing)
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zeldax"))
+
+            assertFalse(viewModel.uiState.value.isRefreshing)
+            assertTrue(viewModel.uiState.value.isLoading)
+        }
+
     private companion object {
         // Longer than the ViewModel's debounce, which is private to its file.
         const val PAST_DEBOUNCE_MILLIS = 500L
         const val IN_FLIGHT_MILLIS = 1_000L
+        const val RESPONSE_MILLIS = 150L
     }
 }

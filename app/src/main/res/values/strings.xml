@@ -6,7 +6,6 @@
 
     <string name="search_bar_placeholder">Search for games…</string>
     <string name="search_bar_clear_content_description">Clear search</string>
-    <string name="search_results_heading">Search Results</string>
     <string name="search_initial_title">Search for games</string>
     <string name="search_initial_description">Find games by title to see their details and add them to your library.</string>
     <string name="search_empty_title">No Results Found</string>
