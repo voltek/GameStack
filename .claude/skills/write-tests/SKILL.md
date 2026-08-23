@@ -146,6 +146,45 @@ fun `handleEvent OnGameClicked should send NavigateToGameDetail effect`()
 
 Pattern: `{method or event} should {expected result} when {condition}`
 
+## Verifying a regression test actually catches the bug
+A test written after the fix can pass whether or not the fix is present. That
+test is worse than no test: it looks like coverage and proves nothing. Every
+regression test must be *seen* to fail against the code it guards (CLAUDE.md →
+Testing Stack, Tier 1).
+
+```bash
+# 1. Test and fix are both written and green.
+# 2. Park the production change only — never the test.
+git stash push -- app/src/main/java/com/gamestack/<path>/Foo.kt
+
+# 3. Run that test class alone. It MUST fail.
+./gradlew testDebugUnitTest --tests "com.gamestack.<path>.FooTest"
+
+# 4. Restore.
+git stash pop
+```
+
+Three things that decide whether this is worth anything:
+
+- **Read the failure message, not just the red.** It should describe the bug. A
+  failure from a compile error, an NPE, or MockK's `no answer found for …` is red
+  for the wrong reason and proves nothing. (That last one is common here: `runTest`
+  drains pending work after the body, so a debounced query you never meant to
+  dispatch still reaches the mock — stub it, and say in a comment that the stub
+  exists only for the drain.)
+- **Run the one class, not the suite.** Otherwise you cannot tell your test failed
+  rather than something you disturbed.
+- **This applies to regression tests, not to tests for brand-new code** — those
+  have no previous behaviour to fail against, and would just fail to compile.
+
+Writing the test first (watch it fail, then fix) gives you the same guarantee and
+is cheaper. This recipe is for when the fix came first, which in practice is
+often. Say in the commit message that it was verified.
+
+The automated generalization of this idea is **mutation testing** (PIT on the
+JVM): mutate production code, assert some test goes red. Not adopted here — its
+Android setup is awkward and slow — but it is the same question asked at scale.
+
 ## Quality criteria
 - Every public function/UseCase/ViewModel event has at least one Happy and one Sad path test
 - Mocks use MockK exclusively (`mockk()`, `every {}`, `verify {}`, `coEvery {}`, `coVerify {}`)

@@ -164,6 +164,19 @@ change does not need this pass.
   body's edit box on the web** — GitHub uploads them to its own CDN. Never commit
   emulator captures to the repo; only design references under
   `docs/project/design/` are versioned, and those can be linked by URL.
+- **Never overwrite a PR body wholesale once it is open.** `gh pr edit --body`
+  replaces everything, including screenshots the human dragged in and any text
+  they added — GitHub's own edit history is then the only way back. Read the
+  current body first and change only what needs changing, or add a comment
+  instead. This already destroyed an uploaded screenshot on PR #5, minutes after
+  asking for it.
+- **Hand the captures over; do not make the human retake them.** The device pass
+  already produced screenshots. Save them somewhere stable outside the repo
+  (`~/Pictures/GameStack/pr-{n}/`, named for what they show — a scratchpad or
+  `%TEMP%` path gets cleaned), give the paths in chat when the PR is opened, and
+  say plainly that the PR needs them dragged in **before** it is merged. An agent
+  that verified on device and then let the human go hunting for a screenshot
+  wasted the one part of this only the human can finish.
 - **Automated review threads (Codex bot, `/code-review`) are closed explicitly.**
   Fix the finding or dismiss it with a reason, reply in the thread saying what
   was done, then **Resolve conversation** — the reply is the history, the resolve
@@ -178,6 +191,35 @@ change does not need this pass.
   finding exposes code/doc drift, log it in DRIFT-CHECKLIST's Resolution log per
   the Self-Healing Loop. The gate is mechanical and the review is semantic: on
   PR #3 the gate passed while six real defects were still in the diff.
+- **Triage every finding into one of two buckets, and say which.**
+  - *Blocking* — correctness, data loss, a defect the user can see. Fix before
+    merge, with a regression test verified per Testing Stack.
+  - *Non-blocking* — design, performance, polish, debt. Open an issue, link it in
+    the thread, and merge. "Dismissed with a reason" is what lets a PR close;
+    it is legitimate precisely because the reason is written down and linked.
+
+  Taken as "fix everything a reviewer mentions", this rule never lets a PR land:
+  an automated reviewer almost always finds *something*. **Stopping rule:** a
+  round that produces only design or style suggestions is the signal to merge. A
+  round that produces a real defect earns another round.
+- **`/code-review` is run by the human — the agent cannot invoke it.** So the
+  agent's job is to *ask for it and wait*, never to tick that box or excuse it.
+  Do not confuse it with the GitHub bot: they are different reviewers, and the
+  bot's quota says nothing about whether `/code-review` has run. That exact
+  confusion was written into PR #5's body to justify skipping it.
+- **Automated review is an advisor, not a gatekeeper.** This applies to the
+  GitHub bot, not to `/code-review`. The blocking gate is
+  `build`/`test`/`lint` plus `/code-review`. If the bot is unavailable — quota
+  exhausted, service down — merge anyway; an external quota must not decide
+  whether work ships. Request it **once per PR, when the PR is ready**, not after
+  every fix; PR #3 burned five reviews in one day and then hit the limit. When
+  waiting on one, watch for its usage-limit comment and stop waiting the moment
+  it appears, rather than polling until the timeout.
+- **Rule of three.** Touching the same code a third time for the same class of
+  defect means the design is the problem, not the instances — stop patching and
+  redesign. A fix that introduces the next defect in the same place counts double.
+  Search's debounce logic took four rounds before this was acted on; the rewrite
+  that followed deleted the state all four defects came from.
 - **Merging: `Create a merge commit` is the default.** The branch's commits are
   curated (Conventional Commits, code and docs together) and are the unit that
   makes `git blame` and `git bisect` useful; the merge commit also records what
@@ -272,6 +314,16 @@ change does not need this pass.
   is an *instrumented* test under `androidTest/` — currently backlog, not MVP.
   Consequence: DAO interfaces are verified indirectly, through Repository tests
   with a mocked DAO. See `write-tests` for what that does and does not prove.
+- **Every regression test must be seen to fail against the code it guards.** A
+  test written after the fix can pass whether or not the fix is there, and that
+  test is worse than none: it looks like coverage and proves nothing. Park the
+  production change (`git stash push -- <file>`), run that test alone, confirm it
+  fails *and that the message describes the bug* — a failure from a compile error
+  or an NPE is red for the wrong reason — then restore. Doing it the other way
+  round (test first, watch it fail, then fix) gets this for free. State in the
+  commit that it was verified; nine defects in Search were found by review after
+  the gate passed green, so "the tests pass" is not by itself evidence of
+  anything. See `write-tests` for the recipe.
 
 See the `write-tests` skill for full conventions (setup per layer, naming, Happy/Sad paths).
 
@@ -556,6 +608,18 @@ is a documentation gap to report, not to guess at.
      (it covers Requirements only: "new code does what the Skill/Spec asked").
   2. An automated drift checker (Hook or validator subagent) implementing
      `DRIFT-CHECKLIST.md`'s items, replacing the manual pass.
+  3. Automating the regression-test verification in Testing Stack (Tier 1) —
+     currently a manual `git stash` recipe in `write-tests`. Ranked above (2) by
+     value: nine real defects in Search all passed a green gate, and this is the
+     habit that caught whether each new test was worth anything. **Not a naive
+     `PostToolUse` hook**: stashing and restoring a live working tree on every
+     edit risks the user's uncommitted work, fires far too often, and cannot
+     tell a regression test from a test for brand-new code. Likelier shapes: a
+     script the workflow calls deliberately, or a `Stop` hook that *checks
+     whether the verification was done* when a diff adds tests and changes
+     production code, rather than performing it. When it lands, the Tier 1 rule
+     stays — reword it from "do this" to "the hook checks this, here is what it
+     checks and why". Deleting the rule would leave a script nobody can explain.
 - **Block 5 — AI-powered recommendations** based on user history (Room).
 - Future: KMP migration. Data layer prepared for it — Retrofit → Ktor,
   Room → SQLDelight, without touching Domain or UI.

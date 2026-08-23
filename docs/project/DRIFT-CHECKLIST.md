@@ -38,6 +38,9 @@
       database, or a real network call? (JVM-only is the gate — see CLAUDE.md.)
 - [ ] Is there a "DAO test" that only asserts against its own mock? Tautological —
       it proves nothing and hides the real coverage gap.
+- [ ] Did any regression test land without being seen to fail against the code it
+      guards? A test written after the fix can pass either way — same failure
+      mode as the tautological DAO test above, one layer up.
 
 ## Architecture
 - [ ] Does any ViewModel or Composable call a Repository function directly,
@@ -119,6 +122,7 @@ useful history for understanding recurring patterns.
 | Date | Item | Resolution (code fixed / doc updated) |
 |---|---|---|
 | 2026-08-23 | `/code-review` on PR #5 found the snackbar fix reintroducing the failure it was written to prevent. `games` was never cleared when a new query started, so it could hold results for text the user had moved on from; the error card's Retry emits `OnRefresh`, so `keepResults = isRefresh && games.isNotEmpty()` classified a retried *new* search as a refresh and restored the previous query's results under the new text. Third defect in a row traced to state outliving what it describes, after `lastSearchedQuery` and `searchJobQuery` | Code fixed at the root rather than at the symptom: `games` is cleared the moment the effective query changes, so results on screen always belong to the current query. `keepResults` then needs no `isRefresh` guard at all — having results *means* the query was already answered. Also fixed alongside: the snackbar outlived the state it described, staying up over a cleared field where its Retry silently did nothing, so it is now dismissed whenever the query changes. Regression test verified to fail without the fix, and the existing "no results" test now also asserts no effect is emitted |
+| 2026-08-23 | Nothing recorded how review findings get triaged, when a review loop is allowed to stop, or what happens when the automated reviewer is unavailable. In practice PR #3 ran five bot rounds plus one `/code-review` in a day, hit the Codex quota, and stayed open long enough to accumulate unrelated work. Nothing recorded the habit that made its regression tests worth anything either — verifying each one fails against the code it guards | Doc updated — CLAUDE.md → Git workflow gained blocking/non-blocking triage, a stopping rule (a round producing only design suggestions means merge; one producing a real defect earns another round), automated review demoted to advisor with one request per PR, and the rule of three for repeated defects in one place. Testing Stack gained the regression-verification rule as Tier 1, with the `git stash` recipe and its failure modes in `write-tests`. Block 4 gained it as a third deliverable, ranked above the drift checker, with the reasons a naive `PostToolUse` hook is the wrong shape and a note that the rule survives the hook rather than being replaced by it |
 | 2026-08-04 | Checklist demanded Light theme support, contradicting Tier 1 dark-only | Doc updated — item inverted into a violation detector for Light/dynamic color |
 | 2026-08-04 | Domain → Entity conversion had no defined home (write path) | Doc updated — `toEntity()` legitimized in CLAUDE.md + `new-mapper`; boundary rule restated as "DTO/Entity types never surface outside Data" |
 | 2026-08-04 | `completedAt` transition rule fit in no layer without violating a rule | Doc updated — declared a persistence invariant owned by the Repository, as an explicit documented exception |
