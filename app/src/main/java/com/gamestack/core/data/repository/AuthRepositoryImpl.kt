@@ -3,6 +3,7 @@ package com.gamestack.core.data.repository
 import com.gamestack.BuildConfig
 import com.gamestack.core.data.remote.api.TwitchAuthApiService
 import com.gamestack.core.domain.repository.AuthRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
@@ -19,19 +20,26 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun getValidAccessToken(): Result<String> = mutex.withLock {
         cachedToken?.takeIf { !it.isExpired() }?.let { return@withLock Result.success(it.accessToken) }
 
-        runCatching {
+        // try/catch, not runCatching (see CLAUDE.md). Today's only caller bridges
+        // through runBlocking, so no cancellation reaches here yet — this keeps it
+        // correct for the first caller that isn't behind runBlocking.
+        val response = try {
             twitchAuthApiService.getAccessToken(
                 clientId = BuildConfig.IGDB_CLIENT_ID,
                 clientSecret = BuildConfig.IGDB_CLIENT_SECRET
             )
-        }.map { response ->
-            val token = CachedToken(
-                accessToken = response.accessToken,
-                expiresAtMillis = System.currentTimeMillis() + response.expiresIn * 1_000L
-            )
-            cachedToken = token
-            token.accessToken
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            return@withLock Result.failure(e)
         }
+
+        val token = CachedToken(
+            accessToken = response.accessToken,
+            expiresAtMillis = System.currentTimeMillis() + response.expiresIn * 1_000L
+        )
+        cachedToken = token
+        Result.success(token.accessToken)
     }
 
     private data class CachedToken(val accessToken: String, val expiresAtMillis: Long) {

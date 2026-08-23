@@ -22,6 +22,25 @@ description: Create a RepositoryImpl that implements a Repository interface. Use
   merging a partial update into an existing row) are NOT Mappers — implement them as
   private helper functions inside the RepositoryImpl itself.
 
+## Returning `Result` — never `runCatching`
+A suspend function returning `Result` must build it with `try`/`catch`, rethrowing
+`CancellationException` before catching `Exception`:
+
+```kotlin
+override suspend fun searchGames(query: String): Result<List<Game>> =
+    try {
+        Result.success(api.searchGames(buildQuery(query)).map { it.toDomain() })
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+```
+
+`runCatching` catches `Throwable`, so it swallows `CancellationException` too and
+reports a merely-cancelled coroutine as a genuine failure — the caller then shows
+an error for work nobody was waiting on any more (CLAUDE.md, Architecture → Tier 1).
+
 ## Write operations — read-modify-write and persistence invariants
 Writes to `UserGameEntity` are never blind upserts. The Repository:
 1. Loads the existing row for that `gameId` (may be absent — first interaction).

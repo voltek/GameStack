@@ -104,6 +104,14 @@ viewModel.uiEffect.test {
 - Sad: UseCase failure updates UiState to error and/or sends UiEffect (Snackbar)
 - Also test: every UiEvent has at least one corresponding test
 
+### ViewModel — cancellation/debounce
+If the ViewModel stores a `Job` and cancels it (debounce, throttle, superseding
+a previous action), the state-based Happy/Sad tests above are not enough —
+add an interaction test confirming the superseded call never fired
+(`coVerify(exactly = 0)`), not just that the final state looks correct. A
+cancellation that silently fails can still produce a correct-looking final
+state by coincidence.
+
 ### Interceptor
 - Happy: both `Client-ID` and `Authorization: Bearer {token}` are added to the
   outgoing request.

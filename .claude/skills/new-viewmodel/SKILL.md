@@ -29,6 +29,42 @@ description: Create a ViewModel following the MVI pattern for a GameStack screen
 `{ScreenName}ViewModel`, `{ScreenName}UiState`, `{ScreenName}UiEvent`, `{ScreenName}UiEffect`
 Example: `PopularGamesViewModel`, `PopularGamesUiState`, `PopularGamesUiEvent`, `PopularGamesUiEffect`
 
+## Debounced input (search-style screens)
+Never hand-roll this with a `Job` plus fields remembering which query was last
+dispatched. `SearchViewModel` was written that way and produced four defects in
+review, each one a disagreement between a remembered query and what was actually
+on screen. Build it as a flow pipeline instead:
+
+```kotlin
+merge(typedQuery.map { it.trim() }.distinctUntilChanged().map { Request(it, isRefresh = false) },
+      refreshRequests.map { Request(typedQuery.value.trim(), isRefresh = true) })
+    .mapLatest { request ->
+        delay(request.debounceMillis)   // 0 for a refresh or an emptied field
+        if (request.query.isNotEmpty()) performSearch(request.query, request.isRefresh)
+    }
+    .launchIn(viewModelScope)
+```
+
+`distinctUntilChanged` after `trim` means a whitespace-only edit is not a new
+query, so it neither restarts a search nor disturbs one in flight. `mapLatest`
+cancels whatever the previous request was doing — waiting out its debounce, or
+already awaiting a response. Let the empty query travel the pipeline; reaching
+`mapLatest` is what cancels work for text the user just deleted.
+
+**Put the wait inside `mapLatest`, never in a `debounce()` operator upstream of
+it.** With the operator, a new keystroke is held for its own timeout *before*
+`mapLatest` ever sees it, so the previous request keeps running and its response
+can still land — painting settled results, or flashing the error card, for the
+whole debounce window after the query changed. That is the same user-visible
+failure CLAUDE.md's `runCatching` rule exists to prevent, arriving by a different
+route. It was caught in review; the pipeline reads almost identically either way,
+which is exactly why it is worth stating.
+
+Set `isLoading` optimistically in the event handler, so the skeleton appears
+during the debounce rather than after it, and clear `errorMessage` there too —
+only when the effective query actually changed, so a whitespace edit disturbs
+nothing.
+
 ## Quality criteria
 - No business logic — the ViewModel only orchestrates UseCase calls and maps results to UiState.
 - Every UiEvent has a corresponding handler.

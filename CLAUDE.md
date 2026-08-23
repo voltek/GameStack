@@ -74,17 +74,157 @@ drift returns.
 ## Commands
 - Build: `./gradlew build`
 - Unit tests: `./gradlew test`
+  - Single class: `./gradlew testDebugUnitTest --tests "com.gamestack.Foo"`.
+    Plain `test` is a lifecycle task and rejects `--tests`.
 - Lint: `./gradlew lint`
 
+### Device verification — Tier 2
+The gate above (`build`/`test`/`lint`) is necessary but **not sufficient for UI
+work**: it proves the code compiles and that the logic does what a test asserts,
+never that a screen looks right or that a control is reachable. Every feature
+that adds or changes a screen is also verified on the emulator before a merge is
+requested, and the PR body says what was checked. Data/domain work with no UI
+change does not need this pass.
+
+- Install: `ANDROID_SERIAL=emulator-5554 ./gradlew installDebug`. `adb` is not
+  on PATH — use `$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe`.
+- **If no emulator is running, ask for one** — do not declare a UI feature done
+  without this pass, and do not launch an AVD unprompted (it opens a window on
+  the user's desktop).
+- **Two tools, two questions.** `Grep` over `uiautomator dump` for assertions
+  that can be stated in advance (which tab is `selected="true"`, whether a text
+  or node exists) — only matching lines enter context, so it is by far the
+  cheaper path. `adb exec-out screencap -p`, read as an image, when the
+  criterion is visual (clipping, spacing, contrast, alignment) and **whenever a
+  keyboard may be on screen**: the dump contains only the app window, never the
+  IME, so it reports as visible controls the keyboard is actually covering.
+  This cost real debugging time once — taps aimed from dump coordinates landed
+  on keyboard keys. `dumpsys input_method` is unreliable on this AVD for the
+  same question. Close every UI verification with at least one screenshot: the
+  dump cannot find what nobody thought to assert, and three of the Search bugs
+  were purely visual.
+- Cover every state the screen declares (initial, loading, content, empty,
+  error), plus the keyboard raised if there is a text field. Network-dependent
+  states can be forced with `adb shell svc data disable` / `svc wifi disable`.
+- Screenshot cost is set by aspect ratio, not by AVD resolution — see
+  `docs/project/design/README.md`. Do not shrink the AVD to save tokens; it
+  saves none.
+
 ## Git workflow
-- Commit at logical checkpoints — after a Skill completes and the build is
-  verified green (e.g. after `project-scaffold`, after a feature's full
-  `new-feature` flow, after a standalone piece like AuthRepository).
-  Use a short, descriptive message (e.g. "Add AuthRepository with token
-  caching and auto-refresh").
-- `git commit` freely once the build/tests/lint gate passes.
-- Always ask before `git push` — commits stay local and reversible; push
-  goes to the remote and is less easily undone.
+
+### Tier 1 — Immutable
+- **Always ask before `git push`, and before opening a PR.** Commits are local
+  and reversible; a push is not, and a PR is outward-facing.
+- **Never `--no-verify`.**
+- **Never force-push `main`, nor any branch another person may have pulled, and
+  never bare `--force` anywhere.** `--force` overwrites whatever is on the remote
+  without checking. A bounded exception for cleaning your own unreviewed feature
+  branch is defined in Tier 2 below; nothing outside that exception is allowed.
+- **The gate is all three green:** `./gradlew build`, `./gradlew test`,
+  `./gradlew lint`. A lint *Error* fails the gate; warnings do not. `git commit`
+  freely once it passes.
+- **Never commit directly to `main`** — branch first.
+- **Code and its documentation land in the same commit.** A commit that changes
+  an architectural rule carries its CLAUDE.md/Spec/DRIFT-CHECKLIST update with
+  it (Documentation completeness rule). Never code now, docs next commit.
+- **Read `git status` in full before committing.** Untracked source files are
+  invisible to `git add -u` and silently break the build for everyone else.
+- **Before pushing, `git fetch` and reconcile with `origin/main`.** Rebase or
+  merge if the branch is behind. If local `main` is ahead of `origin/main`,
+  push it first, or the PR will carry commits that have nothing to do with it.
+  Divergence in either direction is a problem — check both, not just
+  "am I behind".
+
+### Tier 2 — Configurable within a defined range
+- Branch naming: `feature/{name}`, `fix/{name}`, `chore/{name}`, `docs/{name}`.
+- One branch per unit of work. A refactor that exists *only because of* a feature
+  (e.g. navigation restructured so Detail belongs to a tab) belongs on that
+  feature's branch — it cannot be built or tested independently of it.
+- **Before each commit, ask whether it exists *because of* this branch's unit of
+  work.** If it does not, it belongs on its own branch off `main` — park it with
+  `git stash`, or `git cherry-pick` it onto a fresh branch afterwards. This rule
+  already existed and PR #3 still reached 1,992 additions across 46 files, of
+  which only two commits were the Search feature; the rest were an unrelated auth
+  fix, two `.gitignore` chores, a design asset and three documentation-policy
+  changes that merely happened to occur while the branch was open. What inflates
+  a PR is how long the branch stays open, not how hard the feature is.
+- Treat **400 changed lines or 15 files** as a smoke alarm, not a limit: past
+  roughly that size review quality drops sharply, so stop and check the PR is
+  still one reviewable claim. If its title needs an "and", split it.
+- Commit messages follow **Conventional Commits**: `type(scope): imperative
+  summary`, lowercase, no trailing period. Types in use: `feat`, `fix`,
+  `refactor`, `docs`, `chore`, `test`. Scope is the feature or layer
+  (`search`, `auth`, `nav`) and is optional for repo-wide changes.
+  Example: `feat(search): search IGDB games with results, empty and error states`.
+  (Commits before 2026-08-22 predate this convention — do not rewrite them.)
+- Open a PR when a branch is ready for review, using
+  `.github/pull_request_template.md`. The body states what changed, why, and how
+  it was verified (gate output, emulator/device check). UI changes include
+  screenshots: generate them locally, then **drag or paste them into the PR
+  body's edit box on the web** — GitHub uploads them to its own CDN. Never commit
+  emulator captures to the repo; only design references under
+  `docs/project/design/` are versioned, and those can be linked by URL.
+- **Automated review threads (Codex bot, `/code-review`) are closed explicitly.**
+  Fix the finding or dismiss it with a reason, reply in the thread saying what
+  was done, then **Resolve conversation** — the reply is the history, the resolve
+  is only the filing. An unanswered thread is indistinguishable from an unnoticed
+  one. Check the reviewed commit before trusting a bot review: it pins to the SHA
+  it ran on, so a review from four commits ago may already be stale. Re-request
+  with `@codex review` after pushing fixes.
+- Run `/code-review` on any PR touching app code before asking for a merge;
+  doc-only or chore-only PRs may skip it. Every finding is either fixed or
+  dismissed with a stated reason in the PR thread — a review whose findings are
+  silently dropped is worse than none, because it looks like coverage. If a
+  finding exposes code/doc drift, log it in DRIFT-CHECKLIST's Resolution log per
+  the Self-Healing Loop. The gate is mechanical and the review is semantic: on
+  PR #3 the gate passed while six real defects were still in the diff.
+- **Merging: `Create a merge commit` is the default.** The branch's commits are
+  curated (Conventional Commits, code and docs together) and are the unit that
+  makes `git blame` and `git bisect` useful; the merge commit also records what
+  landed together as one reviewed unit. Delete the branch afterwards.
+  - `Squash and merge` is the fallback for a branch whose history is genuinely
+    disposable — not the default. Squashing keeps the *text* of the messages (as
+    bullets in the body) and destroys the structure: per-commit SHAs, line-level
+    `blame`, and every bisection point but one. It would also make two rules here
+    pointless — writing careful Conventional Commit messages that are discarded
+    at merge, and "code and its documentation land in the same commit", which is
+    tautological once everything is one commit. If it is used, the subject must
+    still follow Conventional Commits; GitHub defaults it to the PR title.
+  - `Rebase and merge`: do not use. Replaying commits onto a new base produces
+    intermediate states that never existed and never passed the gate, so
+    `git bisect` can land on a commit that does not build, and the grouping of
+    what was reviewed together is lost.
+- **A branch is clean when** every commit message names a change worth finding
+  later (no `wip`, `fix`, `address review`); every commit passes the gate on its
+  own; no commit exists only to correct an earlier commit *on this same branch*
+  (that is a fixup — fold it in); and nothing is added and then removed within
+  the branch. Clean it with `git commit --amend` or `git reset --soft` and
+  recommit; `git rebase -i` is unavailable in this environment.
+- **Force-push is allowed to clean your own feature branch, and only until it has
+  been reviewed.** Use `git push --force-with-lease`, never bare `--force`:
+  with-lease refuses to write if the remote moved since your last `fetch`, so it
+  cannot silently overwrite anything you have not seen.
+  - **The window closes at the first review, not at the first push.** Once the
+    Codex bot or `/code-review` has commented, rewriting commits breaks the
+    anchor for those threads — they go outdated or hang off a SHA that no longer
+    exists. That review history is worth more than a tidy log: on PR #3 it is
+    what caught two defects that the gate passed.
+  - After that point the only remedy for a messy branch is `Squash and merge`,
+    with the cost described above. Cleaning early is what keeps the merge commit
+    (and with it `blame` and `bisect`) as the default.
+  - This is deliberately a conditional rule where an absolute one would be easier
+    to obey. It is accepted because the risk the absolute version guards against
+    — overwriting work someone else holds — does not exist in a solo repo, while
+    its cost (losing a whole branch's granularity over one clumsy commit) is
+    permanent and recurring. The condition is cheap to check: does the PR have
+    review comments yet?
+
+### Tier 3 — Suggested
+- Commit as you go, not in one blob at the end. A feature that reaches completion
+  entirely uncommitted forces a choice between one unreviewable commit and
+  inventing a history that never existed.
+- Keep unrelated housekeeping (IDE files, ignore rules, asset corrections) in
+  their own commits so a feature's history stays readable.
 
 ---
 
@@ -145,6 +285,13 @@ within a single app module.
 ### Tier 1 — Immutable
 - UI never accesses the Repository directly — always via UseCase through the ViewModel.
 - Repositories contain no business logic — they only coordinate data sources.
+- **Never build a `Result` with `runCatching` around a suspend call.** It catches
+  `Throwable`, `CancellationException` included, so a coroutine that was merely
+  cancelled (a superseded debounce, a ViewModel clearing) comes back as
+  `Result.failure` and surfaces to the user as a real error. Use `try`/`catch`
+  that rethrows `CancellationException` before catching `Exception`. This is not
+  a style preference: it produced a visible bug where every cancelled Search
+  flashed the error screen before the next results landed.
 - Domain models never import Retrofit, Room, or Android types (only allowed
   external dependency: `javax.inject` for Hilt).
 - Never use LiveData — only StateFlow and Flow.
@@ -157,6 +304,30 @@ within a single app module.
   (3-5 destinations of equal importance, reachable from anywhere). Detail is
   NOT a bottom nav destination — it's reached from a game card in any of
   the three, not a top-level tab. High cost to change once built — ask first.
+- **Navigation structure — one nested graph per tab.** Each tab is a nested
+  graph (`HomeGraph`/`SearchGraph`/`LibraryGraph`) whose start destination is
+  that tab's screen, and `Detail` is registered *inside every tab graph* via the
+  shared `NavGraphBuilder.gameDetailDestination()` helper — never once at top
+  level. That is what gives each tab its own back stack. It does not add a
+  fourth tab: the graphs are structure, the tabs are still exactly three.
+  Consequences, all intended:
+  - A Detail belongs to the tab that opened it: that tab stays selected while
+    Detail is on screen, and Back from Detail returns to that tab's own screen.
+  - Switching tabs saves the originating tab's whole stack (Detail included) and
+    restores it on return — coming back to a tab lands you exactly where you
+    left it, **including on an open Detail**. Returning to a tab deliberately
+    does not reset it to its root.
+  - Back from a non-start tab goes to Home, then exits the app. This is standard
+    Android bottom nav behavior, not a defect — do not "fix" it.
+  - Bottom nav items and `navigateToBottomNavDestination()` always target a
+    `*Graph` route, never the screen inside it; targeting the screen stops the
+    tab's back stack from being the unit that gets saved and restored.
+  - Never use `NavController.currentBackStack` — it is `@RestrictTo`
+    library-group API and fails the `lint` gate. If tab switching appears to
+    need it, the graph structure is wrong, not the API.
+
+  Registering `Detail` once at top level instead is what previously let it leak
+  across tabs — it would reappear under an unrelated tab with no tab selected.
 
 ### MVI Contract conventions (Tier 1)
 Every screen defines exactly three contract types, and they are the only way
@@ -172,6 +343,21 @@ UI and ViewModel communicate:
   snackbars), exposed via `Channel` + `receiveAsFlow()`. Never put a one-shot
   event in UiState: state replays on recomposition/rotation, so a navigation
   or snackbar modeled as state fires twice.
+  The `Channel` **queues** anything sent while the screen is not collecting —
+  that is deliberate (a snackbar raised during a config change must survive),
+  and it is why the alternative, `SharedFlow(replay = 0)`, is not used here:
+  it would silently drop those instead. The cost of queueing is that a
+  *duplicated* effect is not merely handled twice, it is replayed when the user
+  returns to the screen. So the invariant is at the source: **one user intent
+  must emit exactly one effect.** Wrap **every** callback that emits a
+  navigation effect in `rememberSingleClick` (`core/presentation/`) — a list's
+  items, an empty-state CTA, a toolbar action, all of them. For a list, share one
+  wrapper across the whole list so two different items cannot fire back to back;
+  a no-argument overload exists for single controls. Auditing this is per screen,
+  not per list: the CTA on Search kept emitting duplicates because the wrapper
+  was introduced for the result cards only, which is where the bug had been seen.
+  Do not "fix" a duplicated effect by changing the Channel — that trades a
+  visible bug for a silent one.
 
 All three live together in `feature/{name}/presentation/{ScreenName}Contract.kt`
 — this is the one-class-per-file exception (1) below. The ViewModel exposes a
@@ -326,8 +512,6 @@ This project uses Claude Code Skills for repeatable procedures. Prefer invoking
 these over improvising the same task differently each time:
 
 **Setup / planning**
-- `project-scaffold` — bootstraps an empty project (deps, folders, Hilt, Theme,
-  test utilities). Runs ONCE per project; already done for GameStack.
 - `discovery-feature` — turns a vague feature idea into a Spec section. Only
   needed when scope is genuinely ambiguous; the MVP screens are already specced.
 
@@ -347,6 +531,13 @@ these over improvising the same task differently each time:
 If a task doesn't map to any Skill above, that's a coverage gap worth naming:
 do the work, then say so, so the gap can be closed deliberately rather than
 by improvising the same task differently every time.
+
+**Retired skills** — kept as a record, not invocable, not in `.claude/skills/`:
+- `project-scaffold` — bootstrapped this project (deps, folder skeleton, Hilt,
+  Theme, core test utilities). Ran once, at the start; retired 2026-08-22 because
+  a once-per-project skill has nothing left to do here and only added a dead
+  option to the listing. Archived at
+  `docs/project/retired-skills/project-scaffold.md`.
 
 ## Pending / Roadmap
 

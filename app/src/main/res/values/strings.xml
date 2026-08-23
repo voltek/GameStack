@@ -3,4 +3,17 @@
     <string name="nav_home">Home</string>
     <string name="nav_search">Search</string>
     <string name="nav_library">Library</string>
+
+    <string name="search_bar_placeholder">Search for games…</string>
+    <string name="search_bar_clear_content_description">Clear search</string>
+    <string name="search_initial_title">Search for games</string>
+    <string name="search_initial_description">Find games by title to see their details and add them to your library.</string>
+    <string name="search_empty_title">No Results Found</string>
+    <string name="search_empty_description">Try adjusting your search terms to find what you\'re looking for. We couldn\'t find any games matching your current criteria.</string>
+    <string name="search_empty_action">Go To Library</string>
+    <string name="search_error_title">Something went wrong</string>
+    <string name="search_error_description">We\'re having trouble loading your games. Please check your connection and try again.</string>
+    <string name="search_error_action">Retry</string>
+
+    <string name="detail_placeholder_title">Game Detail</string>
 </resources>
