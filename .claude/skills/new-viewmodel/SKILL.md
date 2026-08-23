@@ -29,6 +29,32 @@ description: Create a ViewModel following the MVI pattern for a GameStack screen
 `{ScreenName}ViewModel`, `{ScreenName}UiState`, `{ScreenName}UiEvent`, `{ScreenName}UiEffect`
 Example: `PopularGamesViewModel`, `PopularGamesUiState`, `PopularGamesUiEvent`, `PopularGamesUiEffect`
 
+## Debounced input (search-style screens)
+Never hand-roll this with a `Job` plus fields remembering which query was last
+dispatched. `SearchViewModel` was written that way and produced four defects in
+review, each one a disagreement between a remembered query and what was actually
+on screen. Build it as a flow pipeline instead:
+
+```kotlin
+merge(typedQuery.map { it.trim() }.distinctUntilChanged().map { Request(it, isRefresh = false) },
+      refreshRequests.map { Request(typedQuery.value.trim(), isRefresh = true) })
+    .debounce { it.debounceMillis }   // 0 for a refresh or an emptied field
+    .mapLatest { if (it.query.isNotEmpty()) performSearch(it.query, it.isRefresh) }
+    .launchIn(viewModelScope)
+```
+
+Each operator removes a class of bug: `distinctUntilChanged` after `trim` means a
+whitespace-only edit is not a new query (it neither restarts a search nor
+disturbs one in flight); `debounce` drops what was still pending when a newer
+request arrives; `mapLatest` cancels the search already running so no stale
+response lands after the query moved on. Let the empty query travel the pipeline
+— reaching `mapLatest` is what cancels work for text the user just deleted.
+
+Set `isLoading` optimistically in the event handler, so the skeleton appears
+during the debounce rather than after it, and clear `errorMessage` there too —
+only when the effective query actually changed, so a whitespace edit disturbs
+nothing.
+
 ## Quality criteria
 - No business logic — the ViewModel only orchestrates UseCase calls and maps results to UiState.
 - Every UiEvent has a corresponding handler.

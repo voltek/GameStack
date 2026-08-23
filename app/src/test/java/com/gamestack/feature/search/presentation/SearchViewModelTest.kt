@@ -44,11 +44,18 @@ class SearchViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
     }
 
-    // Regression: reverting to the previously searched text must also cancel the
-    // job scheduled for the intermediate query, or that job lands later and paints
-    // results for text the field no longer shows.
+    // Regression: reverting to the previously searched text must not let the job
+    // scheduled for the intermediate query land, or it paints results for text
+    // the field no longer shows.
+    //
+    // Reverting does re-run the search for "zel". Suppressing that would require
+    // remembering which query the displayed results belong to, and every version
+    // of this ViewModel that kept such a field eventually let it disagree with
+    // what was on screen — three separate defects, all found in review. One extra
+    // request behind a 400ms debounce is the accepted price for deleting that
+    // field; the assertion below is deliberate, not a relaxed expectation.
     @Test
-    fun `handleEvent OnQueryChanged should cancel a pending search when the query reverts to the last searched one`() =
+    fun `handleEvent OnQueryChanged should not dispatch an intermediate query when the text reverts`() =
         runTest {
             coEvery { searchGamesUseCase(any()) } returns Result.success(listOf(sampleGame))
 
@@ -59,9 +66,35 @@ class SearchViewModelTest {
             advanceDebounce()
 
             coVerify(exactly = 0) { searchGamesUseCase("zeld") }
-            coVerify(exactly = 1) { searchGamesUseCase("zel") }
+            coVerify(exactly = 2) { searchGamesUseCase("zel") }
             assertEquals("zel", viewModel.uiState.value.query)
             assertFalse(viewModel.uiState.value.isLoading)
+        }
+
+    // Regression: after a failed search, editing back to the query whose results
+    // are still loaded left the previous failure's errorMessage on screen, so the
+    // error state covered content that was perfectly good.
+    @Test
+    fun `handleEvent OnQueryChanged should clear a previous failure when the text changes back`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            coEvery { searchGamesUseCase("mario") } returns Result.failure(RuntimeException("network down"))
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("mario"))
+            advanceDebounce()
+            assertNotNull(viewModel.uiState.value.errorMessage)
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+
+            // Cleared immediately, not only once the new results land.
+            assertNull(viewModel.uiState.value.errorMessage)
+
+            advanceDebounce()
+
+            assertEquals(listOf(sampleGame), viewModel.uiState.value.games)
+            assertNull(viewModel.uiState.value.errorMessage)
         }
 
     // Regression: cancelling an in-flight refresh by clearing the query left
