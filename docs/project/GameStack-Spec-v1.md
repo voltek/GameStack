@@ -136,10 +136,23 @@ guess at.
 ## Explicitly Deferred
 - **Block 5:** AI-powered game recommendations based on user history (Room data).
 - **Instrumented tests (`androidTest/`).** Everything currently tested runs on
-  the JVM. Real-SQLite DAO tests, Room migration tests, and Compose UI tests need
-  a device/emulator and are deferred. Consequence to keep in mind: a wrong `@Query`
-  or a missing migration passes every existing test and fails on device. Revisit
-  before the first release that has real users with data to lose.
+  the JVM. Real-SQLite DAO tests, Room migration tests, and true device
+  interaction need a device/emulator and are deferred. Three concrete triggers,
+  so this is not "some day" — in priority order:
+  1. **The first Room migration.** A wrong `@Query` or a missing migration passes
+     every existing test and fails on device, and it fails by *destroying real
+     users' data*. This is the only item on the list whose cost is irreversible,
+     and it is the trigger to act on. No Room table exists yet.
+  2. **Real gestures and IME** — pull-to-refresh, the soft keyboard. Robolectric
+     screen tests cover render and semantics but not these.
+  3. **A pre-release smoke test.** Partly free already: Play Console's
+     pre-launch report runs the app on real devices when a build is uploaded to a
+     test track, so this trigger is weaker than it looks.
+
+  Compose *screen* tests are being taken out of this deferral: agreed to run
+  under Robolectric on the JVM, in their own source set so `./gradlew test` stays
+  instant **(PENDING — not yet implemented; the Testing Stack rule still forbids
+  Robolectric until that lands)**.
 - **Future:** KMP migration. The Data layer is architected for it —
   when the time comes, Retrofit → Ktor and Room → SQLDelight,
   without touching Domain or UI.
