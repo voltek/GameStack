@@ -70,6 +70,10 @@ import kotlinx.coroutines.flow.collectLatest
 
 private const val GameCoverAspectRatio = 3f / 4f
 
+// M3's own disabled-content opacity, restated because overriding a button's
+// content colour drops the default it would otherwise apply.
+private const val DisabledContentAlpha = 0.38f
+
 @Composable
 fun SearchScreen(
     onNavigateToGameDetail: (Int) -> Unit,
@@ -221,13 +225,16 @@ private fun RefreshErrorBanner(
                 .semantics { liveRegion = LiveRegionMode.Polite }
         )
         // A refresh already in flight makes Retry a no-op (the ViewModel drops
-        // it), so the control says so rather than looking available. The colour
-        // goes through ButtonDefaults so the disabled state dims with it.
+        // it), so the control says so rather than looking available. Both colours
+        // are set: overriding contentColor alone leaves disabledContentColor at
+        // M3's onSurface, which lands near-illegible on errorContainer.
         TextButton(
             onClick = onRetry,
             enabled = !isRetrying,
             colors = ButtonDefaults.textButtonColors(
-                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    .copy(alpha = DisabledContentAlpha)
             )
         ) {
             Text(text = stringResource(R.string.search_error_action))
