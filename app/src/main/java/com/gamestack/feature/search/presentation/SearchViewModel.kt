@@ -111,14 +111,15 @@ class SearchViewModel @Inject constructor(
 
                 startsSearch -> state.copy(
                     query = query,
+                    // games must never outlive the query it answers: anything
+                    // still holding them can only misread them as current.
+                    games = emptyList(),
                     // Optimistic, so the skeleton appears while the debounce runs
                     // rather than 400ms into the wait.
                     isLoading = true,
                     // Typing supersedes a refresh, and mapLatest cancels it, so
                     // its coroutine will never reset this flag itself.
                     isRefreshing = false,
-                    // Cleared here so a failure from the query being replaced
-                    // cannot outlive it and hide the results that do arrive.
                     errorMessage = null
                 )
 
@@ -149,16 +150,12 @@ class SearchViewModel @Inject constructor(
                 }
             }
             .onFailure {
-                // Only a *refresh* can keep what is on screen: those results still
-                // answer the query, so replacing them with the full-screen error
-                // would lose them to a transient failure — announce it over them
-                // instead. A failed search for new text is different: the results
-                // still displayed answer the previous query, so showing them under
-                // a snackbar would be a lie, and the error state is right.
-                // CLAUDE.md's MVI section names the first case as the reason
-                // UiState is a data class and not sealed — content and error do
-                // coexist.
-                val keepResults = isRefresh && _uiState.value.games.isNotEmpty()
+                // Results on screen always belong to the current query (they are
+                // cleared the moment it changes), so having any means this was a
+                // refresh of an answered query: keep them and announce the
+                // failure over them rather than losing them to a blip. Nothing
+                // on screen means the error state is all there is to show.
+                val keepResults = _uiState.value.games.isNotEmpty()
 
                 _uiState.update {
                     it.copy(

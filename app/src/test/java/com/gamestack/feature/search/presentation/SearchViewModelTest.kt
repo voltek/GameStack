@@ -456,7 +456,8 @@ class SearchViewModelTest {
         }
 
     // The full-screen error state still applies when a failure leaves nothing to
-    // keep — that is the case the error branch exists for.
+    // keep — that is the case the error branch exists for, and it must not also
+    // announce the failure as a snackbar over it.
     @Test
     fun `handleEvent OnRefresh should show the error state when a refresh fails with no results`() =
         runTest {
@@ -465,10 +466,40 @@ class SearchViewModelTest {
             advanceDebounce()
 
             coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
+
+            viewModel.uiEffect.test {
+                viewModel.handleEvent(SearchUiEvent.OnRefresh)
+                advanceDebounce()
+
+                expectNoEvents()
+            }
+
+            assertNotNull(viewModel.uiState.value.errorMessage)
+        }
+
+    // Regression: results were kept across a query change, so Retry on the error
+    // card — which emits OnRefresh — saw a non-empty list and treated a failed
+    // *new* search as a failed refresh. The previous query's results came back
+    // under the new text, which is precisely what this feature exists to prevent.
+    @Test
+    fun `handleEvent OnRefresh should not restore the previous query's results when a new search fails`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("halo") } returns Result.failure(RuntimeException("network down"))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("halo"))
+            advanceDebounce()
+
+            // Retry on the error card is an OnRefresh.
             viewModel.handleEvent(SearchUiEvent.OnRefresh)
             advanceDebounce()
 
-            assertNotNull(viewModel.uiState.value.errorMessage)
+            val state = viewModel.uiState.value
+            assertEquals("halo", state.query)
+            assertTrue(state.games.isEmpty())
+            assertNotNull(state.errorMessage)
         }
 
     private companion object {

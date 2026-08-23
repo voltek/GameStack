@@ -101,6 +101,14 @@ fun SearchScreen(
         }
     }
 
+    // The snackbar announces one failed refresh of one query. Once the query
+    // changes its message is about something the user has moved on from, and its
+    // Retry would act on the new text instead — or do nothing at all if the field
+    // was cleared, since a blank query cannot be refreshed.
+    LaunchedEffect(uiState.query) {
+        snackbarHostState.currentSnackbarData?.dismiss()
+    }
+
     // The host lives here rather than in GameStackApp's Scaffold: Search is the
     // only screen that raises a snackbar today, and NavHost content is already
     // inset by that Scaffold's padding, so bottom-aligning it here clears the
