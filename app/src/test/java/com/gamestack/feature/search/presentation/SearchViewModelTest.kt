@@ -8,6 +8,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -257,5 +258,66 @@ class SearchViewModelTest {
             val effect = awaitItem()
             assertTrue(effect is SearchUiEffect.NavigateToLibrary)
         }
+    }
+
+    // Regression: cancelling unconditionally on every keystroke also killed the
+    // request already running for the same effective query. On a first search
+    // there were no results to fall back on, so the screen dropped straight to
+    // "No Results Found" and the response that was about to arrive was discarded.
+    @Test
+    fun `handleEvent OnQueryChanged should keep an in-flight search alive when only whitespace changes`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } coAnswers {
+                delay(IN_FLIGHT_MILLIS)
+                Result.success(listOf(sampleGame))
+            }
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            // Past the debounce: the request is now running, not merely scheduled.
+            testDispatcher.scheduler.advanceTimeBy(PAST_DEBOUNCE_MILLIS)
+
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda "))
+
+            // The bug showed here: isLoading went false with games still empty.
+            assertTrue(viewModel.uiState.value.isLoading)
+            assertTrue(viewModel.uiState.value.games.isEmpty())
+
+            advanceDebounce()
+
+            val state = viewModel.uiState.value
+            assertEquals(listOf(sampleGame), state.games)
+            assertFalse(state.isLoading)
+            assertNull(state.errorMessage)
+            coVerify(exactly = 1) { searchGamesUseCase("zelda") }
+        }
+
+    // Refreshes are dispatched immediately, so the same guard must not let a
+    // whitespace keystroke cancel one mid-flight either.
+    @Test
+    fun `handleEvent OnQueryChanged should keep an in-flight refresh alive when only whitespace changes`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(emptyList())
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } coAnswers {
+                delay(IN_FLIGHT_MILLIS)
+                Result.success(listOf(sampleGame))
+            }
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda "))
+
+            assertTrue(viewModel.uiState.value.isRefreshing)
+
+            advanceDebounce()
+
+            assertEquals(listOf(sampleGame), viewModel.uiState.value.games)
+            assertFalse(viewModel.uiState.value.isRefreshing)
+        }
+
+    private companion object {
+        // Longer than the ViewModel's debounce, which is private to its file.
+        const val PAST_DEBOUNCE_MILLIS = 500L
+        const val IN_FLIGHT_MILLIS = 1_000L
     }
 }

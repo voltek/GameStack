@@ -100,6 +100,10 @@ private fun SearchContent(
     // quick taps on different cards both emit a single navigation effect.
     val onGameClicked = rememberSingleClick<Int> { onEvent(SearchUiEvent.OnGameClicked(it)) }
 
+    // Every callback that emits a navigation effect needs the guard, not just the
+    // ones in lists — this CTA was missed when the wrapper was introduced.
+    val onGoToLibrary = rememberSingleClick { onEvent(SearchUiEvent.OnGoToLibraryClicked) }
+
     Column(modifier = modifier.fillMaxSize()) {
         SearchBar(
             query = uiState.query,
@@ -162,7 +166,7 @@ private fun SearchContent(
                     description = stringResource(R.string.search_empty_description),
                     modifier = Modifier.imePadding(),
                     actionLabel = stringResource(R.string.search_empty_action),
-                    onAction = { onEvent(SearchUiEvent.OnGoToLibraryClicked) }
+                    onAction = onGoToLibrary
                 )
 
                 else -> SearchResultsGrid(games = uiState.games, onGameClicked = onGameClicked)

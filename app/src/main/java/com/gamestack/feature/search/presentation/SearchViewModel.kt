@@ -32,6 +32,13 @@ class SearchViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
+    // Effective query [searchJob] serves, or null when nothing is running. Two
+    // opposite situations otherwise reach the same branch below: a job already
+    // searching this exact text must be left to land, while a job scheduled for
+    // text the user has since abandoned must be cancelled. Only the query the
+    // job was started for tells them apart.
+    private var searchJobQuery: String? = null
+
     // Trimmed value of the last query actually dispatched to the UseCase (via
     // debounce or refresh) — lets onQueryChanged tell "user added/removed
     // leading/trailing whitespace" apart from "the effective search text
@@ -53,12 +60,8 @@ class SearchViewModel @Inject constructor(
 
         val trimmedQuery = query.trim()
 
-        // Cancel before deciding anything else: whatever is pending was scheduled
-        // for a query the user has since changed, so it must never land — even on
-        // the paths below that start no new search of their own.
-        searchJob?.cancel()
-
         if (trimmedQuery.isEmpty()) {
+            cancelSearch()
             lastSearchedQuery = ""
             _uiState.update {
                 it.copy(
@@ -71,30 +74,50 @@ class SearchViewModel @Inject constructor(
             return
         }
 
-        // Same effective query as the last one actually searched (e.g. only
-        // whitespace was added/removed) — nothing new to search for, and the
-        // results already on screen are the right ones.
+        // A job is already serving this exact effective query — the user only
+        // added or removed surrounding whitespace while it ran. Cancelling here
+        // would throw away the response that is about to arrive.
+        if (trimmedQuery == searchJobQuery) return
+
+        // Anything still scheduled is for text the user has since changed, so it
+        // must never land — including on the path below that starts no new
+        // search of its own.
+        cancelSearch()
+
+        // Same effective query as the last one actually searched — nothing new to
+        // search for, and the results already on screen are the right ones.
         if (trimmedQuery == lastSearchedQuery) {
             _uiState.update { it.copy(isLoading = false) }
             return
         }
 
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-        searchJob = viewModelScope.launch {
-            delay(SearchDebounceMillis)
-            lastSearchedQuery = trimmedQuery
-            performSearch(trimmedQuery, isRefresh = false)
-        }
+        startSearch(trimmedQuery, isRefresh = false)
     }
 
     private fun onRefresh() {
         val trimmedQuery = _uiState.value.query.trim()
         if (trimmedQuery.isEmpty()) return
 
+        cancelSearch()
+        startSearch(trimmedQuery, isRefresh = true)
+    }
+
+    private fun cancelSearch() {
         searchJob?.cancel()
+        searchJob = null
+        searchJobQuery = null
+    }
+
+    private fun startSearch(query: String, isRefresh: Boolean) {
+        searchJobQuery = query
         searchJob = viewModelScope.launch {
-            lastSearchedQuery = trimmedQuery
-            performSearch(trimmedQuery, isRefresh = true)
+            // A refresh is an explicit user action, so it runs immediately; a
+            // keystroke waits out the debounce.
+            if (!isRefresh) delay(SearchDebounceMillis)
+            lastSearchedQuery = query
+            performSearch(query, isRefresh)
+            searchJobQuery = null
         }
     }
 

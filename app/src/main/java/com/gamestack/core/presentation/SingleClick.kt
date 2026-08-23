@@ -30,3 +30,12 @@ fun <T> rememberSingleClick(onClick: (T) -> Unit): (T) -> Unit {
         }
     }
 }
+
+// Same guard for a callback that carries no argument, e.g. an empty-state CTA.
+// Without it those call sites read `rememberSingleClick<Unit>` and `wrapped(Unit)`,
+// which is noise at exactly the places that are easiest to forget to guard.
+@Composable
+fun rememberSingleClick(onClick: () -> Unit): () -> Unit {
+    val guarded = rememberSingleClick<Unit> { onClick() }
+    return { guarded(Unit) }
+}

@@ -331,10 +331,15 @@ UI and ViewModel communicate:
   it would silently drop those instead. The cost of queueing is that a
   *duplicated* effect is not merely handled twice, it is replayed when the user
   returns to the screen. So the invariant is at the source: **one user intent
-  must emit exactly one effect.** Wrap navigation callbacks in
-  `rememberSingleClick` (`core/presentation/`), sharing one wrapper per list so
-  two different items cannot fire back to back. Do not "fix" a duplicated effect
-  by changing the Channel — that trades a visible bug for a silent one.
+  must emit exactly one effect.** Wrap **every** callback that emits a
+  navigation effect in `rememberSingleClick` (`core/presentation/`) — a list's
+  items, an empty-state CTA, a toolbar action, all of them. For a list, share one
+  wrapper across the whole list so two different items cannot fire back to back;
+  a no-argument overload exists for single controls. Auditing this is per screen,
+  not per list: the CTA on Search kept emitting duplicates because the wrapper
+  was introduced for the result cards only, which is where the bug had been seen.
+  Do not "fix" a duplicated effect by changing the Channel — that trades a
+  visible bug for a silent one.
 
 All three live together in `feature/{name}/presentation/{ScreenName}Contract.kt`
 — this is the one-class-per-file exception (1) below. The ViewModel exposes a
