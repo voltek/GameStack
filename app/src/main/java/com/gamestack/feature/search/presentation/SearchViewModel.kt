@@ -135,6 +135,10 @@ class SearchViewModel @Inject constructor(
 
     private fun onRefresh() {
         if (_uiState.value.query.isBlank()) return
+        // Repeat taps on the banner's Retry would each reach IGDB, whose quota is
+        // finite. mapLatest and the buffered SharedFlow already keep the *state*
+        // consistent, so this exists purely to stop redundant requests.
+        if (_uiState.value.isRefreshing) return
         // Set here, not in performSearch: PullToRefreshBox reads this flag
         // synchronously when the pull is released and retracts the indicator if
         // it is still false, so leaving it to a coroutine hop makes the spinner

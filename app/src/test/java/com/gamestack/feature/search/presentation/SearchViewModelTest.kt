@@ -348,6 +348,31 @@ class SearchViewModelTest {
             assertFalse(viewModel.uiState.value.isRefreshing)
         }
 
+    // Regression: nothing stopped a second OnRefresh while one was already running,
+    // so repeat taps on the banner's Retry each reached IGDB's rate-limited API.
+    // mapLatest kept the *state* correct throughout, which is precisely why the
+    // waste was invisible on screen and only a call count can catch it.
+    @Test
+    fun `handleEvent OnRefresh should ignore a repeat request while one is already in flight`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } coAnswers {
+                delay(IN_FLIGHT_MILLIS)
+                Result.success(listOf(sampleGame))
+            }
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+
+            advanceDebounce()
+
+            // One for the original search, one for the single refresh that got through.
+            coVerify(exactly = 2) { searchGamesUseCase("zelda") }
+        }
+
     // Regression: marking a query as searched at dispatch time made that flag lie
     // whenever the request was later cancelled. Typing a character and deleting it
     // while the first search was still in flight left the restored query matching

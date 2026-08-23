@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +48,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -177,7 +181,8 @@ private fun SearchContent(
                     uiState.refreshError?.let { message ->
                         RefreshErrorBanner(
                             message = message.asString(),
-                            onRetry = { onEvent(SearchUiEvent.OnRefresh) }
+                            onRetry = { onEvent(SearchUiEvent.OnRefresh) },
+                            isRetrying = uiState.isRefreshing
                         )
                     }
                     SearchResultsGrid(games = uiState.games, onGameClicked = onGameClicked)
@@ -191,6 +196,7 @@ private fun SearchContent(
 private fun RefreshErrorBanner(
     message: String,
     onRetry: () -> Unit,
+    isRetrying: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -206,13 +212,25 @@ private fun RefreshErrorBanner(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onErrorContainer,
-            modifier = Modifier.weight(1f)
+            // The Snackbar this replaced was announced on display; a Row is not,
+            // so a TalkBack user would keep reading a list with no cue it is
+            // stale. Declared on the Text rather than the Row so the announcement
+            // carries the message and the Retry button stays separately focusable.
+            modifier = Modifier
+                .weight(1f)
+                .semantics { liveRegion = LiveRegionMode.Polite }
         )
-        TextButton(onClick = onRetry) {
-            Text(
-                text = stringResource(R.string.search_error_action),
-                color = MaterialTheme.colorScheme.onErrorContainer
+        // A refresh already in flight makes Retry a no-op (the ViewModel drops
+        // it), so the control says so rather than looking available. The colour
+        // goes through ButtonDefaults so the disabled state dims with it.
+        TextButton(
+            onClick = onRetry,
+            enabled = !isRetrying,
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = MaterialTheme.colorScheme.onErrorContainer
             )
+        ) {
+            Text(text = stringResource(R.string.search_error_action))
         }
     }
 }
@@ -385,6 +403,26 @@ private fun SearchContentResultsPreview() {
 private fun SearchContentEmptyPreview() {
     GameStackTheme {
         SearchContent(uiState = SearchUiState(query = "asdkjhaksjd"), onEvent = {})
+    }
+}
+
+// The one state that cannot be reached deterministically on device without
+// dropping the network mid-session — the others are all a query away.
+@Preview(showBackground = true)
+@Composable
+private fun SearchContentRefreshErrorPreview() {
+    GameStackTheme {
+        SearchContent(
+            uiState = SearchUiState(
+                query = "Elden Ring",
+                games = listOf(
+                    Game(1, "Elden Ring", null, listOf("RPG"), "FromSoftware"),
+                    Game(2, "God of War Ragnarok", null, listOf("Action"), "Santa Monica Studio")
+                ),
+                refreshError = UiText.DynamicString("Couldn't refresh results.")
+            ),
+            onEvent = {}
+        )
     }
 }
 
