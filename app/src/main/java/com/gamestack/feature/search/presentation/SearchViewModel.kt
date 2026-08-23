@@ -106,20 +106,24 @@ class SearchViewModel @Inject constructor(
                     games = emptyList(),
                     isLoading = false,
                     isRefreshing = false,
-                    errorMessage = null
+                    errorMessage = null,
+                    refreshError = null
                 )
 
                 startsSearch -> state.copy(
                     query = query,
+                    // games must never outlive the query it answers: anything
+                    // still holding them can only misread them as current.
+                    games = emptyList(),
                     // Optimistic, so the skeleton appears while the debounce runs
                     // rather than 400ms into the wait.
                     isLoading = true,
                     // Typing supersedes a refresh, and mapLatest cancels it, so
                     // its coroutine will never reset this flag itself.
                     isRefreshing = false,
-                    // Cleared here so a failure from the query being replaced
-                    // cannot outlive it and hide the results that do arrive.
-                    errorMessage = null
+                    errorMessage = null,
+                    // The stale results it described are gone, so is it.
+                    refreshError = null
                 )
 
                 else -> state.copy(query = query)
@@ -131,6 +135,10 @@ class SearchViewModel @Inject constructor(
 
     private fun onRefresh() {
         if (_uiState.value.query.isBlank()) return
+        // Repeat taps on the banner's Retry would each reach IGDB, whose quota is
+        // finite. mapLatest and the buffered SharedFlow already keep the *state*
+        // consistent, so this exists purely to stop redundant requests.
+        if (_uiState.value.isRefreshing) return
         // Set here, not in performSearch: PullToRefreshBox reads this flag
         // synchronously when the pull is released and retracts the indicator if
         // it is still false, so leaving it to a coroutine hop makes the spinner
@@ -145,15 +153,40 @@ class SearchViewModel @Inject constructor(
         searchGamesUseCase(query)
             .onSuccess { games ->
                 _uiState.update {
-                    it.copy(games = games, isLoading = false, isRefreshing = false, errorMessage = null)
+                    it.copy(
+                        games = games,
+                        isLoading = false,
+                        isRefreshing = false,
+                        errorMessage = null,
+                        // Fresh results resolve the condition the banner reports,
+                        // so it goes with them. Nothing else has to remember to
+                        // take it down.
+                        refreshError = null
+                    )
                 }
             }
             .onFailure {
+                // Results on screen always belong to the current query (they are
+                // cleared the moment it changes), so having any means this was a
+                // refresh of an answered query: keep them and report the failure
+                // alongside rather than losing them to a blip. Nothing on screen
+                // means the error state is all there is to show.
+                val keepResults = _uiState.value.games.isNotEmpty()
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         isRefreshing = false,
-                        errorMessage = UiText.StringResource(R.string.search_error_description)
+                        errorMessage = if (keepResults) {
+                            null
+                        } else {
+                            UiText.StringResource(R.string.search_error_description)
+                        },
+                        refreshError = if (keepResults) {
+                            UiText.StringResource(R.string.search_refresh_error)
+                        } else {
+                            null
+                        }
                     )
                 }
             }

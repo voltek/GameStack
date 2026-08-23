@@ -2,6 +2,7 @@ package com.gamestack.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,7 +40,13 @@ fun GameStackApp() {
         NavHost(
             navController = navController,
             startDestination = Destination.HomeGraph,
-            modifier = Modifier.padding(innerPadding)
+            // padding() positions the content but does not mark those insets as
+            // handled, so an imePadding() inside would add the keyboard height
+            // measured from the window bottom — counting the bottom bar twice
+            // and floating the content a bar's height too high.
+            modifier = Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
         ) {
             navigation<Destination.HomeGraph>(startDestination = Destination.Home) {
                 composable<Destination.Home> { HomePlaceholder() }

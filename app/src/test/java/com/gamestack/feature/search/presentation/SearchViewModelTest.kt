@@ -348,6 +348,31 @@ class SearchViewModelTest {
             assertFalse(viewModel.uiState.value.isRefreshing)
         }
 
+    // Regression: nothing stopped a second OnRefresh while one was already running,
+    // so repeat taps on the banner's Retry each reached IGDB's rate-limited API.
+    // mapLatest kept the *state* correct throughout, which is precisely why the
+    // waste was invisible on screen and only a call count can catch it.
+    @Test
+    fun `handleEvent OnRefresh should ignore a repeat request while one is already in flight`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } coAnswers {
+                delay(IN_FLIGHT_MILLIS)
+                Result.success(listOf(sampleGame))
+            }
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+
+            advanceDebounce()
+
+            // One for the original search, one for the single refresh that got through.
+            coVerify(exactly = 2) { searchGamesUseCase("zelda") }
+        }
+
     // Regression: marking a query as searched at dispatch time made that flag lie
     // whenever the request was later cancelled. Typing a character and deleting it
     // while the first search was still in flight left the restored query matching
@@ -427,6 +452,113 @@ class SearchViewModelTest {
 
             assertFalse(viewModel.uiState.value.isRefreshing)
             assertTrue(viewModel.uiState.value.isLoading)
+        }
+
+    // Regression: a failed refresh set errorMessage while games were untouched,
+    // and the screen renders the error branch first, so the whole results grid was
+    // replaced by the full-screen error card. The user lost loaded results to a
+    // transient network failure.
+    @Test
+    fun `handleEvent OnRefresh should keep results and announce the failure when a refresh fails`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+
+            val state = viewModel.uiState.value
+            assertEquals(listOf(sampleGame), state.games)
+            assertNotNull(state.refreshError)
+            assertNull(state.errorMessage)
+            assertFalse(state.isRefreshing)
+        }
+
+    // Regression: the failure used to be announced transiently, so it outlived
+    // the condition — a later successful refresh left the message sitting over
+    // fresh results. As state it goes away with the thing it described.
+    @Test
+    fun `handleEvent OnRefresh should clear the refresh error once a later refresh succeeds`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+            assertNotNull(viewModel.uiState.value.refreshError)
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+
+            assertNull(viewModel.uiState.value.refreshError)
+        }
+
+    // Same lifetime rule from the other direction: the banner describes results
+    // for one query, so changing the query must take it down with them.
+    @Test
+    fun `handleEvent OnQueryChanged should clear the refresh error when the query changes`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+            assertNotNull(viewModel.uiState.value.refreshError)
+
+            coEvery { searchGamesUseCase("halo") } returns Result.success(emptyList())
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("halo"))
+
+            assertNull(viewModel.uiState.value.refreshError)
+        }
+
+    // The full-screen error state still applies when a failure leaves nothing to
+    // keep — that is the case the error branch exists for, and it must not also
+    // raise the banner, which would then have no results to sit above.
+    @Test
+    fun `handleEvent OnRefresh should show the error state when a refresh fails with no results`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(emptyList())
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+
+            assertNotNull(viewModel.uiState.value.errorMessage)
+            assertNull(viewModel.uiState.value.refreshError)
+        }
+
+    // Regression: results were kept across a query change, so Retry on the error
+    // card — which emits OnRefresh — saw a non-empty list and treated a failed
+    // *new* search as a failed refresh. The previous query's results came back
+    // under the new text, which is precisely what this feature exists to prevent.
+    @Test
+    fun `handleEvent OnRefresh should not restore the previous query's results when a new search fails`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("halo") } returns Result.failure(RuntimeException("network down"))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("halo"))
+            advanceDebounce()
+
+            // Retry on the error card is an OnRefresh.
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+
+            val state = viewModel.uiState.value
+            assertEquals("halo", state.query)
+            assertTrue(state.games.isEmpty())
+            assertNotNull(state.errorMessage)
         }
 
     private companion object {
