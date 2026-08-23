@@ -106,7 +106,8 @@ class SearchViewModel @Inject constructor(
                     games = emptyList(),
                     isLoading = false,
                     isRefreshing = false,
-                    errorMessage = null
+                    errorMessage = null,
+                    refreshError = null
                 )
 
                 startsSearch -> state.copy(
@@ -120,7 +121,9 @@ class SearchViewModel @Inject constructor(
                     // Typing supersedes a refresh, and mapLatest cancels it, so
                     // its coroutine will never reset this flag itself.
                     isRefreshing = false,
-                    errorMessage = null
+                    errorMessage = null,
+                    // The stale results it described are gone, so is it.
+                    refreshError = null
                 )
 
                 else -> state.copy(query = query)
@@ -146,15 +149,24 @@ class SearchViewModel @Inject constructor(
         searchGamesUseCase(query)
             .onSuccess { games ->
                 _uiState.update {
-                    it.copy(games = games, isLoading = false, isRefreshing = false, errorMessage = null)
+                    it.copy(
+                        games = games,
+                        isLoading = false,
+                        isRefreshing = false,
+                        errorMessage = null,
+                        // Fresh results resolve the condition the banner reports,
+                        // so it goes with them. Nothing else has to remember to
+                        // take it down.
+                        refreshError = null
+                    )
                 }
             }
             .onFailure {
                 // Results on screen always belong to the current query (they are
                 // cleared the moment it changes), so having any means this was a
-                // refresh of an answered query: keep them and announce the
-                // failure over them rather than losing them to a blip. Nothing
-                // on screen means the error state is all there is to show.
+                // refresh of an answered query: keep them and report the failure
+                // alongside rather than losing them to a blip. Nothing on screen
+                // means the error state is all there is to show.
                 val keepResults = _uiState.value.games.isNotEmpty()
 
                 _uiState.update {
@@ -165,16 +177,12 @@ class SearchViewModel @Inject constructor(
                             null
                         } else {
                             UiText.StringResource(R.string.search_error_description)
+                        },
+                        refreshError = if (keepResults) {
+                            UiText.StringResource(R.string.search_refresh_error)
+                        } else {
+                            null
                         }
-                    )
-                }
-
-                if (keepResults) {
-                    sendEffect(
-                        SearchUiEffect.ShowRefreshError(
-                            message = UiText.StringResource(R.string.search_refresh_error),
-                            query = query
-                        )
                     )
                 }
             }

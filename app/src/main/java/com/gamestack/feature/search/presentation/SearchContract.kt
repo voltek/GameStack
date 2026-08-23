@@ -8,7 +8,14 @@ data class SearchUiState(
     val games: List<Game> = emptyList(),
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
-    val errorMessage: UiText? = null
+    val errorMessage: UiText? = null,
+    // A refresh failed while [games] stayed on screen. State rather than a
+    // one-shot effect because it describes a condition that lasts until
+    // something resolves it, not a moment: it clears itself when a load
+    // succeeds or the query changes. Announcing it transiently instead cost
+    // three separate defects, each a different way for the announcement's
+    // lifetime to drift from the condition's.
+    val refreshError: UiText? = null
 )
 
 sealed class SearchUiEvent {
@@ -22,12 +29,4 @@ sealed class SearchUiEvent {
 sealed class SearchUiEffect {
     data class NavigateToGameDetail(val gameId: Int) : SearchUiEffect()
     data object NavigateToLibrary : SearchUiEffect()
-
-    // A refresh that fails while results are still on screen. It is an effect and
-    // not a UiState field because the results stay: the failure is announced over
-    // them and then gone, which is a one-shot event, not a state the screen is in.
-    // [query] is the effective query it belongs to — the Channel can hold it
-    // while the user types, and a message about text they have left is worse than
-    // no message, so the screen drops it rather than showing it late.
-    data class ShowRefreshError(val message: UiText, val query: String) : SearchUiEffect()
 }

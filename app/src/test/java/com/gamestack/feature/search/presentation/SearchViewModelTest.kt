@@ -441,27 +441,61 @@ class SearchViewModelTest {
             advanceDebounce()
 
             coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
-
-            viewModel.uiEffect.test {
-                viewModel.handleEvent(SearchUiEvent.OnRefresh)
-                advanceDebounce()
-
-                val effect = awaitItem()
-                assertTrue(effect is SearchUiEffect.ShowRefreshError)
-                // Carries the query it belongs to, so the screen can drop it if
-                // the user has typed on while it sat in the Channel.
-                assertEquals("zelda", (effect as SearchUiEffect.ShowRefreshError).query)
-            }
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
 
             val state = viewModel.uiState.value
             assertEquals(listOf(sampleGame), state.games)
+            assertNotNull(state.refreshError)
             assertNull(state.errorMessage)
             assertFalse(state.isRefreshing)
         }
 
+    // Regression: the failure used to be announced transiently, so it outlived
+    // the condition — a later successful refresh left the message sitting over
+    // fresh results. As state it goes away with the thing it described.
+    @Test
+    fun `handleEvent OnRefresh should clear the refresh error once a later refresh succeeds`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+            assertNotNull(viewModel.uiState.value.refreshError)
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+
+            assertNull(viewModel.uiState.value.refreshError)
+        }
+
+    // Same lifetime rule from the other direction: the banner describes results
+    // for one query, so changing the query must take it down with them.
+    @Test
+    fun `handleEvent OnQueryChanged should clear the refresh error when the query changes`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+            assertNotNull(viewModel.uiState.value.refreshError)
+
+            coEvery { searchGamesUseCase("halo") } returns Result.success(emptyList())
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("halo"))
+
+            assertNull(viewModel.uiState.value.refreshError)
+        }
+
     // The full-screen error state still applies when a failure leaves nothing to
     // keep — that is the case the error branch exists for, and it must not also
-    // announce the failure as a snackbar over it.
+    // raise the banner, which would then have no results to sit above.
     @Test
     fun `handleEvent OnRefresh should show the error state when a refresh fails with no results`() =
         runTest {
@@ -470,15 +504,11 @@ class SearchViewModelTest {
             advanceDebounce()
 
             coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
-
-            viewModel.uiEffect.test {
-                viewModel.handleEvent(SearchUiEvent.OnRefresh)
-                advanceDebounce()
-
-                expectNoEvents()
-            }
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
 
             assertNotNull(viewModel.uiState.value.errorMessage)
+            assertNull(viewModel.uiState.value.refreshError)
         }
 
     // Regression: results were kept across a query change, so Retry on the error

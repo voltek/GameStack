@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,16 +31,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +44,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -77,58 +73,17 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
-    val retryLabel = stringResource(R.string.search_error_action)
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
                 is SearchUiEffect.NavigateToGameDetail -> onNavigateToGameDetail(effect.gameId)
                 SearchUiEffect.NavigateToLibrary -> onNavigateToLibrary()
-                is SearchUiEffect.ShowRefreshError -> {
-                    // The Channel can hold this while the user keeps typing, so
-                    // the check has to be here, at display time. Dismissing on a
-                    // query change only reaches a snackbar that is already up.
-                    if (effect.query != uiState.query.trim()) return@collectLatest
-
-                    val result = snackbarHostState.showSnackbar(
-                        message = effect.message.asString(context),
-                        actionLabel = retryLabel,
-                        withDismissAction = true,
-                        duration = SnackbarDuration.Long
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.handleEvent(SearchUiEvent.OnRefresh)
-                    }
-                }
             }
         }
     }
 
-    // Keyed on the effective query, matching the ViewModel: a trailing space is
-    // not a new search and must not disturb a snackbar that still applies.
-    LaunchedEffect(uiState.query.trim()) {
-        snackbarHostState.currentSnackbarData?.dismiss()
-    }
-
-    // The host lives here rather than in GameStackApp's Scaffold: Search is the
-    // only screen that raises a snackbar today, and NavHost content is already
-    // inset by that Scaffold's padding, so bottom-aligning it here clears the
-    // bottom nav with no offset maths. Promote it to the app Scaffold as soon as
-    // a second screen needs one — two local hosts would be the wrong shape.
-    Box(modifier = Modifier.fillMaxSize()) {
-        SearchContent(uiState = uiState, onEvent = viewModel::handleEvent)
-        SnackbarHost(
-            hostState = snackbarHostState,
-            // enableEdgeToEdge() means adjustResize never shrinks the window, so
-            // without this the snackbar and its Retry sit behind the keyboard —
-            // the same reason the message states carry it.
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .imePadding()
-        )
-    }
+    SearchContent(uiState = uiState, onEvent = viewModel::handleEvent)
 }
 
 @Composable
@@ -216,8 +171,48 @@ private fun SearchContent(
                     onAction = onGoToLibrary
                 )
 
-                else -> SearchResultsGrid(games = uiState.games, onGameClicked = onGameClicked)
+                else -> Column(modifier = Modifier.fillMaxSize()) {
+                    // Only ever reached with results on screen, which is the
+                    // only situation the banner describes.
+                    uiState.refreshError?.let { message ->
+                        RefreshErrorBanner(
+                            message = message.asString(),
+                            onRetry = { onEvent(SearchUiEvent.OnRefresh) }
+                        )
+                    }
+                    SearchResultsGrid(games = uiState.games, onGameClicked = onGameClicked)
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun RefreshErrorBanner(
+    message: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.errorContainer)
+            .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier.weight(1f)
+        )
+        TextButton(onClick = onRetry) {
+            Text(
+                text = stringResource(R.string.search_error_action),
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
         }
     }
 }
