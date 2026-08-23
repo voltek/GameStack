@@ -446,7 +446,11 @@ class SearchViewModelTest {
                 viewModel.handleEvent(SearchUiEvent.OnRefresh)
                 advanceDebounce()
 
-                assertTrue(awaitItem() is SearchUiEffect.ShowRefreshError)
+                val effect = awaitItem()
+                assertTrue(effect is SearchUiEffect.ShowRefreshError)
+                // Carries the query it belongs to, so the screen can drop it if
+                // the user has typed on while it sat in the Channel.
+                assertEquals("zelda", (effect as SearchUiEffect.ShowRefreshError).query)
             }
 
             val state = viewModel.uiState.value

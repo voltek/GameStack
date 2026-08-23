@@ -87,6 +87,11 @@ fun SearchScreen(
                 is SearchUiEffect.NavigateToGameDetail -> onNavigateToGameDetail(effect.gameId)
                 SearchUiEffect.NavigateToLibrary -> onNavigateToLibrary()
                 is SearchUiEffect.ShowRefreshError -> {
+                    // The Channel can hold this while the user keeps typing, so
+                    // the check has to be here, at display time. Dismissing on a
+                    // query change only reaches a snackbar that is already up.
+                    if (effect.query != uiState.query.trim()) return@collectLatest
+
                     val result = snackbarHostState.showSnackbar(
                         message = effect.message.asString(context),
                         actionLabel = retryLabel,
@@ -101,11 +106,9 @@ fun SearchScreen(
         }
     }
 
-    // The snackbar announces one failed refresh of one query. Once the query
-    // changes its message is about something the user has moved on from, and its
-    // Retry would act on the new text instead — or do nothing at all if the field
-    // was cleared, since a blank query cannot be refreshed.
-    LaunchedEffect(uiState.query) {
+    // Keyed on the effective query, matching the ViewModel: a trailing space is
+    // not a new search and must not disturb a snackbar that still applies.
+    LaunchedEffect(uiState.query.trim()) {
         snackbarHostState.currentSnackbarData?.dismiss()
     }
 
@@ -118,7 +121,12 @@ fun SearchScreen(
         SearchContent(uiState = uiState, onEvent = viewModel::handleEvent)
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            // enableEdgeToEdge() means adjustResize never shrinks the window, so
+            // without this the snackbar and its Retry sit behind the keyboard —
+            // the same reason the message states carry it.
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .imePadding()
         )
     }
 }

@@ -172,7 +172,8 @@ class SearchViewModel @Inject constructor(
                 if (keepResults) {
                     sendEffect(
                         SearchUiEffect.ShowRefreshError(
-                            UiText.StringResource(R.string.search_refresh_error)
+                            message = UiText.StringResource(R.string.search_refresh_error),
+                            query = query
                         )
                     )
                 }
