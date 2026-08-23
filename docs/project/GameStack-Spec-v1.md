@@ -176,6 +176,8 @@ guess at.
   `.claude/skills/`, kept as a record of how the project was built. Not
   invocable. Currently: `project-scaffold`.
 - `docs/project/design/` — approved Stitch exports (HTML + PNG) per screen,
-  plus `design/states/` for the shared loading/empty/error states
+  plus `design/states/` for the shared loading/empty/error states.
+  `design/README.md` covers how to regenerate a PNG from its HTML and what a
+  screenshot costs to read
 - `docs/project/DESIGN.md` — visual design system (colors, typography, spacing)
 - `docs/project/DRIFT-CHECKLIST.md` — manual audit checklist against CLAUDE.md Tier 1 rules

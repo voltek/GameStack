@@ -78,6 +78,38 @@ drift returns.
     Plain `test` is a lifecycle task and rejects `--tests`.
 - Lint: `./gradlew lint`
 
+### Device verification — Tier 2
+The gate above (`build`/`test`/`lint`) is necessary but **not sufficient for UI
+work**: it proves the code compiles and that the logic does what a test asserts,
+never that a screen looks right or that a control is reachable. Every feature
+that adds or changes a screen is also verified on the emulator before a merge is
+requested, and the PR body says what was checked. Data/domain work with no UI
+change does not need this pass.
+
+- Install: `ANDROID_SERIAL=emulator-5554 ./gradlew installDebug`. `adb` is not
+  on PATH — use `$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe`.
+- **If no emulator is running, ask for one** — do not declare a UI feature done
+  without this pass, and do not launch an AVD unprompted (it opens a window on
+  the user's desktop).
+- **Two tools, two questions.** `Grep` over `uiautomator dump` for assertions
+  that can be stated in advance (which tab is `selected="true"`, whether a text
+  or node exists) — only matching lines enter context, so it is by far the
+  cheaper path. `adb exec-out screencap -p`, read as an image, when the
+  criterion is visual (clipping, spacing, contrast, alignment) and **whenever a
+  keyboard may be on screen**: the dump contains only the app window, never the
+  IME, so it reports as visible controls the keyboard is actually covering.
+  This cost real debugging time once — taps aimed from dump coordinates landed
+  on keyboard keys. `dumpsys input_method` is unreliable on this AVD for the
+  same question. Close every UI verification with at least one screenshot: the
+  dump cannot find what nobody thought to assert, and three of the Search bugs
+  were purely visual.
+- Cover every state the screen declares (initial, loading, content, empty,
+  error), plus the keyboard raised if there is a text field. Network-dependent
+  states can be forced with `adb shell svc data disable` / `svc wifi disable`.
+- Screenshot cost is set by aspect ratio, not by AVD resolution — see
+  `docs/project/design/README.md`. Do not shrink the AVD to save tokens; it
+  saves none.
+
 ## Git workflow
 
 ### Tier 1 — Immutable
