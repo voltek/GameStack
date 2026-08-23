@@ -164,6 +164,13 @@ change does not need this pass.
   body's edit box on the web** — GitHub uploads them to its own CDN. Never commit
   emulator captures to the repo; only design references under
   `docs/project/design/` are versioned, and those can be linked by URL.
+- **Hand the captures over; do not make the human retake them.** The device pass
+  already produced screenshots. Save them somewhere stable outside the repo
+  (`~/Pictures/GameStack/pr-{n}/`, named for what they show — a scratchpad or
+  `%TEMP%` path gets cleaned), give the paths in chat when the PR is opened, and
+  say plainly that the PR needs them dragged in **before** it is merged. An agent
+  that verified on device and then let the human go hunting for a screenshot
+  wasted the one part of this only the human can finish.
 - **Automated review threads (Codex bot, `/code-review`) are closed explicitly.**
   Fix the finding or dismiss it with a reason, reply in the thread saying what
   was done, then **Resolve conversation** — the reply is the history, the resolve
