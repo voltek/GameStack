@@ -191,10 +191,9 @@ to keep:
   instead. This already destroyed an uploaded screenshot on PR #5, minutes after
   asking for it.
 - **Hand the captures over; do not make the human retake them.** The device pass
-  already produced screenshots. Save them somewhere stable outside the repo
-  (`~/Documents/GameStack/screenshots/pr-{n}/`, alongside the other out-of-repo
-  artifacts for this project — named for what they show; a scratchpad or
-  `%TEMP%` path gets cleaned), give the paths in chat when the PR is opened, and
+  already produced screenshots. Save them somewhere stable outside the repo,
+  named for what they show — a scratchpad or `%TEMP%` path gets cleaned — then
+  give the paths in chat when the PR is opened, and
   say plainly that the PR needs them dragged in **before** it is merged. An agent
   that verified on device and then let the human go hunting for a screenshot
   wasted the one part of this only the human can finish.
