@@ -136,14 +136,37 @@ change does not need this pass.
 - One branch per unit of work. A refactor that exists *only because of* a feature
   (e.g. navigation restructured so Detail belongs to a tab) belongs on that
   feature's branch — it cannot be built or tested independently of it.
+- **Before each commit, ask whether it exists *because of* this branch's unit of
+  work.** If it does not, it belongs on its own branch off `main` — park it with
+  `git stash`, or `git cherry-pick` it onto a fresh branch afterwards. This rule
+  already existed and PR #3 still reached 1,992 additions across 46 files, of
+  which only two commits were the Search feature; the rest were an unrelated auth
+  fix, two `.gitignore` chores, a design asset and three documentation-policy
+  changes that merely happened to occur while the branch was open. What inflates
+  a PR is how long the branch stays open, not how hard the feature is.
+- Treat **400 changed lines or 15 files** as a smoke alarm, not a limit: past
+  roughly that size review quality drops sharply, so stop and check the PR is
+  still one reviewable claim. If its title needs an "and", split it.
 - Commit messages follow **Conventional Commits**: `type(scope): imperative
   summary`, lowercase, no trailing period. Types in use: `feat`, `fix`,
   `refactor`, `docs`, `chore`, `test`. Scope is the feature or layer
   (`search`, `auth`, `nav`) and is optional for repo-wide changes.
   Example: `feat(search): search IGDB games with results, empty and error states`.
   (Commits before 2026-08-22 predate this convention — do not rewrite them.)
-- Open a PR when a branch is ready for review. The body states what changed, why,
-  and how it was verified (gate output, emulator/device check).
+- Open a PR when a branch is ready for review, using
+  `.github/pull_request_template.md`. The body states what changed, why, and how
+  it was verified (gate output, emulator/device check). UI changes include
+  screenshots: generate them locally, then **drag or paste them into the PR
+  body's edit box on the web** — GitHub uploads them to its own CDN. Never commit
+  emulator captures to the repo; only design references under
+  `docs/project/design/` are versioned, and those can be linked by URL.
+- **Automated review threads (Codex bot, `/code-review`) are closed explicitly.**
+  Fix the finding or dismiss it with a reason, reply in the thread saying what
+  was done, then **Resolve conversation** — the reply is the history, the resolve
+  is only the filing. An unanswered thread is indistinguishable from an unnoticed
+  one. Check the reviewed commit before trusting a bot review: it pins to the SHA
+  it ran on, so a review from four commits ago may already be stale. Re-request
+  with `@codex review` after pushing fixes.
 - Run `/code-review` on any PR touching app code before asking for a merge;
   doc-only or chore-only PRs may skip it. Every finding is either fixed or
   dismissed with a stated reason in the PR thread — a review whose findings are
@@ -151,6 +174,32 @@ change does not need this pass.
   finding exposes code/doc drift, log it in DRIFT-CHECKLIST's Resolution log per
   the Self-Healing Loop. The gate is mechanical and the review is semantic: on
   PR #3 the gate passed while six real defects were still in the diff.
+- **Merging: `Create a merge commit` is the default.** The branch's commits are
+  curated (Conventional Commits, code and docs together) and are the unit that
+  makes `git blame` and `git bisect` useful; the merge commit also records what
+  landed together as one reviewed unit. Delete the branch afterwards.
+  - `Squash and merge` is the fallback for a branch whose history is genuinely
+    disposable — not the default. Squashing keeps the *text* of the messages (as
+    bullets in the body) and destroys the structure: per-commit SHAs, line-level
+    `blame`, and every bisection point but one. It would also make two rules here
+    pointless — writing careful Conventional Commit messages that are discarded
+    at merge, and "code and its documentation land in the same commit", which is
+    tautological once everything is one commit. If it is used, the subject must
+    still follow Conventional Commits; GitHub defaults it to the PR title.
+  - `Rebase and merge`: do not use. Replaying commits onto a new base produces
+    intermediate states that never existed and never passed the gate, so
+    `git bisect` can land on a commit that does not build, and the grouping of
+    what was reviewed together is lost.
+- **History is cleaned before the first push, or not at all** — Tier 1 forbids
+  force-pushing a pushed branch, so that window closes permanently. Before
+  pushing, a branch is clean when: every commit message names a change worth
+  finding later (no `wip`, `fix`, `address review`); every commit passes the gate
+  on its own; no commit exists only to correct an earlier commit *on this same
+  branch* (that is a fixup — fold it in with `git commit --amend` or
+  `git reset --soft`); and nothing is added and then removed within the branch.
+  Note `git rebase -i` is unavailable in this environment. This is the honest
+  reason squash-merge exists as a fallback: it is the only remaining remedy once
+  a messy branch has been pushed.
 
 ### Tier 3 — Suggested
 - Commit as you go, not in one blob at the end. A feature that reaches completion
