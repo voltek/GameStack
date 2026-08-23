@@ -9,16 +9,10 @@ import androidx.compose.runtime.setValue
 
 private const val SingleClickWindowMillis = 700L
 
-// One-shot UiEffects are delivered over a Channel (CLAUDE.md, MVI Contract
-// conventions), which queues anything sent while the screen is not collecting.
-// So a repeated tap does not merely navigate twice: the second effect waits in
-// the queue and fires again when the user returns, bouncing them straight back
-// out of the screen they just came back to.
-//
-// The fix belongs here rather than in the Channel: one user intent must produce
-// one effect. Wrap a navigation callback with this so repeats inside the window
-// are dropped. Share a single wrapper across a whole list — wrapping each item
-// separately would still let two different items fire back to back.
+// A duplicate navigation effect is not merely handled twice: the Channel it
+// travels on queues it, so it fires again when the user returns to the screen.
+// Share one wrapper per list, or two different items can still fire back to
+// back. Why the fix lives here and not in the Channel: CLAUDE.md, MVI contract.
 @Composable
 fun <T> rememberSingleClick(onClick: (T) -> Unit): (T) -> Unit {
     var lastClickMillis by remember { mutableLongStateOf(0L) }
@@ -31,9 +25,6 @@ fun <T> rememberSingleClick(onClick: (T) -> Unit): (T) -> Unit {
     }
 }
 
-// Same guard for a callback that carries no argument, e.g. an empty-state CTA.
-// Without it those call sites read `rememberSingleClick<Unit>` and `wrapped(Unit)`,
-// which is noise at exactly the places that are easiest to forget to guard.
 @Composable
 fun rememberSingleClick(onClick: () -> Unit): () -> Unit {
     val guarded = rememberSingleClick<Unit> { onClick() }

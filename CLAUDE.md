@@ -191,9 +191,9 @@ to keep:
   instead. This already destroyed an uploaded screenshot on PR #5, minutes after
   asking for it.
 - **Hand the captures over; do not make the human retake them.** The device pass
-  already produced screenshots. Save them somewhere stable outside the repo
-  (`~/Pictures/GameStack/pr-{n}/`, named for what they show — a scratchpad or
-  `%TEMP%` path gets cleaned), give the paths in chat when the PR is opened, and
+  already produced screenshots. Save them somewhere stable outside the repo,
+  named for what they show — a scratchpad or `%TEMP%` path gets cleaned — then
+  give the paths in chat when the PR is opened, and
   say plainly that the PR needs them dragged in **before** it is merged. An agent
   that verified on device and then let the human go hunting for a screenshot
   wasted the one part of this only the human can finish.
@@ -340,8 +340,11 @@ to keep:
   production change (`git stash push -- <file>`), run that test alone, confirm it
   fails *and that the message describes the bug* — a failure from a compile error
   or an NPE is red for the wrong reason — then restore. Doing it the other way
-  round (test first, watch it fail, then fix) gets this for free. State in the
-  commit that it was verified; nine defects in Search were found by review after
+  round (test first, watch it fail, then fix) gets this for free. **When the fix
+  is a redesign the old code no longer compiles against, stashing cannot work** —
+  it would fail for the wrong reason. Break the fix instead: mutate one line the
+  new test claims to cover, and confirm exactly that test fails. State in the
+  commit which method was used; nine defects in Search were found by review after
   the gate passed green, so "the tests pass" is not by itself evidence of
   anything. See `write-tests` for the recipe.
 
@@ -551,6 +554,33 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
   (2) A small `private` helper type used exclusively by one Composable/class
   in that same file (e.g. a private data class configuring a static list of
   items for that Composable) — it has no meaning or reuse outside that context.
+
+- **Comments carry the *why*, never the *what* and never the *history*.** Three
+  questions before leaving one:
+  1. Does it restate what the code already says? Delete it.
+  2. Is it about *how we got here* rather than *what to do here*? That belongs in
+     the commit message and DRIFT-CHECKLIST's Resolution log, both of which this
+     project already maintains. Writing it in both places is duplication, and the
+     copy in the code is the one nobody updates.
+  3. Would it become false if someone refactored correctly? Then it is a
+     chronicle, not a constraint — delete it or rewrite it as the constraint.
+
+  Prefer encoding the *why* as a name, a type, or a **test**: a test named
+  `should cancel an in-flight search immediately when the query changes` states
+  the invariant *and fails when it breaks*, which no comment can do.
+
+  **Bounds:** no comment block longer than 4 lines in production code — anything
+  needing more belongs in the owning Skill with a one-line pointer — and treat
+  **15% comment lines in a file** as a smoke alarm worth looking at, not a hard
+  limit. Both numbers are heuristics; the three questions are the actual rule.
+  The percentage is meaningless below ~50 lines — one justified 5-line comment
+  puts a 30-line contract file over 15% — so read it as a signal on substantial
+  files and judge short ones by the block bound and the questions alone.
+
+  This is a known LLM failure mode, not a hypothetical: models narrate design
+  decisions into comments, and the words are free to produce and costly to read.
+  `SearchViewModel.kt` reached 25% and `SingleClick.kt` 35%, one sediment layer
+  per review round, while every other file in the project sat between 5% and 9%.
 
 ### Tier 3 — Suggested, can be challenged with justification
 - Mapper file naming pattern (`{Name}Mapper.kt`) — consistency preference,

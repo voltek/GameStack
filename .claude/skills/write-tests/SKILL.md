@@ -177,6 +177,34 @@ Three things that decide whether this is worth anything:
 - **This applies to regression tests, not to tests for brand-new code** — those
   have no previous behaviour to fail against, and would just fail to compile.
 
+### When stashing cannot work: targeted mutation
+The stash recipe assumes the old code still *compiles* against the current
+contract. That holds for a patch and fails for a redesign: if the fix removed a
+`UiEffect`, renamed a field, or changed a signature, restoring the old file
+breaks the build — red for the wrong reason, which the first bullet above already
+rejects.
+
+The equivalent at that scale is to break the fix rather than remove it. Delete or
+invert **one line** that the new test depends on, run the class, and confirm that
+exactly the expected test fails:
+
+```bash
+# e.g. delete `refreshError = null` from the success branch,
+# then run the class and expect exactly one failure.
+./gradlew testDebugUnitTest --tests "com.gamestack.<path>.FooTest"
+```
+
+Then restore the line. Two rules make it worth as much as the stash version:
+
+- **One line, chosen because a specific test claims to cover it.** Mutating
+  several at once, or picking a line at random, only tells you the suite is
+  non-empty.
+- **Exactly the expected test must fail.** If none fails, that test proves
+  nothing. If several fail, the mutation was too broad to attribute.
+
+This is hand-run mutation testing, which is also the automated technique (PIT)
+named in Block 4 — the manual version is what to reach for until that lands.
+
 Writing the test first (watch it fail, then fix) gives you the same guarantee and
 is cheaper. This recipe is for when the fix came first, which in practice is
 often. Say in the commit message that it was verified.

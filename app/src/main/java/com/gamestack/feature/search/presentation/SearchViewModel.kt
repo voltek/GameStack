@@ -25,10 +25,8 @@ import javax.inject.Inject
 
 private const val SearchDebounceMillis = 400L
 
-// What the pipeline carries: an effective (trimmed) query plus how it was asked
-// for. Both exceptions to the debounce are properties of the request itself — a
-// refresh is an explicit user action, and an emptied field must clear the screen
-// at once rather than 400ms later.
+// Both exceptions to the debounce are properties of the request: a refresh is an
+// explicit action, and an emptied field must clear the screen at once.
 private data class SearchRequest(val query: String, val isRefresh: Boolean) {
     val debounceMillis: Long get() = if (isRefresh || query.isEmpty()) 0L else SearchDebounceMillis
 }
@@ -44,21 +42,14 @@ class SearchViewModel @Inject constructor(
     private val _uiEffect = Channel<SearchUiEffect>()
     val uiEffect = _uiEffect.receiveAsFlow()
 
-    // Raw text as typed, whitespace included — the pipeline trims it, the text
-    // field keeps showing exactly what the user wrote.
+    // Raw text as typed: the pipeline trims it, the field shows what was written.
     private val typedQuery = MutableStateFlow("")
     private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    // Two operators replace what used to be hand-written bookkeeping across
-    // several nullable fields, and with it a whole class of defects:
-    //  - distinctUntilChanged after trim: a whitespace-only edit is not a new
-    //    query, so it neither restarts a search nor disturbs one in flight.
-    //  - mapLatest: a newer request cancels whatever the previous one was doing,
-    //    whether that was waiting out its debounce or already awaiting a
-    //    response.
-    // Nothing here records "which query was already searched"; every earlier
-    // version of this class did, and every one of them eventually disagreed with
-    // what was actually on screen.
+    // No field records which query was already searched — the operators carry it.
+    // distinctUntilChanged after trim: a whitespace-only edit is not a new query,
+    // so it neither restarts a search nor disturbs one in flight. See the
+    // debounced-pipeline pattern in the new-viewmodel Skill.
     @OptIn(ExperimentalCoroutinesApi::class)
     private val searchPipeline = merge(
         typedQuery
@@ -69,15 +60,13 @@ class SearchViewModel @Inject constructor(
             .map { SearchRequest(query = typedQuery.value.trim(), isRefresh = true) }
     )
         .mapLatest { request ->
-            // The wait lives here rather than in a debounce() operator upstream.
-            // An operator would hold the new request for its own timeout while
-            // the previous search kept running, so a response for text the user
-            // had already changed could still land — showing settled results, or
-            // flashing the error card, for the whole debounce window. Inside
-            // mapLatest the new request cancels the running one first, then waits.
+            // Must stay inside mapLatest, never a debounce() operator upstream:
+            // upstream, the new request waits out its own timeout while the
+            // previous search keeps running, so a response for replaced text can
+            // still land. Here the newer request cancels first, then waits.
             delay(request.debounceMillis)
-            // An empty query still travels the pipeline: reaching this point is
-            // what cancels any search still running for the text just deleted.
+            // An empty query still travels the pipeline — reaching here is what
+            // cancels a search running for the text just deleted.
             if (request.query.isNotEmpty()) performSearch(request.query, request.isRefresh)
         }
         .launchIn(viewModelScope)
@@ -94,9 +83,8 @@ class SearchViewModel @Inject constructor(
 
     private fun onQueryChanged(query: String) {
         val trimmedQuery = query.trim()
-        // Mirrors the distinctUntilChanged above: only a changed effective query
-        // will reach the network, and only then is the screen out of date. A
-        // whitespace-only edit must leave every transient flag exactly as it is.
+        // Mirrors the distinctUntilChanged above, so a whitespace-only edit leaves
+        // every transient flag exactly as it is.
         val startsSearch = trimmedQuery != typedQuery.value.trim()
 
         _uiState.update { state ->
@@ -112,17 +100,14 @@ class SearchViewModel @Inject constructor(
 
                 startsSearch -> state.copy(
                     query = query,
-                    // games must never outlive the query it answers: anything
-                    // still holding them can only misread them as current.
+                    // Results must never outlive the query they answer.
                     games = emptyList(),
-                    // Optimistic, so the skeleton appears while the debounce runs
-                    // rather than 400ms into the wait.
+                    // Optimistic, so the skeleton appears during the debounce.
                     isLoading = true,
-                    // Typing supersedes a refresh, and mapLatest cancels it, so
-                    // its coroutine will never reset this flag itself.
+                    // mapLatest cancels the superseded refresh, so its coroutine
+                    // will never reset this flag itself.
                     isRefreshing = false,
                     errorMessage = null,
-                    // The stale results it described are gone, so is it.
                     refreshError = null
                 )
 
@@ -135,14 +120,12 @@ class SearchViewModel @Inject constructor(
 
     private fun onRefresh() {
         if (_uiState.value.query.isBlank()) return
-        // Repeat taps on the banner's Retry would each reach IGDB, whose quota is
-        // finite. mapLatest and the buffered SharedFlow already keep the *state*
-        // consistent, so this exists purely to stop redundant requests.
+        // State stays consistent without this (mapLatest cancels the predecessor);
+        // it exists only to stop repeat Retry taps burning IGDB's finite quota.
         if (_uiState.value.isRefreshing) return
-        // Set here, not in performSearch: PullToRefreshBox reads this flag
-        // synchronously when the pull is released and retracts the indicator if
-        // it is still false, so leaving it to a coroutine hop makes the spinner
-        // visibly bounce back and re-appear on every pull.
+        // Must be synchronous: PullToRefreshBox reads this flag when the pull is
+        // released and retracts the indicator if it is still false, so a
+        // coroutine hop makes the spinner bounce back on every pull.
         _uiState.update { it.copy(isRefreshing = true) }
         refreshRequests.tryEmit(Unit)
     }
@@ -158,19 +141,16 @@ class SearchViewModel @Inject constructor(
                         isLoading = false,
                         isRefreshing = false,
                         errorMessage = null,
-                        // Fresh results resolve the condition the banner reports,
-                        // so it goes with them. Nothing else has to remember to
-                        // take it down.
+                        // Fresh results resolve the condition the banner reports.
                         refreshError = null
                     )
                 }
             }
             .onFailure {
-                // Results on screen always belong to the current query (they are
-                // cleared the moment it changes), so having any means this was a
-                // refresh of an answered query: keep them and report the failure
-                // alongside rather than losing them to a blip. Nothing on screen
-                // means the error state is all there is to show.
+                // Results on screen always belong to the current query, so having
+                // any means this was a refresh of an already-answered one: keep
+                // them rather than lose them to a blip. This is why no isRefresh
+                // flag is needed here.
                 val keepResults = _uiState.value.games.isNotEmpty()
 
                 _uiState.update {
