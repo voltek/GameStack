@@ -27,6 +27,12 @@ It is NOT:
   the original mockups — surfaced by code review of the Search PR, which found
   the screen rendering an empty grid on first open — and is now specified in
   `docs/project/design/search/search-initial.html`.
+- A **failed pull-to-refresh keeps the results already on screen** and reports the
+  failure as a snackbar with Retry, rather than replacing them with the error
+  state — those results still answer the query, and losing them to a transient
+  network blip is worse than a stale list. A failed search for *new* text is not
+  the same case and does show the error state: the results still displayed answer
+  the previous query, so keeping them would misrepresent what was searched.
 
 ### Game Detail
 - Name, description

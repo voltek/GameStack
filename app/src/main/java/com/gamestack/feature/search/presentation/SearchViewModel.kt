@@ -149,11 +149,34 @@ class SearchViewModel @Inject constructor(
                 }
             }
             .onFailure {
+                // Only a *refresh* can keep what is on screen: those results still
+                // answer the query, so replacing them with the full-screen error
+                // would lose them to a transient failure — announce it over them
+                // instead. A failed search for new text is different: the results
+                // still displayed answer the previous query, so showing them under
+                // a snackbar would be a lie, and the error state is right.
+                // CLAUDE.md's MVI section names the first case as the reason
+                // UiState is a data class and not sealed — content and error do
+                // coexist.
+                val keepResults = isRefresh && _uiState.value.games.isNotEmpty()
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         isRefreshing = false,
-                        errorMessage = UiText.StringResource(R.string.search_error_description)
+                        errorMessage = if (keepResults) {
+                            null
+                        } else {
+                            UiText.StringResource(R.string.search_error_description)
+                        }
+                    )
+                }
+
+                if (keepResults) {
+                    sendEffect(
+                        SearchUiEffect.ShowRefreshError(
+                            UiText.StringResource(R.string.search_refresh_error)
+                        )
                     )
                 }
             }

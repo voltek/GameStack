@@ -429,6 +429,48 @@ class SearchViewModelTest {
             assertTrue(viewModel.uiState.value.isLoading)
         }
 
+    // Regression: a failed refresh set errorMessage while games were untouched,
+    // and the screen renders the error branch first, so the whole results grid was
+    // replaced by the full-screen error card. The user lost loaded results to a
+    // transient network failure.
+    @Test
+    fun `handleEvent OnRefresh should keep results and announce the failure when a refresh fails`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(listOf(sampleGame))
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
+
+            viewModel.uiEffect.test {
+                viewModel.handleEvent(SearchUiEvent.OnRefresh)
+                advanceDebounce()
+
+                assertTrue(awaitItem() is SearchUiEffect.ShowRefreshError)
+            }
+
+            val state = viewModel.uiState.value
+            assertEquals(listOf(sampleGame), state.games)
+            assertNull(state.errorMessage)
+            assertFalse(state.isRefreshing)
+        }
+
+    // The full-screen error state still applies when a failure leaves nothing to
+    // keep — that is the case the error branch exists for.
+    @Test
+    fun `handleEvent OnRefresh should show the error state when a refresh fails with no results`() =
+        runTest {
+            coEvery { searchGamesUseCase("zelda") } returns Result.success(emptyList())
+            viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
+            advanceDebounce()
+
+            coEvery { searchGamesUseCase("zelda") } returns Result.failure(RuntimeException("network down"))
+            viewModel.handleEvent(SearchUiEvent.OnRefresh)
+            advanceDebounce()
+
+            assertNotNull(viewModel.uiState.value.errorMessage)
+        }
+
     private companion object {
         // Longer than the ViewModel's debounce, which is private to its file.
         const val PAST_DEBOUNCE_MILLIS = 500L
