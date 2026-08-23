@@ -27,6 +27,15 @@ It is NOT:
   the original mockups — surfaced by code review of the Search PR, which found
   the screen rendering an empty grid on first open — and is now specified in
   `docs/project/design/search/search-initial.html`.
+- A **failed pull-to-refresh keeps the results already on screen** and reports the
+  failure as a banner above them, with Retry, rather than replacing them with the
+  error state — those results still answer the query, and losing them to a
+  transient network blip is worse than a stale list. The banner stays as long as
+  the situation does and disappears on its own when a refresh succeeds or the
+  query changes; it is not a transient toast, because "these results are stale"
+  is a condition, not a moment. A failed search for *new* text is not the same
+  case and does show the error state: the results still displayed answer the
+  previous query, so keeping them would misrepresent what was searched.
 
 ### Game Detail
 - Name, description
@@ -146,6 +155,15 @@ guess at.
   decisions on cache invalidation and freshness, and likely a dedicated
   Repository-layer redesign. Treat as its own future evaluation — comparable
   in scope to the Retrofit-vs-Ktor decision — not something to bolt on casually.
+- **Backlog (low priority for now, but with a deadline):** accessibility. MVP
+  does not target it — no TalkBack pass, no large-font or contrast audit, no
+  touch-target review. Accessibility findings from code review are non-blocking
+  while this holds. Two limits on the deferral, both in CLAUDE.md → Accessibility:
+  a change may not *remove* an affordance that already worked (replacing a
+  Material component with a hand-built one is where this happens silently), and
+  the deferral expires before the first Play Store release — Google publishes
+  accessibility expectations, and retrofitting semantics across a finished UI is
+  a rewrite rather than an addition.
 - **Backlog:** Light theme. MVP ships dark-only — the project's visual
   identity (confirmed via Stitch prototyping and the GameStack Core
   DESIGN.md) is dark-first, matching genre conventions (Steam, Xbox app,

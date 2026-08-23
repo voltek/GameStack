@@ -110,6 +110,26 @@ change does not need this pass.
   `docs/project/design/README.md`. Do not shrink the AVD to save tokens; it
   saves none.
 
+### Accessibility — Tier 2
+**MVP does not target accessibility.** TalkBack passes, large-font and contrast
+audits, and touch-target sizing are backlog (Spec → Explicitly Deferred). So an
+accessibility finding from a review is **non-blocking by default**: open an
+issue, link it in the thread, merge. Do not build accessibility work that was
+not asked for, and do not hold a PR for it.
+
+Two things this does *not* license, because both cost far more to retrofit than
+to keep:
+
+- **Never drop an affordance that already worked.** Material components carry
+  semantics for free — a `Snackbar` announces itself, an `IconButton` exposes a
+  focus target. Replacing one with a hand-built equivalent silently loses that,
+  and the loss is invisible to `build`/`test`/`lint` and to a screenshot. If a
+  change removes an announcement or a focus target, restore it in that same
+  change; that is *not* new accessibility work, it is not regressing.
+- **This deferral has an expiry.** The app is headed for the Play Store, which
+  publishes accessibility expectations and where retrofitting semantics across a
+  finished UI is a rewrite. Revisit before the first public release, not after.
+
 ## Git workflow
 
 ### Tier 1 — Immutable
