@@ -12,6 +12,29 @@ It is NOT:
 - A social/gameplay video platform (only official trailers are shown,
   no user-generated gameplay videos)
 
+## Why this project exists, and what it optimises for
+GameStack is a real product headed for the Play Store, with everything that
+implies. It is also, deliberately, a **case study in building software well with
+AI assistance** — that is the reason it is being built at all.
+
+Both are true at once, and the second one changes engineering decisions that
+would otherwise be settled by convention. Recorded here because those decisions
+keep needing a justification, and without this section each one looks arbitrary:
+
+- **The repository's history is part of the deliverable.** `git log` is study
+  material, not only a changelog. This is why `Create a merge commit` is the
+  default merge strategy, why a branch showing "patch, patch, patch, redesign"
+  was kept intact rather than squashed, and why commit messages carry diagnosis
+  rather than a summary of the diff.
+- **Process work is product work.** The Skills, the tiered rules, the
+  Resolution log and the review loops are not overhead around the app — they are
+  a second thing being built, and often the more valuable one.
+- **A decision is worth more written down than made quickly.** Where a
+  conventional default exists, it is still stated explicitly, with the trade.
+
+None of this licenses gold-plating the app itself. Product scope is exactly what
+the MVP section below says it is.
+
 ## Core Features (MVP)
 
 ### Search

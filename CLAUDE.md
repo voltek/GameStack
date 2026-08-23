@@ -31,6 +31,41 @@ gap — it hides the missing piece until an agent trips over it mid-task.
 in this document before its behavior was written down anywhere. Now fixed;
 the rule exists to catch the next case, whatever it turns out to be.)
 
+## What belongs in this document — Tier 1
+
+### Every line here is loaded on every turn, forever
+This file is injected into the context of **every request**, whether or not the
+task touches what it says. A Skill loads only when invoked; the Spec, DESIGN.md
+and DRIFT-CHECKLIST are read on demand. So the question for anything proposed
+here is never "is this valuable?" — almost everything written here was — but
+**"is this needed on every turn?"**
+
+### Three questions before adding anything
+1. **Does it survive a clone?** If it names a path on one machine, a device
+   serial, or anything that exists only in one person's environment, it is not
+   project knowledge. It belongs in agent memory or a Skill, never here.
+2. **Is it a rule, or is it a procedure?** A *rule* constrains code that could be
+   written on any turn (layer boundaries, naming, MVI, the tiers). A *procedure*
+   is a sequence followed while doing one named task (opening a PR, verifying on
+   device, writing a mapper). **Procedures belong in Skills** — that is what
+   Skills are for, and a procedure sitting here is paid for on every unrelated
+   turn.
+3. **Is it a rule, or is it history?** The incident that produced a rule belongs
+   in DRIFT-CHECKLIST's Resolution log. Keep at most a clause of *why* here —
+   enough that the rule does not read as arbitrary and get "improved" away — and
+   let the log carry the account.
+
+If the answer sends it elsewhere, **write it elsewhere and, only when the rule
+itself would be incomplete without it, leave a one-line pointer.** A pointer is
+not free either.
+
+### The trade this makes, stated honestly
+Pruning the scars weakens the rules: a rule with an incident attached gets
+obeyed, a bare rule gets "improved". That is why the pointer exists, and why
+this is falsifiable — **if an agent starts violating a rule whose story was
+moved, that story was load-bearing and belongs back inline.** Restore it rather
+than re-deriving the rule.
+
 ## Human-in-the-Loop principle
 
 ### Tier 1 — Immutable
