@@ -47,6 +47,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -94,8 +95,10 @@ fun SearchScreen(
     SearchContent(uiState = uiState, onEvent = viewModel::handleEvent)
 }
 
+// internal, not private: the screen tests drive this directly, so they can supply
+// a UiState rather than standing up a ViewModel and its whole dependency graph.
 @Composable
-private fun SearchContent(
+internal fun SearchContent(
     uiState: SearchUiState,
     onEvent: (SearchUiEvent) -> Unit,
     modifier: Modifier = Modifier
@@ -361,11 +364,17 @@ private fun GameCard(game: Game, onClick: () -> Unit, modifier: Modifier = Modif
 
 private const val LoadingSkeletonItemCount = 6
 
+// The skeleton renders no text, so without a tag a test cannot tell it apart
+// from an empty screen.
+internal const val SearchLoadingGridTag = "search_loading_grid"
+
 @Composable
 private fun SearchLoadingGrid(modifier: Modifier = Modifier) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .testTag(SearchLoadingGridTag),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
