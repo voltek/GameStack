@@ -121,6 +121,18 @@ non-Home tab returns to Home.
   Never synced back to IGDB.
 
 ## Explicitly Deferred
+- **Landscape orientation.** MVP is **portrait-only**, locked in the manifest
+  (`android:screenOrientation="portrait"`). Every screen was designed portrait,
+  and supporting landscape means a second layout decision per screen — a grid
+  that should reflow to more columns, a Detail whose hero image would dominate —
+  not a free consequence of Compose. Locking it is honest about what was
+  designed rather than shipping an untested rotation.
+
+  Two things this does not undo. The `verticalScroll` on `MessageState` stays:
+  it was added for landscape but is what keeps the CTA reachable with the
+  keyboard raised in portrait, which is the case that actually ships. And
+  tablets and foldables are the same decision deferred — revisit both together,
+  since a portrait lock reads very differently on a large screen.
 - **AI-powered game recommendations** based on the user's history (Room data).
 - **Instrumented tests (`androidTest/`).** Everything currently tested runs on
   the JVM. Real-SQLite DAO tests, Room migration tests, and true device
