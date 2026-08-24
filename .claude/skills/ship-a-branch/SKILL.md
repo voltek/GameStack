@@ -100,9 +100,16 @@ orphaned. That trade was backwards: branch history is permanent and drives
 revisited after merge. Freezing the permanent thing to protect the ephemeral one
 also meant a single clumsy commit cost a whole branch's granularity.
 
-What survives a rewrite: the comment text, in the PR timeline. What does not: the
-comment's anchor into the diff, and possibly its resolved state. So **reply in
-the thread before rewriting** — the reply is the history, the anchor is not.
+Measured on PR #12 rather than assumed. A thread whose commented line was
+rewritten keeps its text and `path`, keeps `originalLine` as a reference, loses
+`line` (the live anchor becomes null) and is flagged `isOutdated`. It still
+**accepts replies** and still **resolves** — and resolving it moved the PR from
+`BLOCKED` to `CLEAN`, so this does not deadlock against *require conversation
+resolution*.
+
+The only loss is the diff anchor: GitHub can no longer show the comment beside
+the code that prompted it. **Reply in the thread before rewriting** — the reply
+is the history, the anchor is only the presentation.
 
 In practice this should rarely come up, because step 3 keeps the reviews ahead of
 the PR. It exists for the residual case: the bot finding something real on a
