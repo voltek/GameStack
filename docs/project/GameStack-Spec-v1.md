@@ -12,6 +12,29 @@ It is NOT:
 - A social/gameplay video platform (only official trailers are shown,
   no user-generated gameplay videos)
 
+## Why this project exists, and what it optimises for
+GameStack is a real product headed for the Play Store, with everything that
+implies. It is also, deliberately, a **case study in building software well with
+AI assistance** — that is the reason it is being built at all.
+
+Both are true at once, and the second one changes engineering decisions that
+would otherwise be settled by convention. Recorded here because those decisions
+keep needing a justification, and without this section each one looks arbitrary:
+
+- **The repository's history is part of the deliverable.** `git log` is study
+  material, not only a changelog. This is why `Create a merge commit` is the
+  default merge strategy, why a branch showing "patch, patch, patch, redesign"
+  was kept intact rather than squashed, and why commit messages carry diagnosis
+  rather than a summary of the diff.
+- **Process work is product work.** The Skills, the tiered rules, the
+  Resolution log and the review loops are not overhead around the app — they are
+  a second thing being built, and often the more valuable one.
+- **A decision is worth more written down than made quickly.** Where a
+  conventional default exists, it is still stated explicitly, with the trade.
+
+None of this licenses gold-plating the app itself. Product scope is exactly what
+the MVP section below says it is.
+
 ## Core Features (MVP)
 
 ### Search
@@ -74,7 +97,7 @@ non-Home tab returns to Home.
 ## Home Screen
 - Most popular games today
 - Games the user has recently interacted with
-- (Optional / deferred to Block 5) AI-based recommendations based on
+- (Optional / deferred) AI-based recommendations based on
   user preferences and rating history
 
 ## Tech Stack
@@ -97,26 +120,26 @@ non-Home tab returns to Home.
 - **Room** (local, read/write): user lists and personal ratings.
   Never synced back to IGDB.
 
-## Roadmap Phases ("Block N")
-Several documents reference development phases by number. Only the phases
-actually referenced somewhere are defined — do not infer meaning for any other
-block number; an undefined reference is a documentation gap to report, not to
-guess at.
-
-- **Block 4 — Loop Engineering.** Harness/tooling work, not product: automating
-  what is currently a manual review pass. Two pending deliverables, both already
-  referenced elsewhere: (1) a Hook running the affected test suite after each
-  agent edit — the regression pillar `write-tests` explicitly does not cover;
-  (2) an automated drift checker implementing `DRIFT-CHECKLIST.md`.
-- **Block 5 — AI-powered recommendations.** Product feature; see below.
-
 ## Explicitly Deferred
-- **Block 5:** AI-powered game recommendations based on user history (Room data).
+- **AI-powered game recommendations** based on the user's history (Room data).
 - **Instrumented tests (`androidTest/`).** Everything currently tested runs on
-  the JVM. Real-SQLite DAO tests, Room migration tests, and Compose UI tests need
-  a device/emulator and are deferred. Consequence to keep in mind: a wrong `@Query`
-  or a missing migration passes every existing test and fails on device. Revisit
-  before the first release that has real users with data to lose.
+  the JVM. Real-SQLite DAO tests, Room migration tests, and true device
+  interaction need a device/emulator and are deferred. Three concrete triggers,
+  so this is not "some day" — in priority order:
+  1. **The first Room migration.** A wrong `@Query` or a missing migration passes
+     every existing test and fails on device, and it fails by *destroying real
+     users' data*. This is the only item on the list whose cost is irreversible,
+     and it is the trigger to act on. No Room table exists yet.
+  2. **Real gestures and IME** — pull-to-refresh, the soft keyboard. Robolectric
+     screen tests cover render and semantics but not these.
+  3. **A pre-release smoke test.** Partly free already: Play Console's
+     pre-launch report runs the app on real devices when a build is uploaded to a
+     test track, so this trigger is weaker than it looks.
+
+  Compose *screen* tests are being taken out of this deferral: agreed to run
+  under Robolectric on the JVM, in their own source set so `./gradlew test` stays
+  instant **(PENDING — not yet implemented; the Testing Stack rule still forbids
+  Robolectric until that lands)**.
 - **Future:** KMP migration. The Data layer is architected for it —
   when the time comes, Retrofit → Ktor and Room → SQLDelight,
   without touching Domain or UI.
@@ -164,6 +187,10 @@ guess at.
   the deferral expires before the first Play Store release — Google publishes
   accessibility expectations, and retrofitting semantics across a finished UI is
   a rewrite rather than an addition.
+- **Backlog (tooling):** consider adopting OpenSpec as an active change-tracking
+  layer alongside CLAUDE.md, IF the project grows beyond solo development or
+  manual tracking via Skills becomes a real pain point. Not worth the added
+  infrastructure at current scale.
 - **Backlog:** Light theme. MVP ships dark-only — the project's visual
   identity (confirmed via Stitch prototyping and the GameStack Core
   DESIGN.md) is dark-first, matching genre conventions (Steam, Xbox app,
@@ -199,3 +226,5 @@ guess at.
   screenshot costs to read
 - `docs/project/DESIGN.md` — visual design system (colors, typography, spacing)
 - `docs/project/DRIFT-CHECKLIST.md` — manual audit checklist against CLAUDE.md Tier 1 rules
+- `docs/project/TOOLING-BACKLOG.md` — repository tooling planned but not built
+  (review automation, hooks). Harness, not product, which is why it is not here

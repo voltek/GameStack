@@ -31,6 +31,41 @@ gap — it hides the missing piece until an agent trips over it mid-task.
 in this document before its behavior was written down anywhere. Now fixed;
 the rule exists to catch the next case, whatever it turns out to be.)
 
+## What belongs in this document — Tier 1
+
+### Every line here is loaded on every turn, forever
+This file is injected into the context of **every request**, whether or not the
+task touches what it says. A Skill loads only when invoked; the Spec, DESIGN.md
+and DRIFT-CHECKLIST are read on demand. So the question for anything proposed
+here is never "is this valuable?" — almost everything written here was — but
+**"is this needed on every turn?"**
+
+### Three questions before adding anything
+1. **Does it survive a clone?** If it names a path on one machine, a device
+   serial, or anything that exists only in one person's environment, it is not
+   project knowledge. It belongs in agent memory or a Skill, never here.
+2. **Is it a rule, or is it a procedure?** A *rule* constrains code that could be
+   written on any turn (layer boundaries, naming, MVI, the tiers). A *procedure*
+   is a sequence followed while doing one named task (opening a PR, verifying on
+   device, writing a mapper). **Procedures belong in Skills** — that is what
+   Skills are for, and a procedure sitting here is paid for on every unrelated
+   turn.
+3. **Is it a rule, or is it history?** The incident that produced a rule belongs
+   in DRIFT-CHECKLIST's Resolution log. Keep at most a clause of *why* here —
+   enough that the rule does not read as arbitrary and get "improved" away — and
+   let the log carry the account.
+
+If the answer sends it elsewhere, **write it elsewhere and, only when the rule
+itself would be incomplete without it, leave a one-line pointer.** A pointer is
+not free either.
+
+### The trade this makes, stated honestly
+Pruning the scars weakens the rules: a rule with an incident attached gets
+obeyed, a bare rule gets "improved". That is why the pointer exists, and why
+this is falsifiable — **if an agent starts violating a rule whose story was
+moved, that story was load-bearing and belongs back inline.** Restore it rather
+than re-deriving the rule.
+
 ## Human-in-the-Loop principle
 
 ### Tier 1 — Immutable
@@ -79,36 +114,14 @@ drift returns.
 - Lint: `./gradlew lint`
 
 ### Device verification — Tier 2
-The gate above (`build`/`test`/`lint`) is necessary but **not sufficient for UI
-work**: it proves the code compiles and that the logic does what a test asserts,
-never that a screen looks right or that a control is reachable. Every feature
-that adds or changes a screen is also verified on the emulator before a merge is
-requested, and the PR body says what was checked. Data/domain work with no UI
-change does not need this pass.
+The gate above is necessary but **not sufficient for UI work**: it proves the
+code compiles and that the logic does what a test asserts, never that a screen
+looks right or that a control is reachable. Every change that adds or alters a
+screen is verified on the emulator before a merge is requested, covering every
+state the screen declares, and the PR body says what was checked. Data/domain
+work with no UI change does not need this pass.
 
-- Install: `ANDROID_SERIAL=emulator-5554 ./gradlew installDebug`. `adb` is not
-  on PATH — use `$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe`.
-- **If no emulator is running, ask for one** — do not declare a UI feature done
-  without this pass, and do not launch an AVD unprompted (it opens a window on
-  the user's desktop).
-- **Two tools, two questions.** `Grep` over `uiautomator dump` for assertions
-  that can be stated in advance (which tab is `selected="true"`, whether a text
-  or node exists) — only matching lines enter context, so it is by far the
-  cheaper path. `adb exec-out screencap -p`, read as an image, when the
-  criterion is visual (clipping, spacing, contrast, alignment) and **whenever a
-  keyboard may be on screen**: the dump contains only the app window, never the
-  IME, so it reports as visible controls the keyboard is actually covering.
-  This cost real debugging time once — taps aimed from dump coordinates landed
-  on keyboard keys. `dumpsys input_method` is unreliable on this AVD for the
-  same question. Close every UI verification with at least one screenshot: the
-  dump cannot find what nobody thought to assert, and three of the Search bugs
-  were purely visual.
-- Cover every state the screen declares (initial, loading, content, empty,
-  error), plus the keyboard raised if there is a text field. Network-dependent
-  states can be forced with `adb shell svc data disable` / `svc wifi disable`.
-- Screenshot cost is set by aspect ratio, not by AVD resolution — see
-  `docs/project/design/README.md`. Do not shrink the AVD to save tokens; it
-  saves none.
+Run the `verify-on-device` Skill for the procedure.
 
 ### Accessibility — Tier 2
 **MVP does not target accessibility.** TalkBack passes, large-font and contrast
@@ -157,129 +170,48 @@ to keep:
 
 ### Tier 2 — Configurable within a defined range
 - Branch naming: `feature/{name}`, `fix/{name}`, `chore/{name}`, `docs/{name}`.
-- One branch per unit of work. A refactor that exists *only because of* a feature
-  (e.g. navigation restructured so Detail belongs to a tab) belongs on that
-  feature's branch — it cannot be built or tested independently of it.
-- **Before each commit, ask whether it exists *because of* this branch's unit of
-  work.** If it does not, it belongs on its own branch off `main` — park it with
-  `git stash`, or `git cherry-pick` it onto a fresh branch afterwards. This rule
-  already existed and PR #3 still reached 1,992 additions across 46 files, of
-  which only two commits were the Search feature; the rest were an unrelated auth
-  fix, two `.gitignore` chores, a design asset and three documentation-policy
-  changes that merely happened to occur while the branch was open. What inflates
-  a PR is how long the branch stays open, not how hard the feature is.
-- Treat **400 changed lines or 15 files** as a smoke alarm, not a limit: past
-  roughly that size review quality drops sharply, so stop and check the PR is
-  still one reviewable claim. If its title needs an "and", split it.
+- **One branch per unit of work**, checked per commit: does this exist *because
+  of* this branch's unit of work? A refactor that exists only because of a
+  feature belongs on that feature's branch; anything else belongs on its own.
+  What inflates a PR is how long the branch stays open, not how hard the feature
+  is — PR #3 reached 1,992 additions across 46 files with only two commits
+  belonging to its feature.
+- Treat **400 changed lines or 15 files** as a smoke alarm, not a limit. If the
+  PR title needs an "and", split it.
 - Commit messages follow **Conventional Commits**: `type(scope): imperative
   summary`, lowercase, no trailing period. Types in use: `feat`, `fix`,
-  `refactor`, `docs`, `chore`, `test`. Scope is the feature or layer
-  (`search`, `auth`, `nav`) and is optional for repo-wide changes.
-  Example: `feat(search): search IGDB games with results, empty and error states`.
+  `refactor`, `docs`, `chore`, `test`. Scope is the feature or layer (`search`,
+  `auth`, `nav`) and is optional for repo-wide changes.
   (Commits before 2026-08-22 predate this convention — do not rewrite them.)
-- Open a PR when a branch is ready for review, using
-  `.github/pull_request_template.md`. The body states what changed, why, and how
-  it was verified (gate output, emulator/device check). UI changes include
-  screenshots: generate them locally, then **drag or paste them into the PR
-  body's edit box on the web** — GitHub uploads them to its own CDN. Never commit
-  emulator captures to the repo; only design references under
-  `docs/project/design/` are versioned, and those can be linked by URL.
-- **Never overwrite a PR body wholesale once it is open.** `gh pr edit --body`
-  replaces everything, including screenshots the human dragged in and any text
-  they added — GitHub's own edit history is then the only way back. Read the
-  current body first and change only what needs changing, or add a comment
-  instead. This already destroyed an uploaded screenshot on PR #5, minutes after
-  asking for it.
-- **Hand the captures over; do not make the human retake them.** The device pass
-  already produced screenshots. Save them somewhere stable outside the repo,
-  named for what they show — a scratchpad or `%TEMP%` path gets cleaned — then
-  give the paths in chat when the PR is opened, and
-  say plainly that the PR needs them dragged in **before** it is merged. An agent
-  that verified on device and then let the human go hunting for a screenshot
-  wasted the one part of this only the human can finish.
-- **Automated review threads (Codex bot, `/code-review`) are closed explicitly.**
-  Fix the finding or dismiss it with a reason, reply in the thread saying what
-  was done, then **Resolve conversation** — the reply is the history, the resolve
-  is only the filing. An unanswered thread is indistinguishable from an unnoticed
-  one. Check the reviewed commit before trusting a bot review: it pins to the SHA
-  it ran on, so a review from four commits ago may already be stale. Re-request
-  with `@codex review` after pushing fixes.
-- Run `/code-review` on any PR touching app code before asking for a merge;
-  doc-only or chore-only PRs may skip it. Every finding is either fixed or
-  dismissed with a stated reason in the PR thread — a review whose findings are
-  silently dropped is worse than none, because it looks like coverage. If a
-  finding exposes code/doc drift, log it in DRIFT-CHECKLIST's Resolution log per
-  the Self-Healing Loop. The gate is mechanical and the review is semantic: on
-  PR #3 the gate passed while six real defects were still in the diff.
-- **Triage every finding into one of two buckets, and say which.**
-  - *Blocking* — correctness, data loss, a defect the user can see. Fix before
-    merge, with a regression test verified per Testing Stack.
-  - *Non-blocking* — design, performance, polish, debt. Open an issue, link it in
-    the thread, and merge. "Dismissed with a reason" is what lets a PR close;
-    it is legitimate precisely because the reason is written down and linked.
-
-  Taken as "fix everything a reviewer mentions", this rule never lets a PR land:
-  an automated reviewer almost always finds *something*. **Stopping rule:** a
-  round that produces only design or style suggestions is the signal to merge. A
-  round that produces a real defect earns another round.
-- **`/code-review` is run by the human — the agent cannot invoke it.** So the
-  agent's job is to *ask for it and wait*, never to tick that box or excuse it.
-  Do not confuse it with the GitHub bot: they are different reviewers, and the
-  bot's quota says nothing about whether `/code-review` has run. That exact
-  confusion was written into PR #5's body to justify skipping it.
-- **Automated review is an advisor, not a gatekeeper.** This applies to the
-  GitHub bot, not to `/code-review`. The blocking gate is
-  `build`/`test`/`lint` plus `/code-review`. If the bot is unavailable — quota
-  exhausted, service down — merge anyway; an external quota must not decide
-  whether work ships. Request it **once per PR, when the PR is ready**, not after
-  every fix; PR #3 burned five reviews in one day and then hit the limit. When
-  waiting on one, watch for its usage-limit comment and stop waiting the moment
-  it appears, rather than polling until the timeout.
+  The body carries the diagnosis the diff cannot show, in **12 lines or fewer**;
+  anything already in a document is pointed at, not restated (`ship-a-branch`).
+- **Merge strategy: `Create a merge commit`.** `Rebase and merge` is never used —
+  replaying commits onto a new base produces intermediate states that never
+  existed and never passed the gate. `Squash and merge` is a fallback, not the
+  default. The reasoning rests on what this project optimises for: see Spec →
+  *Why this project exists*.
+- **Update a pushed branch with `git merge main`, never `git rebase`** — same
+  reason as above. Rebase is fine on a branch that has never been pushed.
+- **Force-push is allowed to clean your own feature branch, with
+  `--force-with-lease` and never bare `--force`, until its first review.** After
+  a bot or `/code-review` has commented, rewriting commits orphans those threads.
+  Deliberately conditional where an absolute rule would be easier to obey: the
+  risk it would guard against — overwriting work someone else holds — does not
+  exist in a solo repo, while its cost is permanent (Resolution log, 2026-08-22).
+- **Never overwrite an open PR body wholesale.** `gh pr edit --body` replaces
+  everything, screenshots the human dragged in included.
+- **Every review finding is fixed or dismissed with a written reason**, and every
+  thread is answered and then resolved. `main` is protected with *require
+  conversation resolution*, so an open thread blocks the merge button.
+- **`/code-review` is run by the human — the agent cannot invoke it.** Ask and
+  wait; never tick that box or excuse it, and never confuse it with the GitHub
+  bot, which is an advisor and may be skipped when unavailable.
 - **Rule of three.** Touching the same code a third time for the same class of
   defect means the design is the problem, not the instances — stop patching and
   redesign. A fix that introduces the next defect in the same place counts double.
-  Search's debounce logic took four rounds before this was acted on; the rewrite
-  that followed deleted the state all four defects came from.
-- **Merging: `Create a merge commit` is the default.** The branch's commits are
-  curated (Conventional Commits, code and docs together) and are the unit that
-  makes `git blame` and `git bisect` useful; the merge commit also records what
-  landed together as one reviewed unit. Delete the branch afterwards.
-  - `Squash and merge` is the fallback for a branch whose history is genuinely
-    disposable — not the default. Squashing keeps the *text* of the messages (as
-    bullets in the body) and destroys the structure: per-commit SHAs, line-level
-    `blame`, and every bisection point but one. It would also make two rules here
-    pointless — writing careful Conventional Commit messages that are discarded
-    at merge, and "code and its documentation land in the same commit", which is
-    tautological once everything is one commit. If it is used, the subject must
-    still follow Conventional Commits; GitHub defaults it to the PR title.
-  - `Rebase and merge`: do not use. Replaying commits onto a new base produces
-    intermediate states that never existed and never passed the gate, so
-    `git bisect` can land on a commit that does not build, and the grouping of
-    what was reviewed together is lost.
-- **A branch is clean when** every commit message names a change worth finding
-  later (no `wip`, `fix`, `address review`); every commit passes the gate on its
-  own; no commit exists only to correct an earlier commit *on this same branch*
-  (that is a fixup — fold it in); and nothing is added and then removed within
-  the branch. Clean it with `git commit --amend` or `git reset --soft` and
-  recommit; `git rebase -i` is unavailable in this environment.
-- **Force-push is allowed to clean your own feature branch, and only until it has
-  been reviewed.** Use `git push --force-with-lease`, never bare `--force`:
-  with-lease refuses to write if the remote moved since your last `fetch`, so it
-  cannot silently overwrite anything you have not seen.
-  - **The window closes at the first review, not at the first push.** Once the
-    Codex bot or `/code-review` has commented, rewriting commits breaks the
-    anchor for those threads — they go outdated or hang off a SHA that no longer
-    exists. That review history is worth more than a tidy log: on PR #3 it is
-    what caught two defects that the gate passed.
-  - After that point the only remedy for a messy branch is `Squash and merge`,
-    with the cost described above. Cleaning early is what keeps the merge commit
-    (and with it `blame` and `bisect`) as the default.
-  - This is deliberately a conditional rule where an absolute one would be easier
-    to obey. It is accepted because the risk the absolute version guards against
-    — overwriting work someone else holds — does not exist in a solo repo, while
-    its cost (losing a whole branch's granularity over one clumsy commit) is
-    permanent and recurring. The condition is cheap to check: does the PR have
-    review comments yet?
+
+Run the `ship-a-branch` Skill for the procedure: updating, cleaning history,
+writing and maintaining the PR body, review rounds, and merging.
 
 ### Tier 3 — Suggested
 - Commit as you go, not in one blob at the end. A feature that reaches completion
@@ -299,8 +231,7 @@ to keep:
 - Retrofit + Kotlinx.serialization — networking (see Data Sources for the
   Apicalypse-specific constraint).
 - Navigation Compose with Safe-type routes.
-- Material3 — Dark theme only for MVP. Light theme is backlog (see
-  Pending/Roadmap) — do not build a Light ColorScheme now.
+- Material3 — Dark theme only for MVP. Light theme is backlog (see the Spec) — do not build a Light ColorScheme now.
 - **No dynamic color (Material You wallpaper-based theming).** The palette is
   the fixed one in DESIGN.md. Dynamic color would let the OS override the
   violet that carries the "Stack" brand identity, and would make DESIGN.md
@@ -508,15 +439,11 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
   was not. Detecting that transition requires comparing against the stored row,
   which only the Repository can see.
 
-  This is deliberately *not* a UseCase's job: a UseCase would have to read the
-  current entity to compare, and entities never leave the Data layer. It is
-  deliberately not the DAO's job either, since it spans a read and a write.
-  The boundary that still holds: the Repository decides *when a timestamp
-  column is written*, never *what the timestamps mean to the user* — anything
-  user-facing (formatting "Completed on [date]", ordering "Recently Interacted")
-  stays in the Domain/UI layers. If a future rule needs more than comparing
-  old and new persisted state, that is real business logic and belongs in a
-  UseCase — ask first.
+  The boundary that still holds: the Repository decides *when* a timestamp column
+  is written, never *what the timestamps mean to the user* — formatting and
+  ordering stay in Domain/UI. A rule needing more than a comparison of old and
+  new persisted state is real business logic and belongs in a UseCase — ask
+  first. Why not a UseCase or the DAO: see `new-repository-impl`.
 
 ---
 
@@ -630,6 +557,11 @@ these over improvising the same task differently each time:
 - `write-tests` — Unit tests for any of the above
 - `new-feature` — orchestrates all of the above end-to-end
 
+**Shipping**
+- `verify-on-device` — emulator verification of a UI change
+- `ship-a-branch` — finished branch → merged PR (update, clean, PR body, reviews,
+  merge strategy)
+
 If a task doesn't map to any Skill above, that's a coverage gap worth naming:
 do the work, then say so, so the gap can be closed deliberately rather than
 by improvising the same task differently every time.
@@ -641,47 +573,3 @@ by improvising the same task differently every time.
   option to the listing. Archived at
   `docs/project/retired-skills/project-scaffold.md`.
 
-## Pending / Roadmap
-
-**About "Block N":** the numbering comes from the development phases this
-project is being built in, and several documents reference it. Only the phases
-actually referenced somewhere are defined — here and, in product terms, in the
-Spec's "Roadmap Phases" section. Do not infer meaning for an undefined block
-number; if a document references one that isn't defined in either place, that
-is a documentation gap to report, not to guess at.
-
-- **Block 4 — Loop Engineering** (harness work, not product): automate what is
-  currently manual review. Two concrete deliverables are already referenced by
-  other documents and both are still pending:
-  1. A Hook that runs the affected test suite automatically after each agent
-     edit — the Regression pillar that `write-tests` explicitly does not cover
-     (it covers Requirements only: "new code does what the Skill/Spec asked").
-  2. An automated drift checker (Hook or validator subagent) implementing
-     `DRIFT-CHECKLIST.md`'s items, replacing the manual pass.
-  3. Automating the regression-test verification in Testing Stack (Tier 1) —
-     currently a manual `git stash` recipe in `write-tests`. Ranked above (2) by
-     value: nine real defects in Search all passed a green gate, and this is the
-     habit that caught whether each new test was worth anything. **Not a naive
-     `PostToolUse` hook**: stashing and restoring a live working tree on every
-     edit risks the user's uncommitted work, fires far too often, and cannot
-     tell a regression test from a test for brand-new code. Likelier shapes: a
-     script the workflow calls deliberately, or a `Stop` hook that *checks
-     whether the verification was done* when a diff adds tests and changes
-     production code, rather than performing it. When it lands, the Tier 1 rule
-     stays — reword it from "do this" to "the hook checks this, here is what it
-     checks and why". Deleting the rule would leave a script nobody can explain.
-- **Block 5 — AI-powered recommendations** based on user history (Room).
-- Future: KMP migration. Data layer prepared for it — Retrofit → Ktor,
-  Room → SQLDelight, without touching Domain or UI.
-- Future (backlog, not MVP): extend `GameRating` from binary (LIKED/DISLIKED)
-  to a third "LOVED" state (Netflix/Prime-style double thumbs up).
-  Trivial to add later since it's an enum — do not build now.
-- Future (backlog, tooling): consider adopting OpenSpec as an active
-  change-tracking layer alongside CLAUDE.md, IF the project grows beyond
-  solo development (team context) or manual tracking via Skills becomes
-  a real pain point. Not worth the added infrastructure at current scale.
-- Future (backlog): Light theme ColorScheme. Project design identity
-  (established via Stitch prototyping and GameStack Core DESIGN.md) is
-  dark-first, matching gaming apps like Steam/Xbox/Discord. Not worth
-  building a parallel Light ColorScheme now — revisit only if there's a
-  real accessibility or user need.

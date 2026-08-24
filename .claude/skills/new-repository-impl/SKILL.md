@@ -53,6 +53,9 @@ These timestamp rules are **persistence invariants and belong here** — an expl
 documented exception to "Repositories contain no business logic" (CLAUDE.md, Data
 Sources → Tier 2). They live here because detecting a *transition* requires comparing
 against stored state, and Entities never leave the Data layer, so no UseCase can see it.
+Nor is it the DAO's job: the rule spans a read *and* a write, and a DAO method is one
+statement. Those two exclusions are why the exception exists at all — without it the
+invariant would have no legal home in the architecture, not merely an inconvenient one.
 
 The boundary that still applies: the Repository decides *when a timestamp column is
 written*, never *what it means to the user*. Formatting "Completed on [date]" or
