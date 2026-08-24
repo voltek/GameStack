@@ -26,7 +26,7 @@ otherwise it quietly becomes a second changelog, and the real one is `git log`.
 This is read on demand, not loaded every turn. Consult it when picking up
 harness work; there is no need to check it while writing product code.
 
-Four deliverables, in priority order.
+Six deliverables, in priority order.
 
 ## 1. Automate the regression-test verification
 **Ranked first.** CLAUDE.md → Testing Stack (Tier 1) requires every regression
@@ -77,5 +77,46 @@ replacing the manual pass. The checklist is already written as violation
 detectors ("yes" means drift found), which is the shape an automated checker
 needs.
 
-Ranked last because the manual pass currently works and the checklist is short.
-Its value grows with the number of documents, not with the amount of code.
+Ranked below the three above because the manual pass currently works and the
+checklist is short. Its value grows with the number of documents, not with the
+amount of code.
+
+## 5. A `commit-msg` hook for the mechanical half of the message rules
+Check `type(scope): imperative summary` against the allowed types, and a body of
+12 lines or fewer. Both are regex-checkable, and a git hook runs whether or not
+anyone remembers it — CLAUDE.md already forbids `--no-verify`, so it cannot be
+skipped either.
+
+**A Skill was considered and rejected for this.** Skills load when a named task
+begins, and committing is decided by the agent mid-work rather than requested;
+an agent cutting corners is precisely the one that would not invoke it. That
+leaves a Skill on the same rung of the ladder as the prose, plus indirection. A
+hook is a rung up.
+
+Scope limit worth stating before anyone tries: the hook can only see **form**.
+"Does this commit exist because of this branch's unit of work" and "does the body
+carry the diagnosis" are judgement, and the rules covering them stay in CLAUDE.md
+regardless.
+
+## 6. Make the project-coupled Skills exportable — lowest priority
+**No benefit to this project.** Purely to lift Skills into a separate reusable
+collection, so it happens only when nothing else is queued.
+
+An audit on 2026-08-23 classified all fourteen:
+
+- **Portable as-is:** `ship-a-branch`, `discovery-feature` — no project or
+  platform coupling at all.
+- **Android-generic:** `verify-on-device`, `new-usecase`,
+  `new-repository-interface`, `new-viewmodel`, `new-screen`,
+  `new-repository-impl`, `new-hilt-module` — coupled to the platform, not to
+  GameStack. Already lifted.
+- **Mixed — the work is here:** `write-tests` (the regression-verification and
+  mutation recipes are language-agnostic; `GameRatingConverters`,
+  `AuthInterceptor` and `com.gamestack` paths are not), `new-mapper`,
+  `new-room-dao`, and `new-feature`, which is coupled by design as the
+  orchestrator.
+- **Not portable:** `new-api-service` — Apicalypse is IGDB's own query language.
+
+Do not "generalise" these in place. A Skill that has stopped naming this
+project's real types is worse *here*, and the examples are what make them usable.
+Extract a copy instead.
