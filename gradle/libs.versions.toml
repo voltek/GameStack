@@ -2,6 +2,7 @@
 agp = "9.3.1"
 coreKtx = "1.10.1"
 junit = "4.13.2"
+robolectric = "4.16.1"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.6.1"
@@ -23,6 +24,10 @@ kotlinxCoroutinesTest = "1.10.2"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+# Deliberately no android-all-instrumented entry: Robolectric resolves its own SDK
+# jar at test runtime and never consults Gradle's classpath, so declaring it here
+# downloads a second 204MB copy that nothing reads. See TOOLING-BACKLOG → CI.
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }

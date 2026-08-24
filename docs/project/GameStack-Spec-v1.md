@@ -136,10 +136,10 @@ non-Home tab returns to Home.
      pre-launch report runs the app on real devices when a build is uploaded to a
      test track, so this trigger is weaker than it looks.
 
-  Compose *screen* tests are being taken out of this deferral: agreed to run
-  under Robolectric on the JVM, in their own source set so `./gradlew test` stays
-  instant **(PENDING — not yet implemented; the Testing Stack rule still forbids
-  Robolectric until that lands)**.
+  Compose *screen* tests are **no longer part of this deferral**: they run under
+  Robolectric on the JVM (CLAUDE.md → Testing Stack). They share the one Gradle
+  task for now; splitting them out is queued as tooling work, triggered by the
+  second screen-test class (`docs/project/TOOLING-BACKLOG.md`).
 - **Future:** KMP migration. The Data layer is architected for it —
   when the time comes, Retrofit → Ktor and Room → SQLDelight,
   without touching Domain or UI.

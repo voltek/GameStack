@@ -59,6 +59,13 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests {
+            // Robolectric needs real resources and the merged manifest; without
+            // this, screen tests fail to inflate the theme.
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -95,10 +102,17 @@ dependencies {
     testImplementation(libs.cashapp.turbine)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    // Screen tests only — see CLAUDE.md, Testing Stack.
+    testImplementation(composeBom)
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.robolectric)
     androidTestImplementation(composeBom)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    // Not androidTest-only: this is what puts ComponentActivity in the merged
+    // debug manifest, which is where the JVM screen tests get their activity.
+    // Removing it fails every screen test with "Unable to resolve activity".
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
