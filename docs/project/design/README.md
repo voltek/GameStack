@@ -25,7 +25,7 @@ same output every time.
   "file:///C:/absolute/path/to/mockup.html"
 ```
 
-Four things that are not obvious and each cost a failed attempt:
+Five things that are not obvious and each cost a failed attempt:
 
 - **`--screenshot` needs an absolute Windows path.** A relative path fails with
   `Failed to write file … Acceso denegado`, which reads like a permissions
@@ -35,6 +35,12 @@ Four things that are not obvious and each cost a failed attempt:
   you get an unstyled page.
 - **Width matters.** Below ~600px the Stitch markup clips its own fixed header
   and search bar at the right edge. 600×1775 matches the existing assets.
+- **A `sticky` element with a `top` offset displaces itself downward and covers
+  whatever follows it.** These exports use `sticky top-[64px]` on the search bar
+  to clear the fixed header, which in a static render just hides the next block —
+  it cost five renders to find, because the element is present in `--dump-dom`
+  and simply painted over. For a new state, drop the `sticky` and give `main` a
+  `pt-[72px]` instead: same picture, nothing hidden.
 - The Chrome path above is the Windows default; adjust per machine.
 
 ## Screenshot cost, and why the AVD size is not a lever
@@ -83,3 +89,18 @@ a fraction of a screenshot's cost, but never anything involving the keyboard.
 No Skill owns "produce or refresh a design reference". Rendering currently
 happens ad hoc against this file. If it recurs, that is a Skill worth adding
 rather than improvising each time — see CLAUDE.md → Available Skills.
+
+## A new state needs its own mockup
+
+Any element or screen state that departs from what the approved exports already
+show gets its own `.html` and `.png` here, in the folder for its screen, named
+for the state (`search-refresh-error`, not `search-2`).
+
+Both files, not one. The HTML is what an agent reads and re-renders; the PNG is
+what a human looks at without a browser. A state with only a PNG cannot be
+regenerated, and a state with only HTML will not be looked at.
+
+This exists because the refresh-failure banner shipped, was verified on device,
+and then had no design reference at all — the screen's mockup still showed the
+state it replaced. The gap is invisible until someone asks what the screen is
+supposed to look like.

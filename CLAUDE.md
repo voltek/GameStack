@@ -123,6 +123,11 @@ work with no UI change does not need this pass.
 
 Run the `verify-on-device` Skill for the procedure.
 
+- **A new screen state gets a mockup.** Any element or state that departs from
+  what the approved exports show is added to `docs/project/design/` as both
+  `.html` and `.png`, in that screen's folder, in the same change that ships it.
+  Recipe and naming: `docs/project/design/README.md`.
+
 ### Accessibility — Tier 2
 **MVP does not target accessibility.** TalkBack passes, large-font and contrast
 audits, and touch-target sizing are backlog (Spec → Explicitly Deferred). So an
