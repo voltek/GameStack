@@ -239,6 +239,10 @@ writing and maintaining the PR body, review rounds, and merging.
   no `dynamicColor` parameter and calls no `dynamicDarkColorScheme()`.
 - Before adding ANY new library (not just replacing one below): check for the
   latest stable version first — never assume a remembered version is current.
+  **Read `maven-metadata.xml` and sort the versions**; Maven Central's search
+  endpoint does not order by version, so its first page can look like the latest
+  and not be. That mistake shipped a two-releases-old Robolectric past a review
+  of this very rule.
 
 ### Tier 2 — Configurable within a defined range
 - Room — local persistence. Swappable in theory (e.g. a future SQLDelight
@@ -258,13 +262,29 @@ writing and maintaining the PR body, review rounds, and merging.
   Changing any of these breaks consistency across every test in the project.
 - Use the project's `MainDispatcherRule` (`core/testing/`) for ViewModel tests
   instead of manually managing `Dispatchers.setMain()`/`resetMain()`.
-- **Everything under `test/` is a plain JVM unit test** — no Robolectric, no
-  emulator, no real database or network. `./gradlew test` is the gate, and it
-  must stay fast enough to run on every change. Anything genuinely requiring
-  the Android runtime (a real Room DAO against SQLite, Compose UI interaction)
-  is an *instrumented* test under `androidTest/` — currently backlog, not MVP.
-  Consequence: DAO interfaces are verified indirectly, through Repository tests
-  with a mocked DAO. See `write-tests` for what that does and does not prove.
+- **Everything under `test/` runs on the JVM** — no emulator, no real database or
+  network. `./gradlew test` is the gate and must stay fast enough to run on every
+  change. Anything needing a real device (a Room DAO against SQLite, real gestures
+  or IME) is an *instrumented* test under `androidTest/` — still deferred; the
+  Spec lists the triggers. Consequence: DAO interfaces are verified indirectly,
+  through Repository tests with a mocked DAO — see `write-tests`.
+- **Robolectric is permitted for Compose screen tests, and nothing else.** Not for
+  DAOs against real SQLite, and never as a substitute for a test that already runs
+  pure. A screen test asserts what renders in each declared state and what
+  semantics a node carries; it cannot assert that TalkBack speaks an announcement,
+  or anything gesture- or IME-dependent. Those need a device.
+  The bound exists because Robolectric is expensive and the cost **scales with
+  the number of tests rather than amortising across them** — roughly a second per
+  screen test, against milliseconds for every other kind, which already makes it
+  most of `testDebugUnitTest`. The suites are still one Gradle task, and **the
+  trigger to split them is the second screen-test class**: that is the concrete
+  event that roughly doubles this.
+
+  No exact figure is recorded here on purpose. One was, three times, and was
+  stale within the same branch each time — the trigger is an event, so a precise
+  number maintains nothing and only decays. Measure when you need it:
+  `./gradlew testDebugUnitTest --rerun-tasks` then read
+  `app/build/test-results/testDebugUnitTest/TEST-*.xml`.
 - **Every regression test must be seen to fail against the code it guards.** A
   test written after the fix can pass whether or not the fix is there, and that
   test is worse than none: it looks like coverage and proves nothing. Park the

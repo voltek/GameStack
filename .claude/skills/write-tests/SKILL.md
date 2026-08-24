@@ -7,11 +7,15 @@ compatibility: Requires `MainDispatcherRule` to exist in `core/testing/` for Vie
 ## Testing Stack
 Turbine, MockK, TestDispatcher
 
-## Scope — JVM unit tests only
+## Scope — JVM only
 Everything this skill writes goes under `test/` and runs on the JVM via
-`./gradlew test`: no emulator, no Robolectric, no real database or network.
-That boundary is what keeps the suite fast enough to gate every change
-(CLAUDE.md, Testing Stack → Tier 1).
+`./gradlew test`: no emulator, no real database, no real network. That boundary
+is what keeps the suite fast enough to gate every change (CLAUDE.md, Testing
+Stack → Tier 1).
+
+**Robolectric is permitted for Compose screen tests, and only those** — see
+"Screen tests" below. Not for DAOs against real SQLite, and never as a
+substitute for a test that already runs pure.
 
 **DAOs are therefore not tested directly here.** A `@Dao` interface has no
 behavior of its own — Room generates the implementation at compile time, and
@@ -31,6 +35,41 @@ Be honest about the residual gap: a wrong `@Query` string or a missing migration
 will pass every test in this project and fail on device. Don't write a mocked
 "DAO test" that appears to cover this — it would be tautological (see the Oracle
 Problem below) and would hide the gap rather than flag it.
+
+## Screen tests (Compose, under Robolectric)
+The one exception to "no Robolectric" (CLAUDE.md → Testing Stack). Still under
+`test/`, still `./gradlew test`.
+
+```kotlin
+@RunWith(RobolectricTestRunner::class)
+class FooScreenTest {
+    @get:Rule val composeRule = createComposeRule()
+```
+
+**No `@Config(sdk = …)`.** The SDK is pinned once in
+`app/src/test/resources/robolectric.properties`, so every screen test runs on
+the API the app ships. A per-class annotation silently *overrides* that pin —
+which is the divergence the pin exists to prevent, not a way to express it.
+
+Drive the **stateless** content composable directly, passing a `UiState` and
+collecting events into a list — not the screen that builds its own ViewModel.
+That means marking it `internal` rather than `private`, which is the intended
+trade: no Hilt graph, no ViewModel, no mocks, and every declared state is one
+constructor call away.
+
+What a screen test is *for*, and what it cannot do:
+
+- **For:** which branch renders in each declared state, that a control is
+  enabled or disabled, that a node carries the semantics it should, and
+  Composable-level logic that no unit test can reach — a click guard, a
+  `remember`ed derivation.
+- **Not for:** whether a screen reader actually announces something, gestures,
+  the IME, or anything about a real device. Asserting a `liveRegion` is declared
+  is not the same as asserting TalkBack speaks it — say which one the test proves.
+
+Cover each state the screen declares, the same list the device pass uses
+(`verify-on-device`). Both exist: the test is cheap repetition, the device pass
+is the only thing that sees the pixels.
 
 ## Oracle Problem — what "correct" means
 The source of truth for a test is the Skill or Spec that described the task —
