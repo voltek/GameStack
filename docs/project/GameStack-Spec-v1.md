@@ -97,7 +97,7 @@ non-Home tab returns to Home.
 ## Home Screen
 - Most popular games today
 - Games the user has recently interacted with
-- (Optional / deferred to Block 5) AI-based recommendations based on
+- (Optional / deferred) AI-based recommendations based on
   user preferences and rating history
 
 ## Tech Stack
@@ -120,21 +120,8 @@ non-Home tab returns to Home.
 - **Room** (local, read/write): user lists and personal ratings.
   Never synced back to IGDB.
 
-## Roadmap Phases ("Block N")
-Several documents reference development phases by number. Only the phases
-actually referenced somewhere are defined — do not infer meaning for any other
-block number; an undefined reference is a documentation gap to report, not to
-guess at.
-
-- **Block 4 — Loop Engineering.** Harness/tooling work, not product: automating
-  what is currently a manual review pass. Three pending deliverables — automating
-  the regression-test verification, running the affected suite after each agent
-  edit, and a drift checker. Priority order, design notes and the shapes already
-  ruled out: `docs/project/BLOCK-4.md`.
-- **Block 5 — AI-powered recommendations.** Product feature; see below.
-
 ## Explicitly Deferred
-- **Block 5:** AI-powered game recommendations based on user history (Room data).
+- **AI-powered game recommendations** based on the user's history (Room data).
 - **Instrumented tests (`androidTest/`).** Everything currently tested runs on
   the JVM. Real-SQLite DAO tests, Room migration tests, and true device
   interaction need a device/emulator and are deferred. Three concrete triggers,
@@ -239,3 +226,5 @@ guess at.
   screenshot costs to read
 - `docs/project/DESIGN.md` — visual design system (colors, typography, spacing)
 - `docs/project/DRIFT-CHECKLIST.md` — manual audit checklist against CLAUDE.md Tier 1 rules
+- `docs/project/TOOLING-BACKLOG.md` — repository tooling planned but not built
+  (review automation, hooks). Harness, not product, which is why it is not here

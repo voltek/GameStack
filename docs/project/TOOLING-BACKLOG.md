@@ -1,9 +1,10 @@
-# Block 4 — Loop Engineering
+# Tooling backlog
 
-Harness work, not product: automating what is currently a manual review pass.
-The Spec's Roadmap Phases section names this block in one line and points here; the
-design notes live here because they are notes about work not yet done, not rules
-constraining work being done now.
+Repository tooling that is planned but not built: automating what is currently a
+manual review pass. Kept here, and not in CLAUDE.md, because these are notes
+about work not yet done rather than rules constraining work being done now — and
+not in the Spec, which describes the product, while this describes the harness
+around it.
 
 Three deliverables, in priority order.
 
