@@ -41,6 +41,20 @@ no SHA is shared and nothing can be orphaned. It is cosmetic there, and optional
   it (`git stash`) or `git cherry-pick` it onto a fresh branch off `main`.
 - **400 changed lines or 15 files is a smoke alarm**, not a limit. Past roughly
   that size review quality drops sharply. If the PR title needs an "and", split it.
+### Commit messages
+Subject: `type(scope): imperative summary`, lowercase, no trailing period.
+
+Body: **12 lines or fewer.** This project deliberately puts the *diagnosis* in
+commit messages rather than a summary of the diff (Spec → *Why this project
+exists*), which makes them longer than the usual convention — but that licenses
+the reasoning the diff cannot show, not a retelling of it. Three tests:
+
+- Would a reader six months from now need this sentence to see why the change is
+  right? If not, cut it.
+- Is it already in CLAUDE.md, the Spec or the Resolution log? Point at it.
+- Is it narrating the process ("first I tried X, then Y")? The branch's other
+  commits already show that.
+
 - A branch is clean when every commit message names a change worth finding later
   (no `wip`, no `address review`), every commit passes the gate on its own, no
   commit exists only to fix an earlier commit *on this branch*, and nothing is

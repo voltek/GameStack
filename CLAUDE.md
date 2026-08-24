@@ -183,6 +183,10 @@ to keep:
   `refactor`, `docs`, `chore`, `test`. Scope is the feature or layer (`search`,
   `auth`, `nav`) and is optional for repo-wide changes.
   (Commits before 2026-08-22 predate this convention — do not rewrite them.)
+- **A commit body carries the diagnosis, not an essay.** Aim for **12 lines or
+  fewer**: what changed, and the *why* the diff cannot show. Anything already
+  written in CLAUDE.md, the Spec or the Resolution log is pointed at, not
+  restated — same `never both` rule as comments and PR bodies.
 - **Merge strategy: `Create a merge commit`.** `Rebase and merge` is never used —
   replaying commits onto a new base produces intermediate states that never
   existed and never passed the gate. `Squash and merge` is a fallback, not the
