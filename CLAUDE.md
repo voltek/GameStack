@@ -192,12 +192,13 @@ to keep:
   *Why this project exists*.
 - **Update a pushed branch with `git merge main`, never `git rebase`** — same
   reason as above. Rebase is fine on a branch that has never been pushed.
-- **Force-push is allowed to clean your own feature branch, with
-  `--force-with-lease` and never bare `--force`, until its first review.** After
-  a bot or `/code-review` has commented, rewriting commits orphans those threads.
-  Deliberately conditional where an absolute rule would be easier to obey: the
-  risk it would guard against — overwriting work someone else holds — does not
-  exist in a solo repo, while its cost is permanent (Resolution log, 2026-08-22).
+- **Force-push is allowed to clean your own feature branch until it merges**,
+  always with `--force-with-lease` and never bare `--force`. Rewriting can orphan
+  a bot thread's diff anchor, and that is accepted: branch history is permanent
+  and drives `blame` and `bisect`, while a review thread is read once and
+  effectively never revisited after merge. Reply in the thread before rewriting —
+  the reply is the history, the anchor is not. The absolute bans stand: never
+  `main`, and never a branch another person may hold.
 - **Never overwrite an open PR body wholesale.** `gh pr edit --body` replaces
   everything, screenshots the human dragged in included.
 - **Every review finding is fixed or dismissed with a written reason**, and every
