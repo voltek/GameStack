@@ -18,6 +18,7 @@ Architectural/technical rules live in [`CLAUDE.md`](CLAUDE.md).
 - Coil — image loading
 - Navigation Compose (Safe-type routes)
 - Material3 — dark theme only for MVP
+- Locked to portrait orientation for MVP
 
 ## Running the project
 
@@ -44,6 +45,38 @@ Architectural/technical rules live in [`CLAUDE.md`](CLAUDE.md).
   (Home / Search / Library)
 - ✅ IGDB OAuth pipeline: Twitch client-credentials auth, token caching
   and auto-refresh, request interceptor
-- 🚧 Features (Search, Game Detail, Library, ratings) — in progress
+- ✅ Search: debounced query pipeline, results/empty/error states, pull-to-refresh
+  with a non-destructive refresh-error banner (stale results stay on screen),
+  Compose screen tests under Robolectric
+- 🚧 Game Detail, Library, ratings — not started
+
+## Screenshots
+
+Real captures from the emulator ([`docs/project/screenshots/`](docs/project/screenshots/)) —
+not design mockups. For the approved design references instead, see
+[`docs/project/design/`](docs/project/design/).
+
+### Search
+
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <img src="docs/project/screenshots/search/search-initial.png" width="180"><br>
+      <sub>Initial state</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="docs/project/screenshots/search/search-results.png" width="180"><br>
+      <sub>Results</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="docs/project/screenshots/search/search-empty.png" width="180"><br>
+      <sub>No results</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="docs/project/screenshots/search/search-refresh-error.png" width="180"><br>
+      <sub>Refresh error</sub>
+    </td>
+  </tr>
+</table>
 
 This README is intentionally short and will grow as features land.
