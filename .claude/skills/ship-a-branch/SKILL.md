@@ -212,7 +212,9 @@ it surgically; never `--body` wholesale if the human has added screenshots or te
 ## 6. Merge
 **`Create a merge commit` is the default.** The branch's commits are curated and
 are the unit that makes `blame` and `bisect` useful; the merge commit records
-what landed together as one reviewed unit. Delete the branch afterwards.
+what landed together as one reviewed unit. The repo has **Automatically delete
+head branches** enabled (GitHub → Settings → General → Pull Requests), so the
+branch is cleaned up on its own — no manual step.
 
 - **`Squash and merge`** is the fallback for a branch whose history is genuinely
   disposable, or the only remedy once the force-push window has closed on a messy
