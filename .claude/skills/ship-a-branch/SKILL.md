@@ -41,6 +41,36 @@ no SHA is shared and nothing can be orphaned. It is cosmetic there, and optional
   it (`git stash`) or `git cherry-pick` it onto a fresh branch off `main`.
 - **400 changed lines or 15 files is a smoke alarm**, not a limit. Past roughly
   that size review quality drops sharply. If the PR title needs an "and", split it.
+- A branch is clean when every commit message names a change worth finding later
+  (no `wip`, no `address review`), every commit passes the gate on its own, no
+  commit exists only to fix an earlier commit *on this branch*, and nothing is
+  added and then removed within the branch.
+
+Clean it with `git commit --amend` or `git reset --soft` and recommit;
+`git rebase -i` is unavailable in this environment.
+
+### Shape the branch into claims, not into a diary
+A branch's final history is **one commit per claim**. A claim is a change someone
+might later want to find, revert, or bisect to on its own — not a step you went
+through to get there.
+
+- **Fold in every correction of your own not-yet-landed work.** Review rounds are
+  the common case: five rounds do not mean five commits. Fix, re-run the gate,
+  and amend or `reset --soft` into the commit that should have been right.
+- **Do not group by `type:` prefix mechanically.** Two `docs:` commits on one
+  branch usually mean one claim split in two — fold them. But `feat(search)` and
+  `feat(home)` are two claims and stay two, and a branch with genuinely separate
+  doc claims keeps them separate. Type is a useful smell, not the rule.
+- **Keep a commit that records a change of design.** Patch, patch, then redesign
+  is history worth having; "I wrote a weak test, then strengthened it" is not.
+  The test: does this commit represent a different state of the system, or a
+  different state of my understanding? Only the first earns a commit.
+- Every commit still has to pass the gate on its own, which usually decides the
+  order: a production fix lands before the test that depends on it.
+
+Typical end state for a feature branch: the production change, its tests, and the
+documentation — three commits, however many rounds it took to get there.
+
 ### Commit messages
 Subject: `type(scope): imperative summary`, lowercase, no trailing period.
 
@@ -52,60 +82,49 @@ the reasoning the diff cannot show, not a retelling of it. Three tests:
 - Would a reader six months from now need this sentence to see why the change is
   right? If not, cut it.
 - Is it already in CLAUDE.md, the Spec or the Resolution log? Point at it.
-- Is it narrating the process ("first I tried X, then Y")? The branch's other
-  commits already show that.
+- Is it narrating the process ("first I tried X, then Y", "the reviewer found
+  this, I verified that")? Cut it. The review's account belongs in the Resolution
+  log; the commit says *what is now true and why*.
 
-- A branch is clean when every commit message names a change worth finding later
-  (no `wip`, no `address review`), every commit passes the gate on its own, no
-  commit exists only to fix an earlier commit *on this branch*, and nothing is
-  added and then removed within the branch.
-
-Clean it with `git commit --amend` or `git reset --soft` and recommit;
-`git rebase -i` is unavailable in this environment.
+The diagnosis is of **the change**, not of how the change was arrived at. That
+distinction is what keeps 12 lines enough.
 
 ### The force-push window
 `git push --force-with-lease` is allowed to clean **your own** feature branch
-(never bare `--force`), and **the window closes at the first review, not the
-first push.** Once a bot or `/code-review` has commented, rewriting commits
-orphans those threads. After that the only remedy for a messy branch is
-`Squash and merge`.
+right up to the merge — never bare `--force`, never `main`, and never a branch
+another person may hold.
 
-Check it, do not assume it: `gh pr view <n> --json reviews,comments`. A quota
-notice from a bot is not a review.
+The window used to close at the first review, to protect bot threads from being
+orphaned. That trade was backwards: branch history is permanent and drives
+`blame` and `bisect`, while a review thread is read once and effectively never
+revisited after merge. Freezing the permanent thing to protect the ephemeral one
+also meant a single clumsy commit cost a whole branch's granularity.
 
-## 3. Write the PR body
-Use `.github/pull_request_template.md`. **Aim for one screen — about 40 lines.**
+What survives a rewrite: the comment text, in the PR timeline. What does not: the
+comment's anchor into the diff, and possibly its resolved state. So **reply in
+the thread before rewriting** — the reply is the history, the anchor is not.
 
-Three sections carry it: **what changed**, **why**, **how it was verified**. Add
-another heading when the PR genuinely needs one (a known limitation, a scope
-note, a decision taken deliberately) — but only then; the default is the three.
+In practice this should rarely come up, because step 3 keeps the reviews ahead of
+the PR. It exists for the residual case: the bot finding something real on a
+branch that was already final.
 
-Keep it short by *pointing* rather than repeating. The deep reasoning is already
-written twice — in the commit messages and in DRIFT-CHECKLIST's Resolution log —
-and the copy in the PR body is the one nobody updates. Same `never both` rule as
-code comments.
+## 3. Reviews — all of them, before the PR exists
+`/code-review` runs against the local branch and needs no PR. Run every round the
+stopping rule earns, fold each round's fixes into the commits that should have
+been right (step 2), and only then open a PR.
 
-**A body that needs more than one screen usually means the PR has more than one
-claim.** Treat length as the same smoke alarm as 400 lines / 15 files, measured
-in prose.
+Opening one early costs three things at once: review threads anchor to SHAs that
+later get rewritten, the force-push window closes so the branch can no longer be
+cleaned, and the PR body starts going stale from the moment it is written. It
+also makes step 2 impossible — no PR means the window stays open, and an open window
+is what lets a branch be folded into its final shape. The two rules hold each
+other up.
 
-### Screenshots
-UI changes need them. Generate locally, save outside the repo named for what
-they show (never in `%TEMP%` or a scratchpad — those get cleaned), then **give
-the paths in chat** and say plainly the PR needs them dragged into the body's
-edit box on the web before merge. Never commit emulator captures.
+The GitHub bot is the exception, since it needs a PR to run at all: request it
+once, when the PR opens, after the local rounds are done.
 
-An agent that verified on device and then let the human go hunting for a
-screenshot wasted the one part only the human can finish.
-
-### Never overwrite an open PR body wholesale
-`gh pr edit --body` replaces everything, including screenshots the human dragged
-in. Read the current body first and change only what needs changing, or add a
-comment instead — this has already destroyed one (Resolution log, 2026-08-22).
-
-## 4. Reviews
-- **Run `/code-review` on any PR that changes compiled behaviour.** The criterion
-  is what the change can break, not what file extension it touches: a
+- **Run `/code-review` on any branch that changes compiled behaviour.** The
+  criterion is what the change can break, not what file extension it touches: a
   comments-only or docs-only diff skips it.
 - **`/code-review` is run by the human — the agent cannot invoke it.** So ask and
   wait. Never tick that box, never excuse it, and never confuse it with the
@@ -148,6 +167,36 @@ conversation resolution*, so an open thread blocks the merge button mechanically
 Check which commit a bot review ran against before trusting it; it pins to a SHA
 and may already be stale. Re-request with `@codex review` after pushing fixes.
 
+## 4. Write the PR body
+Use `.github/pull_request_template.md`. **Aim for one screen — about 40 lines.**
+
+Three sections carry it: **what changed**, **why**, **how it was verified**. Add
+another heading when the PR genuinely needs one (a known limitation, a scope
+note, a decision taken deliberately) — but only then; the default is the three.
+
+Keep it short by *pointing* rather than repeating. The deep reasoning is already
+written twice — in the commit messages and in DRIFT-CHECKLIST's Resolution log —
+and the copy in the PR body is the one nobody updates. Same `never both` rule as
+code comments.
+
+**A body that needs more than one screen usually means the PR has more than one
+claim.** Treat length as the same smoke alarm as 400 lines / 15 files, measured
+in prose.
+
+### Screenshots
+UI changes need them. Generate locally, save outside the repo named for what
+they show (never in `%TEMP%` or a scratchpad — those get cleaned), then **give
+the paths in chat** and say plainly the PR needs them dragged into the body's
+edit box on the web before merge. Never commit emulator captures.
+
+An agent that verified on device and then let the human go hunting for a
+screenshot wasted the one part only the human can finish.
+
+### Never overwrite an open PR body wholesale
+`gh pr edit --body` replaces everything, including screenshots the human dragged
+in. Read the current body first and change only what needs changing, or add a
+comment instead — this has already destroyed one (Resolution log, 2026-08-22).
+
 ## 5. Before merging, re-read the PR body
 A PR open for days describes what was *proposed*, not what was done — a body
 naming a mechanism the branch went on to delete has happened here already. Update
@@ -162,4 +211,4 @@ what landed together as one reviewed unit. Delete the branch afterwards.
   disposable, or the only remedy once the force-push window has closed on a messy
   branch. It keeps the message *text* and destroys the structure: per-commit
   SHAs, line-level `blame`, and every bisection point but one.
-- **`Rebase and merge`: never.** Same reason as §1, at merge scale.
+- **`Rebase and merge`: never.** Same reason as step 1, at merge scale.
