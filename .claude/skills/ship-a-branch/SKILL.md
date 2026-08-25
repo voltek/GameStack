@@ -214,10 +214,29 @@ it surgically; never `--body` wholesale if the human has added screenshots or te
 are the unit that makes `blame` and `bisect` useful; the merge commit records
 what landed together as one reviewed unit. The repo has **Automatically delete
 head branches** enabled (GitHub → Settings → General → Pull Requests), so the
-branch is cleaned up on its own — no manual step.
+remote branch is cleaned up on its own.
 
 - **`Squash and merge`** is the fallback for a branch whose history is genuinely
   disposable, or the only remedy once the force-push window has closed on a messy
   branch. It keeps the message *text* and destroys the structure: per-commit
   SHAs, line-level `blame`, and every bisection point but one.
 - **`Rebase and merge`: never.** Same reason as step 1, at merge scale.
+
+### Then delete the local branch — `-d`, never `-D`
+The remote half is automatic; the local ref is the half that is not, and that
+asymmetry is what leaves `git branch` reading as archaeology instead of a list of
+live work. Order matters, because doing it backwards produces the mistake the
+rule exists to prevent:
+
+```bash
+git fetch --prune          # drops the remote-tracking refs GitHub already deleted
+git checkout main
+git merge --ff-only origin/main
+git branch -d <branch>
+```
+
+`-d` refuses unless the branch tip is an ancestor of `main`. That is exactly the
+**squash-merge** case above, where the branch holds the only copy of its granular
+history and deleting it makes those commits unreachable. So a refusal is
+information, not an obstacle — and `-D` is the key that disables the check. If
+`-d` refuses, find out why before reaching for it.
