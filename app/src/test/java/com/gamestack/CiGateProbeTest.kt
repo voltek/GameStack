@@ -12,6 +12,6 @@ class CiGateProbeTest {
 
     @Test
     fun `TEMPORARY CI PROBE this must fail to prove the gate blocks the PR`() {
-        assertTrue("intentional failure: CI gate probe, delete before merging", false)
+        assertTrue("probe flipped green: the same PR should now unblock", true)
     }
 }
