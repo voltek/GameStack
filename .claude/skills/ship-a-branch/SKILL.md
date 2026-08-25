@@ -8,9 +8,9 @@ The work is written and the gate is green. Everything below is procedure for
 getting it merged; the *rules* that constrain code on any turn stay in CLAUDE.md.
 
 CLAUDE.md → Git workflow Tier 1 is not repeated here and is not negotiable:
-always ask before `git push` and before opening a PR, never `--no-verify`, never
-force-push `main`, never commit to `main` directly, and the gate is all three of
-`build`/`test`/`lint` green.
+always ask before `git push`, before opening a PR, and before merging it; never
+`--no-verify`, never force-push `main`, never commit to `main` directly; and the
+gate is all three of `build`/`test`/`lint` green.
 
 ## 1. Update the branch against main
 **Use `git merge main`. Do not rebase a branch that has been pushed.**
@@ -37,6 +37,14 @@ the whole reason for the difference; it is not a claim that rebase is inferior.
 no SHA is shared and nothing can be orphaned. It is cosmetic there, and optional.
 
 ## 2. Check the branch is one claim
+- **Does the branch name still describe what it now contains?** A branch drifts
+  in scope more than its name gets revisited — the name was a guess made before
+  the work existed, so nothing forces it to still be true at the end. If the
+  final commits are about something else, rename before doing anything below:
+  `git branch -m <new-name>`. If already pushed, `git push -u origin <new-name>`
+  then `git push origin --delete <old-name>`. Do this before step 3's reviews,
+  not after — a PR opened under a stale name just drags the mismatch into the
+  PR title too.
 - Does every commit exist *because of* this branch's unit of work? If not, park
   it (`git stash`) or `git cherry-pick` it onto a fresh branch off `main`.
 - **400 changed lines or 15 files is a smoke alarm**, not a limit. Past roughly
@@ -181,6 +189,12 @@ Three sections carry it: **what changed**, **why**, **how it was verified**. Add
 another heading when the PR genuinely needs one (a known limitation, a scope
 note, a decision taken deliberately) — but only then; the default is the three.
 
+**`Why` defaults to one paragraph** — three to five sentences pointing at the
+decision, not narrating how it was reached. Expand past that only when the
+decision has real nuance a reviewer can't get from the diff (a rejected
+alternative, a deferred consequence) — and even then prefer pointing at the
+commit message or DRIFT-CHECKLIST's Resolution log over restating them here.
+
 Keep it short by *pointing* rather than repeating. The deep reasoning is already
 written twice — in the commit messages and in DRIFT-CHECKLIST's Resolution log —
 and the copy in the PR body is the one nobody updates. Same `never both` rule as
@@ -210,6 +224,10 @@ naming a mechanism the branch went on to delete has happened here already. Updat
 it surgically; never `--body` wholesale if the human has added screenshots or text.
 
 ## 6. Merge
+**Ask before merging (CLAUDE.md → Git workflow Tier 1).** This is not covered by
+having already asked before push or before opening the PR — the merge is its own
+point of no return and needs its own explicit yes.
+
 **`Create a merge commit` is the default.** The branch's commits are curated and
 are the unit that makes `blame` and `bisect` useful; the merge commit records
 what landed together as one reviewed unit. The repo has **Automatically delete

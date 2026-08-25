@@ -151,8 +151,9 @@ to keep:
 ## Git workflow
 
 ### Tier 1 — Immutable
-- **Always ask before `git push`, and before opening a PR.** Commits are local
-  and reversible; a push is not, and a PR is outward-facing.
+- **Always ask before `git push`, before opening a PR, and before merging it.**
+  Commits are local and reversible; a push is not, a PR is outward-facing, and a
+  merge is the point of no return for the branch.
 - **Never `--no-verify`.**
 - **Never force-push `main`, nor any branch another person may have pulled, and
   never bare `--force` anywhere.** `--force` overwrites whatever is on the remote

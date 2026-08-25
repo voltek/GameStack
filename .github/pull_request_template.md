@@ -4,6 +4,8 @@
 
 ## Why
 
+<!-- One paragraph. Expand only if the decision has real nuance a reviewer can't get from the diff. -->
+
 ## Verification
 
 - [ ] `./gradlew build` `./gradlew test` `./gradlew lint` — all green
