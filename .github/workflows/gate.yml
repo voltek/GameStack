@@ -1,0 +1,93 @@
+name: Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: gate-${{ github.ref }}
+  # Superseding a PR run is free; superseding a push to main is not. Every push
+  # to main shares one ref, so cancelling there leaves that commit recorded as
+  # *cancelled* rather than green — and a green history on main is the point.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: build / test / lint
+    runs-on: ubuntu-latest
+    # The default is 360. A wedged daemon would bill six hours before anyone looks.
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # gradle/gradle-daemon-jvm.properties pins the daemon to Java 21. Anything
+      # else makes Gradle download a toolchain on every job.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      # Robolectric fetches its android-all-instrumented SDK jar at *test* runtime
+      # through its own Maven client, into ~/.m2, never through Gradle's classpath.
+      # Caching only ~/.gradle re-downloads ~204MB every job.
+      #
+      # Both files belong in the key: robolectric.properties picks *which* SDK jar
+      # is fetched, libs.versions.toml picks the Robolectric version that fetches
+      # it. Miss either and a bump keeps the old key, which actions/cache reports
+      # as an exact hit — so it skips the save and re-downloads forever, silently.
+      # (The toml is hashed whole, so an unrelated bump also misses; restore-keys
+      # covers that, and over-invalidating is the safe direction.) The key stays
+      # on one line: wrapping it in a folded scalar keeps literal newlines inside
+      # the `${{ }}` unless every continuation sits at the same indent.
+      #
+      # Restore and save are split because the combined action saves in a post
+      # step that is skipped when the job fails — and a failing job is exactly
+      # when the next run comes soonest. Not `always()`: a run cancelled by the
+      # concurrency group could persist a half-written jar under the primary key,
+      # which then reads as an exact hit and is never overwritten.
+      #
+      # If caching ever stops being enough — a runner with no network at test
+      # time — the supported route is `robolectric.offline=true` plus
+      # `robolectric.dependency.dir` pointing at a resolved configuration.
+      # Declaring the jar as a `testImplementation` is NOT that route: it fetches
+      # a second copy nothing reads (tried 2026-08-23, reverted).
+      - name: Restore the Robolectric SDK jar
+        id: robolectric
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.m2/repository/org/robolectric
+          key: robolectric-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml', 'app/src/test/resources/robolectric.properties') }}
+          restore-keys: robolectric-${{ runner.os }}-
+
+      # `--continue` so one run reports every independent failure. Without it the
+      # gate stops at the first, and each further verdict costs another push.
+      # One invocation, not three: Gradle deduplicates the task graph, so naming
+      # all three costs nothing and keeps this readable as the gate CLAUDE.md defines.
+      # No IGDB credentials needed — local.properties is optional and falls back to "".
+      - name: Run the gate
+        run: ./gradlew build test lint --continue
+
+      - name: Save the Robolectric SDK jar
+        if: ${{ !cancelled() && steps.robolectric.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.m2/repository/org/robolectric
+          key: ${{ steps.robolectric.outputs.cache-primary-key }}
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gate-reports
+          path: |
+            app/build/reports/
+            app/build/test-results/
+          retention-days: 7
