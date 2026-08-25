@@ -26,7 +26,7 @@ otherwise it quietly becomes a second changelog, and the real one is `git log`.
 This is read on demand, not loaded every turn. Consult it when picking up
 harness work; there is no need to check it while writing product code.
 
-Seven deliverables, in priority order.
+Six deliverables, in priority order.
 
 ## 1. Automate the regression-test verification
 **Ranked first.** CLAUDE.md → Testing Stack (Tier 1) requires every regression
@@ -51,29 +51,7 @@ script nobody can explain.
 A longer-term version of the same idea is real mutation testing (PIT). The
 manual targeted mutation documented in `write-tests` is its hand-run form.
 
-## 2. CI on GitHub Actions
-Run `build`, `test` and `lint` on every push and pull request, so the gate stops
-depending on whoever remembered to run it. Nothing exists yet: `main` is
-protected but *require status checks* is deliberately switched off, because there
-are no checks to require.
-
-**Cache `~/.m2` as well as `~/.gradle`.** Robolectric resolves its own SDK jar at
-test runtime through its own Maven client, into `~/.m2`, and never looks at
-Gradle's classpath — so a runner caching only `~/.gradle` re-downloads 204MB on
-every job, and a network-isolated one fails the gate at test runtime with a
-download error that reads as a broken test. Declaring the artifact as a
-`testImplementation` does **not** fix this: it fetches a second copy that nothing
-reads (tried on 2026-08-23 and reverted). The supported alternative, if caching
-is ever not enough, is `robolectric.offline=true` plus
-`robolectric.dependency.dir` pointing at a resolved configuration.
-
-One thing to settle when it lands: Gradle caching, without which every run pays a
-cold build. Screen tests are currently part of `./gradlew test` rather than a
-separate task, so there is one suite to schedule — but see item 5, which will
-change that. Turn on *require status checks* in the branch protection once CI is
-green and stable; that is the whole point of building it.
-
-## 3. Run the affected test suite after each agent edit
+## 2. Run the affected test suite after each agent edit
 A Hook covering the Regression pillar that `write-tests` explicitly does not:
 that Skill covers Requirements only — "new code does what the Skill or Spec
 asked" — and says nothing about whether the change broke something else.
@@ -83,17 +61,17 @@ rather than amortising, so "run the affected class" is not the cheap option it
 sounds like when that class is a screen test. Measure before designing around
 it — see CLAUDE.md → Testing Stack for why no figure is written down.
 
-## 4. Automated drift checker
+## 3. Automated drift checker
 A Hook or validator subagent implementing `DRIFT-CHECKLIST.md`'s items,
 replacing the manual pass. The checklist is already written as violation
 detectors ("yes" means drift found), which is the shape an automated checker
 needs.
 
-Ranked below the three above because the manual pass currently works and the
+Ranked below the two above because the manual pass currently works and the
 checklist is short. Its value grows with the number of documents, not with the
 amount of code.
 
-## 5. Split the Robolectric screen tests into their own Gradle task
+## 4. Split the Robolectric screen tests into their own Gradle task
 Deliberately *not* done when screen tests landed, on a measurement that turned
 out to be wrong: the cost scales at roughly a second per screen test rather than
 amortising as a per-class startup, and Robolectric is already most of
@@ -106,10 +84,10 @@ Shape: a `screenTest` task filtering `*ScreenTest`, with `test` excluding them a
 project uses and which does not tolerate reading another task's state at
 configuration time.
 
-Do this before, not after, the post-edit hook in item 3 — that hook's whole
+Do this before, not after, the post-edit hook in item 2 — that hook's whole
 premise is a quick loop, and without the split there is no quick loop to protect.
 
-## 6. A `commit-msg` hook for the mechanical half of the message rules
+## 5. A `commit-msg` hook for the mechanical half of the message rules
 Check `type(scope): imperative summary` against the allowed types, and a body of
 12 lines or fewer. Both are regex-checkable, and a git hook runs whether or not
 anyone remembers it — CLAUDE.md already forbids `--no-verify`, so it cannot be
@@ -126,7 +104,7 @@ Scope limit worth stating before anyone tries: the hook can only see **form**.
 carry the diagnosis" are judgement, and the rules covering them stay in CLAUDE.md
 regardless.
 
-## 7. Make the project-coupled Skills exportable — lowest priority
+## 6. Make the project-coupled Skills exportable — lowest priority
 **No benefit to this project.** Purely to lift Skills into a separate reusable
 collection, so it happens only when nothing else is queued.
 

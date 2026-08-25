@@ -1,5 +1,7 @@
 # GameStack
 
+[![Gate](https://github.com/voltek/GameStack/actions/workflows/gate.yml/badge.svg)](https://github.com/voltek/GameStack/actions/workflows/gate.yml)
+
 Native Android app for exploring video games and managing a personal game
 library, using the [IGDB API](https://api-docs.igdb.com/) as the data source.
 
@@ -38,6 +40,13 @@ Architectural/technical rules live in [`CLAUDE.md`](CLAUDE.md).
 ./gradlew test    # unit tests
 ./gradlew lint    # lint
 ```
+
+The same three run on GitHub Actions for every pull request and every push to
+`main` — see [`.github/workflows/gate.yml`](.github/workflows/gate.yml). No API
+credentials are needed there: `local.properties` is optional, the build falls
+back to empty values, and nothing in the gate calls IGDB. It does still need the
+network — Gradle resolves dependencies, and Robolectric fetches its own SDK jar
+at test runtime.
 
 ## Current status
 

@@ -27,7 +27,8 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 # Deliberately no android-all-instrumented entry: Robolectric resolves its own SDK
 # jar at test runtime and never consults Gradle's classpath, so declaring it here
-# downloads a second 204MB copy that nothing reads. See TOOLING-BACKLOG → CI.
+# downloads a second 204MB copy that nothing reads. CI caches ~/.m2 instead —
+# see .github/workflows/gate.yml.
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }

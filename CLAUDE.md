@@ -112,6 +112,9 @@ drift returns.
   - Single class: `./gradlew testDebugUnitTest --tests "com.gamestack.Foo"`.
     Plain `test` is a lifecycle task and rejects `--tests`.
 - Lint: `./gradlew lint`
+- CI runs the same three on every PR and every push to `main`
+  (`.github/workflows/gate.yml`). It is the backstop, not the first run — the
+  gate is still green locally before you commit.
 
 ### Device verification — Tier 2
 The gate above is necessary but **not sufficient for UI work**: it proves the
