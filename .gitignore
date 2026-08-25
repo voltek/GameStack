@@ -19,3 +19,6 @@ local.properties
 docs/.obsidian/workspace*
 docs/.obsidian/workspace
 docs/.obsidian/cache
+# Agent worktrees. Each is a checkout of this repo, so `git add -A` records it
+# as a gitlink instead of ignoring it. `.claude/skills/` stays versioned.
+/.claude/worktrees/
