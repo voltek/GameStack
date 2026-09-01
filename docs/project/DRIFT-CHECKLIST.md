@@ -104,7 +104,7 @@
 - [ ] Is there any code comment or identifier written in Spanish?
 - [ ] Does any comment restate what the code says, narrate *how we got here*
       (a past bug, an earlier version, which review found it), or duplicate text
-      that already exists in a Skill or the Resolution log? Any comment block
+      that already exists in a Skill, DRIFT-LOG or an ADR? Any comment block
       over 4 lines, or a file past ~15% comment lines, is where to look first.
 - [ ] Is there any hardcoded UI string in a ViewModel or UseCase instead of `UiText`?
 - [ ] Is any Hilt module named for a layer or lifetime rather than a concern

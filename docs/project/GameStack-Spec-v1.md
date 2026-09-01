@@ -26,8 +26,8 @@ keep needing a justification, and without this section each one looks arbitrary:
   default merge strategy, why a branch showing "patch, patch, patch, redesign"
   was kept intact rather than squashed, and why commit messages carry diagnosis
   rather than a summary of the diff.
-- **Process work is product work.** The Skills, the tiered rules, the
-  Resolution log and the review loops are not overhead around the app — they are
+- **Process work is product work.** The Skills, the tiered rules, the drift
+  log, the ADRs and the review loops are not overhead around the app — they are
   a second thing being built, and often the more valuable one.
 - **A decision is worth more written down than made quickly.** Where a
   conventional default exists, it is still stated explicitly, with the trade.
@@ -238,5 +238,8 @@ non-Home tab returns to Home.
   screenshot costs to read
 - `docs/project/DESIGN.md` — visual design system (colors, typography, spacing)
 - `docs/project/DRIFT-CHECKLIST.md` — manual audit checklist against CLAUDE.md Tier 1 rules
+- `docs/project/DRIFT-LOG.md` — every drift found and which way it was resolved
+- `docs/project/decisions/` — one ADR per architectural decision in force, each
+  naming what enforces it
 - `docs/project/TOOLING-BACKLOG.md` — repository tooling planned but not built
   (review automation, hooks). Harness, not product, which is why it is not here

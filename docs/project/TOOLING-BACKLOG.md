@@ -19,11 +19,11 @@ belonging to the human's separate study programme, which is kept outside this
 repository entirely.
 
 **When an item ships, it leaves this file.** Its rule, if it has one, goes to
-CLAUDE.md; its procedure to a Skill; the incident and the decision to
-DRIFT-CHECKLIST's Resolution log; and what it now *is* — its purpose, where it
-lives, and the shapes ruled out — to TOOLING.md. This file only ever holds
-unbuilt things — otherwise it quietly becomes a second changelog, and the real
-one is `git log`.
+CLAUDE.md; its procedure to a Skill; the incident to DRIFT-LOG; the decision to
+an ADR under `docs/project/decisions/`; and what it now *is* — its purpose,
+where it lives, and the shapes ruled out — to TOOLING.md. This file only ever
+holds unbuilt things — otherwise it quietly becomes a second changelog, and the
+real one is `git log`.
 
 This is read on demand, not loaded every turn. Consult it when picking up
 harness work; there is no need to check it while writing product code.
