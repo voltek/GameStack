@@ -20,19 +20,21 @@ detectors you run to *find* drift.
 - **Numbered by the date of the original decision**, not by when the file was
   written. `0001` is the oldest decision this repository has.
 - Ties within one date break by the order of the CLAUDE.md section the rule
-  belongs to, top to bottom. Decided once; not revisited.
+  belongs to, top to bottom. An ADR whose rule lives outside CLAUDE.md — product
+  scope recorded in the Spec, say — sorts after every ADR of that date whose rule
+  does not. Decided once; not revisited.
 - **A file is never renamed** — not even once its decision is superseded. That
   is what makes the number a stable address.
 
 ## The template
 
 ```markdown
-# ADR 0012 — The force-push window closes at the merge
+# ADR 0014 — The force-push window closes at the merge
 
 Status: Accepted
 Date: 2026-08-23
-Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Two workflow rules were")
-Supersedes: ADR-0009
+Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Two workflow rules were producing the mess")
+Supersedes: ADR-0007
 Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2)
 
 ## Context
@@ -57,7 +59,9 @@ What it buys and what it costs, including what was accepted knowingly.
 - **`Enforced by:`** — exactly one value from the closed vocabulary below.
 
 ### `Enforced by:` — closed vocabulary
-- `none (prose only — CLAUDE.md § <section>)`
+- `none (prose only — <document> § <section>)` — CLAUDE.md in almost every case;
+  name the document that actually carries the rule, since a few live in the Spec
+  rather than in CLAUDE.md (product scope, not a constraint on code).
 - `checklist detector — DRIFT-CHECKLIST.md § <section>`
 - `./gradlew lint`
 - `test: <TestName>#<caseName>`
