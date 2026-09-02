@@ -89,10 +89,10 @@ the reasoning the diff cannot show, not a retelling of it. Three tests:
 
 - Would a reader six months from now need this sentence to see why the change is
   right? If not, cut it.
-- Is it already in CLAUDE.md, the Spec or the Resolution log? Point at it.
+- Is it already in CLAUDE.md, the Spec, DRIFT-LOG or an ADR? Point at it.
 - Is it narrating the process ("first I tried X, then Y", "the reviewer found
-  this, I verified that")? Cut it. The review's account belongs in the Resolution
-  log; the commit says *what is now true and why*.
+  this, I verified that")? Cut it. The review's account belongs in DRIFT-LOG;
+  the commit says *what is now true and why*.
 
 The diagnosis is of **the change**, not of how the change was arrived at. That
 distinction is what keeps 12 lines enough.
@@ -193,10 +193,10 @@ note, a decision taken deliberately) — but only then; the default is the three
 decision, not narrating how it was reached. Expand past that only when the
 decision has real nuance a reviewer can't get from the diff (a rejected
 alternative, a deferred consequence) — and even then prefer pointing at the
-commit message or DRIFT-CHECKLIST's Resolution log over restating them here.
+commit message, DRIFT-LOG or the ADR over restating them here.
 
 Keep it short by *pointing* rather than repeating. The deep reasoning is already
-written twice — in the commit messages and in DRIFT-CHECKLIST's Resolution log —
+written twice — in the commit messages and in DRIFT-LOG —
 and the copy in the PR body is the one nobody updates. Same `never both` rule as
 code comments.
 
@@ -216,7 +216,7 @@ screenshot wasted the one part only the human can finish.
 ### Never overwrite an open PR body wholesale
 `gh pr edit --body` replaces everything, including screenshots the human dragged
 in. Read the current body first and change only what needs changing, or add a
-comment instead — this has already destroyed one (Resolution log, 2026-08-22).
+comment instead — this has already destroyed one (DRIFT-LOG, 2026-08-22).
 
 ## 5. Before merging, re-read the PR body
 A PR open for days describes what was *proposed*, not what was done — a body

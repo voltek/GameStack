@@ -13,9 +13,10 @@ walking into the same dead end.
 **Out:** anything that already has a home. Rules constraining code on any turn are
 in CLAUDE.md; procedures for a named task are Skills; the product is the Spec;
 tooling *not yet built* is TOOLING-BACKLOG; how a drift was found and resolved is
-DRIFT-CHECKLIST's Resolution log. This file does not restate them, and it is not
-a changelog — `git log` is the changelog. It answers the one question none of
-those do: **what is the harness made of, today.**
+DRIFT-LOG, and a decision in force is an ADR under `decisions/`. This file does
+not restate them, and it is not a changelog — `git log` is the changelog. It
+answers the one question none of those do: **what is the harness made of,
+today.**
 
 Read on demand — when picking up harness work, or when rebuilding this setup
 somewhere else. It is not loaded every turn.
@@ -126,20 +127,28 @@ it should never pick. It is archived rather than deleted, because how the projec
 was bootstrapped is worth keeping.
 
 ## 7. The governing documents
-**What.** Four files with disjoint jobs: `CLAUDE.md` holds rules that constrain
-code on any turn, under a three-tier system saying what may be changed and who
-must agree; the Spec holds the product; `DESIGN.md` holds the visual system; and
-`DRIFT-CHECKLIST.md` holds the Resolution log — every time code and documentation
-disagreed, and which of the two was changed.
+**What.** Five files and a folder, with disjoint jobs: `CLAUDE.md` holds rules
+that constrain code on any turn, under a three-tier system saying what may be
+changed and who must agree; the Spec holds the product; `DESIGN.md` holds the visual system;
+`DRIFT-CHECKLIST.md` holds the violation detectors you run to *find* drift;
+`DRIFT-LOG.md` holds the incidents — every time code and documentation
+disagreed, and which of the two was changed; and `decisions/` holds one ADR per
+decision in force, each naming what enforces it. They grow at different rates,
+which is why they are separate files.
 
 **Replaces.** Rediscovering, per session, why the code looks the way it does.
 
 **Where.** `CLAUDE.md`, `docs/project/GameStack-Spec-v1.md`,
-`docs/project/DESIGN.md`, `docs/project/DRIFT-CHECKLIST.md`.
+`docs/project/DESIGN.md`, `docs/project/DRIFT-CHECKLIST.md`,
+`docs/project/DRIFT-LOG.md`, `docs/project/decisions/`.
 
-**Ruled out.** *Putting everything in CLAUDE.md.* Every line there is paid for on
-every request, whether or not the task touches it. The test for admission is not
-"is this valuable" but "is this needed on every turn".
+**Ruled out.**
+- *Putting everything in CLAUDE.md.* Every line there is paid for on every
+  request, whether or not the task touches it. The test for admission is not
+  "is this valuable" but "is this needed on every turn".
+- *A hand-written index of the ADRs.* A second place to update per ADR, and the
+  Skills list in CLAUDE.md already drifted out of sync with `.claude/skills/`
+  exactly that way. `grep -H "^Enforced by:"` reads the set instead.
 
 ## 8. Claude workflows on GitHub
 **What.** Two workflows, and their states differ on purpose. *Claude Code*

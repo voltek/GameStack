@@ -19,16 +19,17 @@ belonging to the human's separate study programme, which is kept outside this
 repository entirely.
 
 **When an item ships, it leaves this file.** Its rule, if it has one, goes to
-CLAUDE.md; its procedure to a Skill; the incident and the decision to
-DRIFT-CHECKLIST's Resolution log; and what it now *is* — its purpose, where it
-lives, and the shapes ruled out — to TOOLING.md. This file only ever holds
-unbuilt things — otherwise it quietly becomes a second changelog, and the real
-one is `git log`.
+CLAUDE.md; its procedure to a Skill; the incident to DRIFT-LOG; the decision to
+an ADR under `docs/project/decisions/`; and what it now *is* — its purpose,
+where it lives, and the shapes ruled out — to TOOLING.md. This file only ever
+holds unbuilt things — otherwise it quietly becomes a second changelog, and the
+real one is `git log`.
 
 This is read on demand, not loaded every turn. Consult it when picking up
 harness work; there is no need to check it while writing product code.
 
-Six deliverables, in priority order.
+Seven deliverables, in priority order — except item 7, which is gated on a
+trigger rather than ranked.
 
 ## 1. Automate the regression-test verification
 **Ranked first.** CLAUDE.md → Testing Stack (Tier 1) requires every regression
@@ -72,6 +73,14 @@ needs.
 Ranked below the two above because the manual pass currently works and the
 checklist is short. Its value grows with the number of documents, not with the
 amount of code.
+
+**Its input data is the ADR set plus the classified checklist.** The ADRs under
+`docs/project/decisions/` already say, per decision, what enforces it, so the
+set names which rules are prose only and which have a fitness function. The
+per-item classification of this checklist — `Verified by:` `(PENDING — not yet
+defined)` — is the other half. The full sweep of CLAUDE.md for rules with no
+enforcement point is collected when this item is picked up, not before: done
+earlier it produces a list nobody is ready to act on.
 
 ## 4. Split the Robolectric screen tests into their own Gradle task
 Deliberately *not* done when screen tests landed, on a measurement that turned
@@ -128,3 +137,25 @@ An audit on 2026-08-23 classified all fourteen:
 Do not "generalise" these in place. A Skill that has stopped naming this
 project's real types is worse *here*, and the examples are what make them usable.
 Extract a copy instead.
+
+## 7. Check the ADR index against `decisions/` — once an index exists
+**Not gated behind items 1 and 2.** Comparing two lists of strings interprets
+nothing, so this is not the drift-auditor of item 3 wearing another hat and does
+not wait behind it.
+
+**What it does.** Reads the ADR files in `docs/project/decisions/` and asserts
+that whatever index names them agrees: same numbers, same titles, nothing listed
+that no longer exists, and nothing on disk missing from the list.
+
+**Replaces.** Re-reading both by eye — the step that reliably goes unrun.
+
+**The trigger is concrete**, and it has not fired: there is deliberately no index
+today, because `grep -H "^Enforced by:" docs/project/decisions/[0-9]*.md`
+answers the question from a terminal. It fires at roughly 30 ADRs, or the first
+time the map is wanted *inside a document* rather than in a terminal, whichever
+comes first. That is when an index earns its keep — and this check lands with it, in
+the same change, not afterwards.
+
+**Ruled out.** *Keeping the index by hand.* CLAUDE.md's Skills list drifted out
+of sync with `.claude/skills/` in exactly that way and had to be given its own
+drift detector. An index nobody verifies is just a second source of truth.

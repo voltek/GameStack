@@ -36,7 +36,7 @@ the rule exists to catch the next case, whatever it turns out to be.)
 ### Every line here is loaded on every turn, forever
 This file is injected into the context of **every request**, whether or not the
 task touches what it says. A Skill loads only when invoked; the Spec, DESIGN.md
-and DRIFT-CHECKLIST are read on demand. So the question for anything proposed
+and the drift documents are read on demand. So the question for anything proposed
 here is never "is this valuable?" — almost everything written here was — but
 **"is this needed on every turn?"**
 
@@ -51,9 +51,9 @@ here is never "is this valuable?" — almost everything written here was — but
    Skills are for, and a procedure sitting here is paid for on every unrelated
    turn.
 3. **Is it a rule, or is it history?** The incident that produced a rule belongs
-   in DRIFT-CHECKLIST's Resolution log. Keep at most a clause of *why* here —
-   enough that the rule does not read as arbitrary and get "improved" away — and
-   let the log carry the account.
+   in DRIFT-LOG, and the decision itself in an ADR. Keep at most a clause of
+   *why* here — enough that the rule does not read as arbitrary and get
+   "improved" away — and let the log carry the account.
 
 If the answer sends it elsewhere, **write it elsewhere and, only when the rule
 itself would be incomplete without it, leave a one-line pointer.** A pointer is
@@ -101,7 +101,9 @@ which one was chosen:
    what's outdated (e.g. an implementation decision was made that the document
    never recorded).
 
-Either way, log it in `docs/project/DRIFT-CHECKLIST.md`'s Resolution log.
+Either way, log it in `docs/project/DRIFT-LOG.md` — and when the resolution
+creates or changes a rule rather than restoring one, that rule is a new ADR
+under `docs/project/decisions/`, which the row then points at.
 Never leave a known contradiction unresolved on the grounds that "the code works" —
 an undocumented decision is invisible to the next agent, which is how the same
 drift returns.
@@ -167,8 +169,8 @@ to keep:
   freely once it passes.
 - **Never commit directly to `main`** — branch first.
 - **Code and its documentation land in the same commit.** A commit that changes
-  an architectural rule carries its CLAUDE.md/Spec/DRIFT-CHECKLIST update with
-  it (Documentation completeness rule). Never code now, docs next commit.
+  an architectural rule carries its CLAUDE.md/Spec/ADR update with it
+  (Documentation completeness rule). Never code now, docs next commit.
 - **Read `git status` in full before committing.** Untracked source files are
   invisible to `git add -u` and silently break the build for everyone else.
 - **Before pushing, `git fetch` and reconcile with `origin/main`.** Rebase or
@@ -516,9 +518,9 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
   questions before leaving one:
   1. Does it restate what the code already says? Delete it.
   2. Is it about *how we got here* rather than *what to do here*? That belongs in
-     the commit message and DRIFT-CHECKLIST's Resolution log, both of which this
-     project already maintains. Writing it in both places is duplication, and the
-     copy in the code is the one nobody updates.
+     the commit message and DRIFT-LOG, both of which this project already
+     maintains. Writing it in both places is duplication, and the copy in the
+     code is the one nobody updates.
   3. Would it become false if someone refactored correctly? Then it is a
      chronicle, not a constraint — delete it or rewrite it as the constraint.
 
