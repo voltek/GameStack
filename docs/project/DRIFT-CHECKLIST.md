@@ -120,10 +120,11 @@ this checklist's own past drift.
 - [ ] Does any document use course or study vocabulary ("Block N", phase
       numbering, learning objectives) rather than naming the work itself?
       That belongs to the course, which is kept outside this repository.
-- [ ] Does CLAUDE.md's "Available Skills" list match the actual contents of
-      `.claude/skills/`, and the Spec's copy of that list? (Retired Skills are
-      listed separately in CLAUDE.md and archived under
-      `docs/project/retired-skills/` — they must not appear as invocable.)
+- [ ] Does CLAUDE.md's "Available Skills" list differ from the actual contents
+      of `.claude/skills/`, or from the Spec's copy of that list? (Retired
+      Skills are listed separately in CLAUDE.md and archived under
+      `docs/project/retired-skills/` — one of those appearing as invocable is
+      the same drift.)
 - [ ] Does DESIGN.md's prose reference a token its own token block doesn't define,
       or state a value that contradicts it (colors, radii, type roles)?
 - [ ] Did a recent implementation decision (a fallback, a mapping, a naming rule)
