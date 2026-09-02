@@ -227,8 +227,8 @@ non-Home tab returns to Home.
 - `.claude/skills/` — reusable procedures (discovery-feature, new-feature,
   new-mapper, new-repository-interface, new-repository-impl, new-api-service,
   new-room-dao, new-hilt-module, new-usecase, new-viewmodel, new-screen,
-  write-tests). CLAUDE.md's "Available Skills" section is the authoritative
-  list — if these two disagree, that is drift.
+  write-tests, verify-on-device, ship-a-branch). CLAUDE.md's "Available Skills"
+  section is the authoritative list — if these two disagree, that is drift.
 - `docs/project/retired-skills/` — Skills that have been withdrawn from
   `.claude/skills/`, kept as a record of how the project was built. Not
   invocable. Currently: `project-scaffold`.
