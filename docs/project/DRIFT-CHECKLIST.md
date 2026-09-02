@@ -191,3 +191,14 @@ this checklist's own past drift.
 - [ ] Did a recent implementation decision (a fallback, a mapping, a naming rule)
       get made in code without being written down anywhere?
       Verified by: subagent (interpretive)
+- [ ] Does any ADR under `docs/project/decisions/` break the field rules its own
+      README sets — a missing `Backfilled:` or `Enforced by:` line, an
+      `Enforced by:` value outside the closed vocabulary, a `Date:` that
+      disagrees with the row `Backfilled:` cites, or quoted opening words that
+      no `grep -F` against `DRIFT-LOG.md` resolves? Three addressing rules, each
+      earned by a false result: anchor `Enforced by:` at line start and read
+      every one of them, because ADR prose quotes the field name too; resolve
+      *every* row a `Backfilled:` line cites, not only the first; and take the
+      cited date as the one immediately before the quoted words, which may
+      carry a date of their own.
+      Verified by: human
