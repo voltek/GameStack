@@ -202,3 +202,8 @@ this checklist's own past drift.
       cited date as the one immediately before the quoted words, which may
       carry a date of their own.
       Verified by: human
+- [ ] Does any item in this file lack a `Verified by:` line, carry more than one,
+      or carry a value outside the closed vocabulary the header declares? An
+      unclassified item is invisible to the checker in `TOOLING-BACKLOG.md`
+      item 3, whose scope this file is.
+      Verified by: human
