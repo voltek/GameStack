@@ -51,10 +51,11 @@ What it buys and what it costs, including what was accepted knowingly.
 - **`Status:`** — `Accepted`, or `Superseded by ADR-00NN`.
 - **`Date:`** — the date of the *original* decision.
 - **`Backfilled:`** — `yes — DRIFT-LOG.md, row <date> ("<opening words>")`, or
-  `no`. The quoted opening words are what make the address resolve: 26 rows
-  share 2026-08-23, so a bare date points at all of them. And without the field
-  at all, a file written today looks like a decision taken today, which
-  falsifies the record.
+  `no`. Where one decision was backfilled from more than one row, the plural
+  form `rows <date> ("<first>") and ("<second>")` addresses them all. The quoted
+  opening words are what make an address resolve: 26 rows share 2026-08-23, so a
+  bare date points at all of them. And without the field at all, a file written
+  today looks like a decision taken today, which falsifies the record.
 - **`Supersedes:` / `Superseded by:`** — only when one applies.
 - **`Enforced by:`** — exactly one value from the closed vocabulary below.
 
