@@ -77,10 +77,13 @@ amount of code.
 **Its input data is the ADR set plus the classified checklist.** The ADRs under
 `docs/project/decisions/` already say, per decision, what enforces it, so the
 set names which rules are prose only and which have a fitness function. The
-per-item classification of this checklist — `Verified by:` `(PENDING — not yet
-defined)` — is the other half. The full sweep of CLAUDE.md for rules with no
-enforcement point is collected when this item is picked up, not before: done
-earlier it produces a list nobody is ready to act on.
+per-item classification of this checklist — one `Verified by:` line per item,
+from a closed vocabulary — is the other half, and it sorts the items three
+ways: `human` is what this checker takes over, `subagent (interpretive)` is
+what it never can, and a value naming a tool is covered elsewhere already and
+out of its scope. The full sweep of CLAUDE.md for enforcement-free rules is
+collected when this item is picked up, not before: done earlier it produces a
+list nobody is ready to act on.
 
 ## 4. Split the Robolectric screen tests into their own Gradle task
 Deliberately *not* done when screen tests landed, on a measurement that turned
