@@ -17,12 +17,15 @@ detectors you run to *find* drift.
 
 ## Naming and numbering
 - `NNNN-slug-in-kebab-case.md`, four digits, zero-padded.
-- **Numbered by the date of the original decision**, not by when the file was
-  written. `0001` is the oldest decision this repository has.
-- Ties within one date break by the order of the CLAUDE.md section the rule
-  belongs to, top to bottom. An ADR whose rule lives outside CLAUDE.md — product
-  scope recorded in the Spec, say — sorts after every ADR of that date whose rule
-  does not. Decided once; not revisited.
+- **Numbered in the order decisions are recorded** — always the next free
+  number. Chronology is read from `Date:`, and `Backfilled:` explains any gap
+  between when a decision was taken and when its file was written; neither is
+  ever inferred from the number
+  ([ADR 0023](0023-adr-numbers-follow-recording-order.md)).
+- `0001`–`0019` were numbered by date during the backfill, so for those the two
+  orders happen to coincide. That is a fact about how they were written, not a
+  promise the numbering makes. There is no tie-break rule, because recording
+  order admits no ties.
 - **A file is never renamed** — not even once its decision is superseded. That
   is what makes the number a stable address.
 
