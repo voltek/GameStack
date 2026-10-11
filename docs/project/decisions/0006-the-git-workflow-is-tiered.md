@@ -3,7 +3,9 @@
 Status: Accepted
 Date: 2026-08-22
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-22 ("CLAUDE.md's Git workflow was the only section")
-Enforced by: none (prose only — CLAUDE.md § Git workflow)
+Enforced by: branch protection — `required_status_checks=build / test / lint` (the gate must be green to merge)
+Enforced by: branch protection — `required_pull_request_reviews` is set (a pull request before anything lands on `main`) and `enforce_admins=false` (administrators are not bound, so this covers everyone but the maintainer)
+Enforced by: none (prose only — CLAUDE.md § Git workflow) — never `--no-verify`, never commit directly to `main` as an administrator, reading `git status` in full, branch names, Conventional Commits
 
 ## Context
 The Git workflow was the only section of CLAUDE.md with no Tier markers, so

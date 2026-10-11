@@ -3,7 +3,9 @@
 Status: Accepted
 Date: 2026-08-22
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-22 ("The Git workflow said nothing about merge strategy")
-Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2)
+Enforced by: repository settings — `allow_rebase_merge=false` (the Rebase and merge button)
+Enforced by: branch protection — `required_conversation_resolution=true` (every review thread resolved before the merge; "answered" is prose)
+Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — `git merge main` instead of `rebase`, merge commit over squash as the default, the per-commit checkpoint, the 400-line and 15-file alarm
 
 ## Context
 The Git workflow said nothing about merge strategy, nothing about PR size, and

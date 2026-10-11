@@ -20,10 +20,11 @@ repository entirely.
 
 **When an item ships, it leaves this file.** Its rule, if it has one, goes to
 CLAUDE.md; its procedure to a Skill; the incident to DRIFT-LOG; the decision to
-an ADR under `docs/project/decisions/`; and what it now *is* — its purpose,
-where it lives, and the shapes ruled out — to TOOLING.md. This file only ever
-holds unbuilt things — otherwise it quietly becomes a second changelog, and the
-real one is `git log`.
+an ADR under `docs/project/decisions/`; the clauses it now polices to the
+`Enforced by:` line of every ADR that states them; and what it now *is* — its
+purpose, where it lives, and the shapes ruled out — to TOOLING.md. This file
+only ever holds unbuilt things — otherwise it quietly becomes a second
+changelog, and the real one is `git log`.
 
 This is read on demand, not loaded every turn. Consult it when picking up
 harness work; there is no need to check it while writing product code.
