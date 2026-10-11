@@ -1,8 +1,15 @@
 # DRIFT-CHECKLIST — GameStack
 
-> Manual audit checklist derived from CLAUDE.md's Tier 1 (Immutable) rules.
-> Run this periodically, or after a batch of agent-generated features, to detect
-> drift between the code and the Project Constitution.
+> Manual audit checklist derived from CLAUDE.md's Tier 1 (Immutable) rules. It
+> detects drift between the code and the Project Constitution, and it runs on
+> either of two events. A pull request touches `CLAUDE.md`, any `.md` under
+> `docs/project/` or `.github/`, or any Skill under `.claude/skills/` — a diff
+> shows you that outright — and what runs then is the *Documentation
+> integrity* set, fired by `ship-a-branch`
+> ([ADR 0022](decisions/0022-a-governance-diff-triggers-the-checklist.md)).
+> Or a batch of agent-generated features lands, which no diff marks, so that
+> half still depends on someone noticing; that is the event for the rest of the
+> file, the detectors that read code.
 >
 > Each item is phrased as a verifiable question, and **every item is written so
 > that "no" is the healthy answer** — a "yes" means drift was found. Read them as

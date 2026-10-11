@@ -152,6 +152,22 @@ once, when the PR opens, after the local rounds are done.
 - **A subagent reviewer's claims about repo or remote state are findings to
   verify, not facts to relay.** Weigh its reasoning; check its assertions.
 
+### A governance diff earns the checklist
+The rule above exempts a docs-only diff from `/code-review`, which leaves the
+documents themselves reviewed by nothing at all. **If the branch touches
+`CLAUDE.md`, any `.md` under `docs/project/` or `.github/`, or any Skill
+under `.claude/skills/`, run the *Documentation integrity* detectors from
+`docs/project/DRIFT-CHECKLIST.md` before opening the PR**, and tick the box for
+it in the PR body so the run leaves a trace. That shape is deliberate: a list of
+governing documents would be one more thing to keep in sync, and mockup and
+image assets are excluded because no detector reads them
+(`docs/project/decisions/0022-a-governance-diff-triggers-the-checklist.md`).
+
+Run the section as it stands rather than a remembered count of it, and confirm
+each detector reached everything it claims to cover. A check that silently skips
+what it cannot parse reports health it never established: one reported twenty
+ADRs clean while reading seventeen.
+
 ### Triage every finding into one bucket, and say which
 - **Blocking** — correctness, data loss, a defect the user can perceive. Fix
   before merge, with a regression test verified per CLAUDE.md → Testing Stack.

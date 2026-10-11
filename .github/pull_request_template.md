@@ -11,6 +11,7 @@
 - [ ] `./gradlew build` `./gradlew test` `./gradlew lint` — all green
 - [ ] `/code-review` run and every finding fixed or dismissed with a reason
 - [ ] Device pass on the emulator (UI changes only) — states checked:
+- [ ] Documentation-integrity detectors run (governing-document or Skill changes only) — found:
 
 ### Screenshots
 
