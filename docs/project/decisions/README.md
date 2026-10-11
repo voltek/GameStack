@@ -62,7 +62,9 @@ What it buys and what it costs, including what was accepted knowingly.
 ### `Enforced by:` — closed vocabulary
 - `none (prose only — <document> § <section>)` — CLAUDE.md in almost every case;
   name the document that actually carries the rule, since a few live in the Spec
-  rather than in CLAUDE.md (product scope, not a constraint on code).
+  rather than in CLAUDE.md (product scope, not a constraint on code), and a few in
+  a Skill (a procedure attached to a named task, which CLAUDE.md's three
+  questions send there rather than into CLAUDE.md itself).
 - `checklist detector — DRIFT-CHECKLIST.md § <section>`
 - `./gradlew lint`
 - `test: <TestName>#<caseName>`
