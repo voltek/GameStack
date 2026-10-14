@@ -3,7 +3,9 @@
 Status: Accepted
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Nothing recorded how review findings get triaged")
-Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2)
+Enforced by: branch protection — `required_conversation_resolution=true` (every review thread resolved before the merge; "answered" is prose; for everyone but administrators while `enforce_admins=false`)
+Enforced by: checklist detector — DRIFT-CHECKLIST.md § Testing Stack — a regression test that was never seen to fail
+Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — findings fixed or dismissed with a reason, the stopping rule, the rule of three, `/code-review` run by the human
 
 ## Context
 Nothing recorded how review findings get triaged, when a review loop is allowed

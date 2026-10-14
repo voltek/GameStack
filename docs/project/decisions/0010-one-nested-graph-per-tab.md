@@ -3,7 +3,8 @@
 Status: Accepted
 Date: 2026-08-22
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-22 ("Neither CLAUDE.md nor the Spec said how the bottom nav back stack works")
-Enforced by: ./gradlew lint
+Enforced by: ./gradlew lint — `NavController.currentBackStack` is never called
+Enforced by: checklist detector — DRIFT-CHECKLIST.md § Architecture — Detail registered inside every tab graph, bottom nav items targeting `*Graph` routes
 
 ## Context
 Neither CLAUDE.md nor the Spec said how the bottom navigation's back stack was

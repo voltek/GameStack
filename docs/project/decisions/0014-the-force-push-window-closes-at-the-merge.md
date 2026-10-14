@@ -4,7 +4,9 @@ Status: Accepted
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Two workflow rules were producing the mess")
 Supersedes: ADR-0007
-Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2)
+Enforced by: branch protection — `allow_force_pushes=false` (no force-push to `main`, for everyone but administrators while `enforce_admins=false`)
+Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — the `--force-with-lease` window on your own branch, never bare `--force`, never a branch another person may hold
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 2 and § 3) — one commit per claim, every review round before any PR exists
 
 ## Context
 Two workflow rules were producing the mess they were written to prevent. PRs

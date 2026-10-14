@@ -1,6 +1,7 @@
 # ADR 0020 — Decisions live in ADRs, incidents live in the drift log
 
 Status: Accepted
+Status: Superseded by ADR-0023 — numbering ADRs by the date of the original decision (Decision, third bullet; Consequences, closing paragraph)
 Date: 2026-08-31
 Backfilled: no
 Enforced by: none (prose only — CLAUDE.md § Self-Healing Loop)

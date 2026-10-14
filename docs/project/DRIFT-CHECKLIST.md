@@ -199,15 +199,36 @@ this checklist's own past drift.
       get made in code without being written down anywhere?
       Verified by: subagent (interpretive)
 - [ ] Does any ADR under `docs/project/decisions/` break the field rules its own
-      README sets — a missing `Backfilled:` or `Enforced by:` line, an
-      `Enforced by:` value outside the closed vocabulary, a `Date:` that
-      disagrees with the row `Backfilled:` cites, or quoted opening words that
-      no `grep -F` against `DRIFT-LOG.md` resolves? Three addressing rules, each
-      earned by a false result: anchor `Enforced by:` at line start and read
-      every one of them, because ADR prose quotes the field name too; resolve
-      *every* row a `Backfilled:` line cites, not only the first; and take the
-      cited date as the one immediately before the quoted words, which may
-      carry a date of their own.
+      README sets — a missing `Backfilled:`, `Status:` or `Enforced by:` line, an
+      `Enforced by:` value outside the closed vocabulary, several `Enforced by:`
+      lines of which any names no scope, a scoped `Status:` line with no unscoped
+      `Accepted` line beside it, a `Date:` that disagrees with the row
+      `Backfilled:` cites, or quoted opening words that no `grep -F` against
+      `DRIFT-LOG.md` resolves? Four addressing rules, each earned by a false
+      result: anchor `Enforced by:` at line start and read every one of them,
+      because ADR prose quotes the field name too and one ADR now carries several;
+      match each value as a literal prefix of the vocabulary, because some values
+      contain ` — ` themselves; resolve *every* row a `Backfilled:` line cites,
+      not only the first; and take the cited date as the one immediately before
+      the quoted words, which may carry a date of their own.
+      Verified by: human
+- [ ] Does any ADR claim a GitHub mechanism that the repository's real settings no
+      longer back, or does a setting police a clause an ADR calls unwatched? Read
+      every line from `grep -H "^Enforced by: \(branch protection\|repository settings\)"
+      docs/project/decisions/[0-9]*.md`, take the `` `field=value` `` each one
+      names, and compare it with `gh api repos/{owner}/{repo}` for a repository
+      setting and `gh api repos/{owner}/{repo}/branches/main/protection` for a
+      protection rule. Read `.enabled` on a toggle such as `enforce_admins`; for
+      `required_status_checks` compare `.contexts`; for a bare field such as
+      `required_pull_request_reviews` the object being present is the claim, and
+      neither of those two has an `.enabled` to read. A line naming neither field
+      nor value is the same finding, and so is a `branch protection` line that
+      omits `enforce_admins=false` while the response says it. Then run it the
+      other way: for each rule the protection response turns on, and each merge
+      setting the repository response turns off (`allow_*_merge`), does an ADR
+      clause it polices still sit under `none`? That is a mechanism the map does
+      not know about. Skip an ADR superseded in whole, whose `Enforced by:` is
+      left as it was.
       Verified by: human
 - [ ] Does any item in this file lack a `Verified by:` line, carry more than one,
       or carry a value outside the closed vocabulary the header declares? An
