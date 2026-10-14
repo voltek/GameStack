@@ -58,7 +58,8 @@ past tense.
   `Superseded by ADR-00NN — <the clause>`. An unscoped `Accepted` line then
   covers whatever no scoped line names, and `grep "^Status: Superseded"` finds
   every ADR that is superseded in whole or in part.
-- **`Date:`** — the date of the *original* decision.
+- **`Date:`** — the date of the *original* decision: the day it was approved,
+  even when the file is written later. `Backfilled:` is what says that it was.
 - **`Backfilled:`** — `yes — DRIFT-LOG.md, row <date> ("<opening words>")`, or
   `no`. Where one decision was backfilled from more than one row, the plural
   form `rows <date> ("<first>") and ("<second>")` addresses them all. The quoted
