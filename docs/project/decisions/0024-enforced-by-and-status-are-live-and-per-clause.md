@@ -67,11 +67,12 @@ eighteen kept their lines: no setting polices a clause of them, and ADR 0007 is
 superseded in whole. A checkbox in the pull request template prompts a person
 and fails nothing, so it was not counted as a mechanism.
 
-The sweep's line for "never commit directly to `main`" records the gap in its
-own scope: the protection on `main` did not bind administrators at the time, and
-the maintainer is one, so the rule was still prose against them. That is a
-finding about the repository, left for the maintainer to act on rather than
-decided here.
+The sweep's `branch protection` lines record the administrator gap in their own
+scope: the protection on `main` did not bind administrators at the time, and the
+maintainer is one, so every one of those rules was prose against them. "Never
+commit directly to `main`" is the clause that gained its protection line only
+with that qualification. That is a finding about the repository, left for the
+maintainer to act on rather than decided here.
 
 The costs, accepted knowingly. Two fields became editable after the fact, so how
 coverage looked at an earlier date survives only in `git log`. The scope after

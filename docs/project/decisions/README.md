@@ -103,7 +103,8 @@ present, using the name GitHub's API uses, because that is what
 - `branch protection` — a rule on the `main` branch, read with
   `gh api repos/{owner}/{repo}/branches/main/protection`. It binds
   administrators only while `enforce_admins` is on, so a rule an administrator
-  can step around is policed only against everyone else.
+  can step around is policed only against everyone else, and its line says so,
+  naming `enforce_admins=false` for as long as that is the case.
 - `repository settings` — a setting of the repository itself, such as which merge
   buttons exist, read with `gh api repos/{owner}/{repo}`. Not the same thing as
   `branch protection`, and a reader needs to know which of the two to look at.

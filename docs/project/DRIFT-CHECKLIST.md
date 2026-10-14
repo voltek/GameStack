@@ -222,11 +222,13 @@ this checklist's own past drift.
       `required_status_checks` compare `.contexts`; for a bare field such as
       `required_pull_request_reviews` the object being present is the claim, and
       neither of those two has an `.enabled` to read. A line naming neither field
-      nor value is the same finding. Then run it the other way: for each rule the
-      protection response turns on, and each merge setting the repository response
-      turns off (`allow_*_merge`), does an ADR clause it polices still sit under
-      `none`? That is a mechanism the map does not know about. Skip an ADR
-      superseded in whole, whose `Enforced by:` is left as it was.
+      nor value is the same finding, and so is a `branch protection` line that
+      omits `enforce_admins=false` while the response says it. Then run it the
+      other way: for each rule the protection response turns on, and each merge
+      setting the repository response turns off (`allow_*_merge`), does an ADR
+      clause it polices still sit under `none`? That is a mechanism the map does
+      not know about. Skip an ADR superseded in whole, whose `Enforced by:` is
+      left as it was.
       Verified by: human
 - [ ] Does any item in this file lack a `Verified by:` line, carry more than one,
       or carry a value outside the closed vocabulary the header declares? An
