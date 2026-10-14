@@ -57,7 +57,9 @@ past tense.
   *Immutability*. It may be scoped when only part of the file was replaced:
   `Superseded by ADR-00NN — <the clause>`. An unscoped `Accepted` line then
   covers whatever no scoped line names, and `grep "^Status: Superseded"` finds
-  every ADR that is superseded in whole or in part.
+  every ADR that is superseded in whole or in part. Superseding means replacing
+  or contradicting a clause: a later ADR that only adds to a rule — a label on
+  the issue the rule already opens — leaves its `Status:` as it is.
 - **`Date:`** — the date of the *original* decision: the day it was approved,
   even when the file is written later. `Backfilled:` is what says that it was.
 - **`Backfilled:`** — `yes — DRIFT-LOG.md, row <date> ("<opening words>")`, or

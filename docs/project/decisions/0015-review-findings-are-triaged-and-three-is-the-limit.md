@@ -1,11 +1,13 @@
 # ADR 0015 — Review findings are triaged, and the rule of three stops the patching
 
 Status: Accepted
+Status: Superseded by ADR-0025 — every finding fixed or dismissed with a written reason; a round producing a real defect earns another round
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Nothing recorded how review findings get triaged")
 Enforced by: branch protection — `required_conversation_resolution=true` (every review thread resolved before the merge; "answered" is prose; for everyone but administrators while `enforce_admins=false`)
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Testing Stack — a regression test that was never seen to fail
-Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — findings fixed or dismissed with a reason, the stopping rule, the rule of three, `/code-review` run by the human
+Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — the rule of three, `/code-review` run by the human
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Triage every finding into one bucket, and say which) — the stopping rule's merge signal
 
 ## Context
 Nothing recorded how review findings get triaged, when a review loop is allowed

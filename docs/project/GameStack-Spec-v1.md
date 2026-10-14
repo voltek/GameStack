@@ -192,7 +192,7 @@ non-Home tab returns to Home.
   in scope to the Retrofit-vs-Ktor decision — not something to bolt on casually.
 - **Backlog (low priority for now, but with a deadline):** accessibility. MVP
   does not target it — no TalkBack pass, no large-font or contrast audit, no
-  touch-target review. Accessibility findings from code review are non-blocking
+  touch-target review. Accessibility findings from code review are deferred
   while this holds. Two limits on the deferral, both in CLAUDE.md → Accessibility:
   a change may not *remove* an affordance that already worked (replacing a
   Material component with a hand-built one is where this happens silently), and

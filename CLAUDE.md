@@ -136,9 +136,9 @@ Run the `verify-on-device` Skill for the procedure.
 ### Accessibility — Tier 2
 **MVP does not target accessibility.** TalkBack passes, large-font and contrast
 audits, and touch-target sizing are backlog (Spec → Explicitly Deferred). So an
-accessibility finding from a review is **non-blocking by default**: open an
-issue, link it in the thread, merge. Do not build accessibility work that was
-not asked for, and do not hold a PR for it.
+accessibility finding from a review is **deferred by default** (`ship-a-branch`
+→ Triage). Do not build accessibility work that was not asked for, and do not
+hold a PR for it.
 
 Two things this does *not* license, because both cost far more to retrofit than
 to keep:
@@ -212,9 +212,10 @@ to keep:
   `main`, and never a branch another person may hold.
 - **Never overwrite an open PR body wholesale.** `gh pr edit --body` replaces
   everything, screenshots the human dragged in included.
-- **Every review finding is fixed or dismissed with a written reason**, and every
-  thread is answered and then resolved. `main` is protected with *require
-  conversation resolution*, so an open thread blocks the merge button.
+- **Every review finding is triaged, and the human confirms the triage**
+  (`ship-a-branch`), and every thread is answered and then resolved. `main` is
+  protected with *require conversation resolution*, so an open thread blocks
+  the merge button.
 - **`/code-review` is run by the human — the agent cannot invoke it.** Ask and
   wait; never tick that box or excuse it, and never confuse it with the GitHub
   bot, which is an advisor and may be skipped when unavailable.
