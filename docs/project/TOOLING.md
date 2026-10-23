@@ -158,9 +158,11 @@ via `gh workflow disable`, reversible with `gh workflow enable`, and free while
 off, since Actions bills executed minutes and not files present.
 
 **Why the file is still there.** Code review on this project is internal:
-`/code-review`, run by the human, before the PR exists. The bot triggered on PR
-open, which is *after* those rounds finish, so it commented on findings already
-fixed. Deleting the file would lose the configuration; disabling it keeps the
+`/code-review`, run by the human, before the PR exists. Its trigger fired on PR
+open, while local rounds could still be landing; rather than retrigger it, the
+project decided it wants no automated Claude reviewer on GitHub at all
+(`DRIFT-LOG.md`, row 2026-08-24, "Installing the Claude GitHub App"). Deleting
+the file would lose the configuration; disabling it keeps the
 decision reversible. **This entry exists because a present-but-disabled workflow
 does not explain itself** — without it, the next reader cannot tell a deliberate
 choice from a bug.
@@ -168,6 +170,28 @@ choice from a bug.
 **Ruled out.** *Re-triggering it on a mention.* `claude.yml` already fires on any
 comment containing that substring, so both workflows would run on the same
 comment. A trigger phrase that is not a substring of it avoids the collision.
+
+## 9. Codex review on GitHub
+**What.** The ChatGPT Codex connector (`chatgpt-codex-connector[bot]`) reviews
+pull requests. A round starts when a PR is opened for review, when a draft is
+marked ready, or on a comment `@codex review` or `@codex security review`. While
+a round runs it reacts 👀; it then posts findings, or reacts 👍 when it has none.
+Its summary comment on each PR names the trigger, the commit and the status.
+
+**Replaces.** Requesting the bot by hand when a PR opened, which `ship-a-branch`
+used to call for and which bought a second round on the same commit.
+
+**Where.** Outside the repository, at chatgpt.com/settings/code-review (Review
+code → Automatic review). No file here configures it, nothing here turns it on
+or off, and no detector checks it.
+
+**Why it stays on while §8's review is off.** §8's decision was about a Claude
+reviewer; Codex was a separate bot and was left as it was. ADR 0015 keeps it as
+the one automated advisor round per PR, and `ship-a-branch` step 3 says how that
+round is used and when to stop waiting for it.
+
+**Ruled out.** *Restating these triggers and signals in the skill.* A copy there
+came out incomplete twice; the skill keeps the rule and points here.
 
 ---
 
