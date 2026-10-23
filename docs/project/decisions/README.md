@@ -110,6 +110,11 @@ present, using the name GitHub's API uses, because that is what
 - `repository settings` — a setting of the repository itself, such as which merge
   buttons exist, read with `gh api repos/{owner}/{repo}`. Not the same thing as
   `branch protection`, and a reader needs to know which of the two to look at.
+- `claude settings` — a `deny` or `ask` rule in the committed
+  `.claude/settings.json`, named as `deny` or `ask` plus what it matches in words;
+  the file holds the exact patterns. It binds an agent session, never a person,
+  so the line says `(the agent only, common spellings)`. A pattern misses other spellings
+  of the same command: it stops a mistake, not an intent.
 
 This field is as much the point of the folder as the decision text is: **an ADR
 with no fitness function behind it is a wish.** This repository has already

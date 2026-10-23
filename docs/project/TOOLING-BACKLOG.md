@@ -192,3 +192,40 @@ transforms from the cache, or a cache-key bump.
   nobody established, and the deleted entry can no longer be inspected.
 - *Making `main` cache-read-only.* PR jobs already are, so no job would save:
   existing entries keep being restored and never refreshed, a bad one included.
+
+## 9. A `PreToolUse` hook that judges git and gh commands by parsing them
+**What it does.** Reads each Bash and PowerShell command before it runs, strips
+git's global options (`-C`, `-c`, `--no-pager`, `--git-dir`, `--work-tree`),
+splits combined short flags, and judges the subcommand: deny a push that reaches
+`main` (including a bare `git push` from `main`), a force-push without a lease,
+and skipping hooks; ask for PR actions and remote-branch deletion.
+
+**Replaces.** The `deny` and `ask` patterns in `.claude/settings.json`, which
+match one spelling each (TOOLING §10). Those stay as the fallback.
+
+**Ranking.** Belongs with the hooks work (item 5 and items 1-2). It matters most
+for feature branches, where branch protection does not reach.
+
+**Before it ships:** test it against one planted command per spelling below.
+Every one of them got past the patterns.
+- Global options before the subcommand: `git --no-pager push -f origin x`,
+  `git -c k=v push --force origin x`, `git -c core.hooksPath=/dev/null commit`,
+  `--git-dir`, `--work-tree`.
+- Combined or short flags: `-vf`, `-qf`, a trailing `-fu`/`-uf`, `git commit -n`,
+  `-an`, `-anm`.
+- Reaching `main` without naming it: a bare `git push` or `git push origin HEAD`
+  from `main`, or a quoted `'main'` or `"HEAD:main"`.
+- Deleting a branch outside the four prefixes: `git push origin :hotfix`,
+  `:refs/heads/fix/x`.
+- `gh` commands outside the lists: `gh pr revert`, `lock` and `unlock`;
+  `gh variable`, `gh repo deploy-key`, `gh label`, `gh workflow enable` and
+  `gh cache delete`; and a `gh api` whose field comes before the path.
+
+It must also let these reads through, since each was wrongly caught on the way:
+`git config --get core.hooksPath`, a commit message that mentions `--no-verify`,
+`git -C <path> log`, and a GraphQL query sent with `-f query=`.
+
+**Ruled out.**
+- *More patterns.* Each of three review rounds on `fix/agent-permissions` found
+  either the next gap or a rule wide enough to catch reads; the rule of three
+  closed that route.

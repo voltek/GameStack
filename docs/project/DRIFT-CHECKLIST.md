@@ -3,7 +3,8 @@
 > Manual audit checklist derived from CLAUDE.md's Tier 1 (Immutable) rules. It
 > detects drift between the code and the Project Constitution, and it runs on
 > either of two events. A pull request touches `CLAUDE.md`, any `.md` under
-> `docs/project/` or `.github/`, or any Skill under `.claude/skills/` — a diff
+> `docs/project/` or `.github/`, any Skill under `.claude/skills/`, or
+> `.claude/settings.json` — a diff
 > shows you that outright — and what runs then is the *Documentation
 > integrity* set, fired by `ship-a-branch`
 > ([ADR 0022](decisions/0022-a-governance-diff-triggers-the-checklist.md)) and
@@ -256,6 +257,15 @@ A rename touches both its paths, so list the diff with `git fetch` and then
       the quoted words, which may carry a date of their own. DRIFT-LOG is an
       input because every `Backfilled:` line resolves against it.
       Runs when: `docs/project/decisions/` or `docs/project/DRIFT-LOG.md`
+      Verified by: human
+- [ ] Does an ADR's `claude settings` line describe a rule that
+      `.claude/settings.json` no longer carries, or does a `deny` or `ask` rule
+      there police a clause an ADR still lists under `none`? Read every line from
+      `grep -H "^Enforced by: claude settings" docs/project/decisions/[0-9]*.md`
+      and find the patterns it describes under `permissions.deny` or
+      `permissions.ask`, in the list the line names. Only the committed file
+      counts.
+      Runs when: `.claude/settings.json` or `docs/project/decisions/`
       Verified by: human
 - [ ] Does any item in this file lack a `Verified by:` line, carry more than one,
       or carry a value outside the closed vocabulary the header declares? An

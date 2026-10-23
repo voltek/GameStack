@@ -156,9 +156,12 @@ to keep:
 ## Git workflow
 
 ### Tier 1 — Immutable
-- **Always ask before `git push`, before opening a PR, and before merging it.**
-  Commits are local and reversible; a push is not, a PR is outward-facing, and a
-  merge is the point of no return for the branch.
+- **Ask before every PR action GitHub shows, from opening to merging, and before
+  deleting a remote branch.** A PR is
+  outward-facing, a merge is the point of no return for the branch, and deleting
+  an open PR's head branch closes it.
+- **Push your own feature branch without asking; never change branch protection
+  or repository settings** (ADR 0028).
 - **Never `--no-verify`.**
 - **Never force-push `main`, nor any branch another person may have pulled, and
   never bare `--force` anywhere.** `--force` overwrites whatever is on the remote
@@ -174,8 +177,9 @@ to keep:
 - **Read `git status` in full before committing.** Untracked source files are
   invisible to `git add -u` and silently break the build for everyone else.
 - **Before pushing, `git fetch` and reconcile with `origin/main`.** Rebase or
-  merge if the branch is behind. If local `main` is ahead of `origin/main`,
-  push it first, or the PR will carry commits that have nothing to do with it.
+  merge if the branch is behind. If local `main` is ahead of `origin/main`, those
+  commits skipped a PR: move them to a branch and reset `main` to `origin/main`
+  (never push `main`), or the PR will carry commits that have nothing to do with it.
   Divergence in either direction is a problem — check both, not just
   "am I behind".
 

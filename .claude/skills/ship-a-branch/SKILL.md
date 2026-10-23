@@ -7,10 +7,8 @@ description: Take a finished branch through to a merged PR — updating against 
 The work is written and the gate is green. Everything below is procedure for
 getting it merged; the *rules* that constrain code on any turn stay in CLAUDE.md.
 
-CLAUDE.md → Git workflow Tier 1 is not repeated here and is not negotiable:
-always ask before `git push`, before opening a PR, and before merging it; never
-`--no-verify`, never force-push `main`, never commit to `main` directly; and the
-gate is all three of `build`/`test`/`lint` green.
+CLAUDE.md → Git workflow Tier 1 governs every step below. It is not negotiable,
+and it is not restated here: read it there.
 
 ## 1. Update the branch against main
 **Use `git merge main`. Do not rebase a branch that has been pushed.**
@@ -166,8 +164,8 @@ below says when it runs).
 ### A governance diff earns the checklist
 `/code-review` judges whether a rule is sound; it does not check one document
 against the others, which is where governance drift lives. **If the branch touches
-`CLAUDE.md`, any `.md` under `docs/project/` or `.github/`, or any Skill
-under `.claude/skills/`, run the *Documentation integrity* detectors from
+`CLAUDE.md`, any `.md` under `docs/project/` or `.github/`, any Skill
+under `.claude/skills/`, or `.claude/settings.json` (ADR 0027), run the *Documentation integrity* detectors from
 `docs/project/DRIFT-CHECKLIST.md` before opening the PR**, and tick the box for
 it in the PR body so the run leaves a trace. That shape is deliberate: a list of
 governing documents would be one more thing to keep in sync, and mockup and
@@ -299,9 +297,8 @@ naming a mechanism the branch went on to delete has happened here already. Updat
 it surgically; never `--body` wholesale if the human has added screenshots or text.
 
 ## 6. Merge
-**Ask before merging (CLAUDE.md → Git workflow Tier 1).** This is not covered by
-having already asked before push or before opening the PR — the merge is its own
-point of no return and needs its own explicit yes.
+**Ask first (CLAUDE.md → Git workflow Tier 1).** The yes given for opening the PR
+does not carry over to the merge.
 
 **`Create a merge commit` is the default.** The branch's commits are curated and
 are the unit that makes `blame` and `bisect` useful; the merge commit records
