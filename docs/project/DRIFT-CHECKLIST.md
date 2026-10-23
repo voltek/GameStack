@@ -6,7 +6,8 @@
 > `docs/project/` or `.github/`, or any Skill under `.claude/skills/` — a diff
 > shows you that outright — and what runs then is the *Documentation
 > integrity* set, fired by `ship-a-branch`
-> ([ADR 0022](decisions/0022-a-governance-diff-triggers-the-checklist.md)).
+> ([ADR 0022](decisions/0022-a-governance-diff-triggers-the-checklist.md)) and
+> scoped by what the diff touches, as that section's own header says.
 > Or a batch of agent-generated features lands, which no diff marks, so that
 > half still depends on someone noticing; that is the event for the rest of the
 > file, the detectors that read code.
@@ -42,6 +43,15 @@
 > `grep -o "^ *Verified by: .*" docs/project/DRIFT-CHECKLIST.md | sort | uniq -c`.
 
 ---
+
+## Adding or changing a detector
+**A detector that was never seen to fire proves nothing**, the same rule
+CLAUDE.md sets for regression tests. When one is added or changed, plant one
+defect per thing it claims to catch, each on its own line, in a copy of the
+repository, and confirm each one is reported. A detector that also reads
+something outside the repository, such as `gh api`, gets its defect planted on
+the repository side. A check that runs by script also reports how many files
+and items it read, so a silent skip shows.
 
 ## Tech Stack
 - [ ] Is there any XML layout or ViewBinding usage in a UI screen (instead of Compose)?
@@ -177,44 +187,32 @@
 
 ## Documentation integrity
 These check the harness itself, not the code — the failure mode that produced
-this checklist's own past drift.
+this checklist's own past drift. A governance diff runs every item under
+*Every run*, and each item under *When the diff touches what it reads* whose
+`Runs when:` names a path the diff touches
+([ADR 0026](decisions/0026-a-detector-runs-when-its-input-changes.md)).
+A `Runs when:` line is one line, however long, holding nothing but
+repository-relative paths in backticks, joined by commas or `or`. A path ending
+in `/` matches anything under it; any other path matches that one file exactly.
+A rename touches both its paths, so list the diff with `git fetch` and then
+`git diff --name-only --no-renames origin/main...HEAD`.
+
+### Every run
 - [ ] Does any document reference a component, Skill, principle, file or section
       that isn't defined anywhere or marked `(PENDING — not yet defined)`?
-      Deleting a section is the usual cause — check what pointed at it.
-      Verified by: human
-- [ ] Does any document use course or study vocabulary ("Block N", phase
-      numbering, learning objectives) rather than naming the work itself?
-      That belongs to the course, which is kept outside this repository.
-      Verified by: human
-- [ ] Does CLAUDE.md's "Available Skills" list differ from the actual contents
-      of `.claude/skills/`, or from the Spec's copy of that list? (Retired
-      Skills are listed separately in CLAUDE.md and archived under
-      `docs/project/retired-skills/` — one of those appearing as invocable is
-      the same drift.)
-      Verified by: human
-- [ ] Does DESIGN.md's prose reference a token its own token block doesn't define,
-      or state a value that contradicts it (colors, radii, type roles)?
+      Deleting a section is the usual cause — check what pointed at it. That
+      includes every path a `Runs when:` line names and every section an ADR's
+      `Enforced by:` line cites, wherever the diff renamed or deleted it.
       Verified by: human
 - [ ] Did a recent implementation decision (a fallback, a mapping, a naming rule)
-      get made in code without being written down anywhere?
+      get made in code without being written down anywhere? A diff that only
+      rewrites documents can still unwrite a decision the code took, so this runs
+      whether or not code changed.
       Verified by: subagent (interpretive)
-- [ ] Does any ADR under `docs/project/decisions/` break the field rules its own
-      README sets — a missing `Backfilled:`, `Status:` or `Enforced by:` line, an
-      `Enforced by:` value outside the closed vocabulary, several `Enforced by:`
-      lines of which any names no scope, a scoped `Status:` line with no unscoped
-      `Accepted` line beside it, a `Date:` that disagrees with the row
-      `Backfilled:` cites, or quoted opening words that no `grep -F` against
-      `DRIFT-LOG.md` resolves? Four addressing rules, each earned by a false
-      result: anchor `Enforced by:` at line start and read every one of them,
-      because ADR prose quotes the field name too and one ADR now carries several;
-      match each value as a literal prefix of the vocabulary, because some values
-      contain ` — ` themselves; resolve *every* row a `Backfilled:` line cites,
-      not only the first; and take the cited date as the one immediately before
-      the quoted words, which may carry a date of their own.
-      Verified by: human
 - [ ] Does any ADR claim a GitHub mechanism that the repository's real settings no
-      longer back, or does a setting police a clause an ADR calls unwatched? Read
-      every line from `grep -H "^Enforced by: \(branch protection\|repository settings\)"
+      longer back, or does a setting police a clause an ADR calls unwatched?
+      Settings change on GitHub without any diff, so no path can gate this one.
+      Read every line from `grep -H "^Enforced by: \(branch protection\|repository settings\)"
       docs/project/decisions/[0-9]*.md`, take the `` `field=value` `` each one
       names, and compare it with `gh api repos/{owner}/{repo}` for a repository
       setting and `gh api repos/{owner}/{repo}/branches/main/protection` for a
@@ -230,8 +228,43 @@ this checklist's own past drift.
       not know about. Skip an ADR superseded in whole, whose `Enforced by:` is
       left as it was.
       Verified by: human
+
+### When the diff touches what it reads
+- [ ] Does CLAUDE.md's "Available Skills" list differ from the actual contents
+      of `.claude/skills/`, or from the Spec's copy of that list? (Retired
+      Skills are listed separately in CLAUDE.md and archived under
+      `docs/project/retired-skills/` — one of those appearing as invocable is
+      the same drift.)
+      Runs when: `.claude/skills/`, `CLAUDE.md`, `docs/project/GameStack-Spec-v1.md` or `docs/project/retired-skills/`
+      Verified by: human
+- [ ] Does DESIGN.md's prose reference a token its own token block doesn't define,
+      or state a value that contradicts it (colors, radii, type roles)?
+      Runs when: `docs/project/DESIGN.md`
+      Verified by: human
+- [ ] Does any ADR under `docs/project/decisions/` break the field rules its own
+      README sets — a missing `Backfilled:`, `Status:` or `Enforced by:` line, an
+      `Enforced by:` value outside the closed vocabulary, several `Enforced by:`
+      lines of which any names no scope, a scoped `Status:` line with no unscoped
+      `Accepted` line beside it, a `Date:` that disagrees with the row
+      `Backfilled:` cites, or quoted opening words that no `grep -F` against
+      `DRIFT-LOG.md` resolves? Four addressing rules, each earned by a false
+      result: anchor `Enforced by:` at line start and read every one of them,
+      because ADR prose quotes the field name too and one ADR now carries several;
+      match each value as a literal prefix of the vocabulary, because some values
+      contain ` — ` themselves; resolve *every* row a `Backfilled:` line cites,
+      not only the first; and take the cited date as the one immediately before
+      the quoted words, which may carry a date of their own. DRIFT-LOG is an
+      input because every `Backfilled:` line resolves against it.
+      Runs when: `docs/project/decisions/` or `docs/project/DRIFT-LOG.md`
+      Verified by: human
 - [ ] Does any item in this file lack a `Verified by:` line, carry more than one,
       or carry a value outside the closed vocabulary the header declares? An
       unclassified item is invisible to the checker in `TOOLING-BACKLOG.md`
-      item 3, whose scope this file is.
+      item 3, whose scope this file is. Under *Documentation integrity*, does an
+      item under *When the diff touches what it reads* lack exactly one
+      `Runs when:` line (anchored at line start, since prose quotes the field), does one under *Every run* carry any, or does a
+      `Runs when:` hold anything but paths as the section header defines them,
+      or name a path that does not exist? Any of those never runs, or runs on a
+      rule nobody wrote.
+      Runs when: `docs/project/DRIFT-CHECKLIST.md`
       Verified by: human

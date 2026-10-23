@@ -1,6 +1,7 @@
 # ADR 0022 — A governance diff triggers the checklist
 
 Status: Accepted
+Status: Superseded by ADR-0026 — every *Documentation integrity* detector runs on every governance diff
 Date: 2026-09-01
 Backfilled: yes — DRIFT-LOG.md, row 2026-09-01 ("The Spec's copy of the Skills list named twelve procedures")
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § A governance diff earns the checklist)

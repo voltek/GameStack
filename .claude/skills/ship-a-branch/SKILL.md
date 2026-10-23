@@ -174,10 +174,13 @@ governing documents would be one more thing to keep in sync, and mockup and
 image assets are excluded because no detector reads them
 (`docs/project/decisions/0022-a-governance-diff-triggers-the-checklist.md`).
 
-Run the section as it stands rather than a remembered count of it, and confirm
-each detector reached everything it claims to cover. A check that silently skips
-what it cannot parse reports health it never established: one reported twenty
-ADRs clean while reading seventeen.
+Run the section as it stands rather than a remembered count of it, scoped as
+its header says
+(`docs/project/decisions/0026-a-detector-runs-when-its-input-changes.md`).
+Say in the PR box which conditional items ran and which were skipped. Confirm
+each detector reached everything it claims to cover. A check that silently
+skips what it cannot parse reports health it never established: one reported
+twenty ADRs clean while reading seventeen.
 
 ### Triage every finding into one bucket, and say which
 - **Fix** — anything fixed on this branch. A real defect is fixed here unless

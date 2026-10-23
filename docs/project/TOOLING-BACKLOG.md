@@ -82,7 +82,9 @@ per-item classification of this checklist — one `Verified by:` line per item,
 from a closed vocabulary — is the other half, and it sorts the items three
 ways: `human` is what this checker takes over, `subagent (interpretive)` is
 what it never can, and a value naming a tool is covered elsewhere already and
-out of its scope. The full sweep of CLAUDE.md for enforcement-free rules is
+out of its scope. Under *Documentation integrity*, a `Runs when:` line decides
+whether an item runs on a given diff at all (ADR 0026), so the checker scopes
+its run the same way. The full sweep of CLAUDE.md for enforcement-free rules is
 collected when this item is picked up, not before: done earlier it produces a
 list nobody is ready to act on.
 
