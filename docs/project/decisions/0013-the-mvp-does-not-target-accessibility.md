@@ -3,7 +3,8 @@
 Status: Accepted
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Neither CLAUDE.md nor the Spec ever said whether the MVP targets accessibility")
-Enforced by: none (prose only — CLAUDE.md § Commands)
+Enforced by: none (prose only — CLAUDE.md § Commands) — the MVP does not target accessibility, its two bounds and its expiry
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Triage every finding into one bucket, and say which) — an accessibility finding is deferred by default
 
 ## Context
 Neither CLAUDE.md nor the Spec ever said whether the MVP targets accessibility.

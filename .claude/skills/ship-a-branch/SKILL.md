@@ -138,9 +138,12 @@ other up.
 The GitHub bot is the exception, since it needs a PR to run at all: request it
 once, when the PR opens, after the local rounds are done.
 
-- **Run `/code-review` on any branch that changes compiled behaviour.** The
-  criterion is what the change can break, not what file extension it touches: a
-  comments-only or docs-only diff skips it.
+- **Run `/code-review` on every branch but two: a comments-only diff, and a
+  docs-only diff outside the governing-document shape** (next subsection). Those
+  are step 3's only exemptions. The criterion is what the change can break, not
+  what file extension it touches: a workflow, a hook or a build file can break the
+  gate, and a governing document is what the agent executes, so it can break
+  every later change.
 - **`/code-review` is run by the human — the agent cannot invoke it.** So ask and
   wait. Never tick that box, never excuse it, and never confuse it with the
   GitHub bot: they are different reviewers and the bot's quota says nothing about
@@ -153,8 +156,8 @@ once, when the PR opens, after the local rounds are done.
   verify, not facts to relay.** Weigh its reasoning; check its assertions.
 
 ### A governance diff earns the checklist
-The rule above exempts a docs-only diff from `/code-review`, which leaves the
-documents themselves reviewed by nothing at all. **If the branch touches
+`/code-review` judges whether a rule is sound; it does not check one document
+against the others, which is where governance drift lives. **If the branch touches
 `CLAUDE.md`, any `.md` under `docs/project/` or `.github/`, or any Skill
 under `.claude/skills/`, run the *Documentation integrity* detectors from
 `docs/project/DRIFT-CHECKLIST.md` before opening the PR**, and tick the box for
@@ -169,21 +172,60 @@ what it cannot parse reports health it never established: one reported twenty
 ADRs clean while reading seventeen.
 
 ### Triage every finding into one bucket, and say which
-- **Blocking** — correctness, data loss, a defect the user can perceive. Fix
-  before merge, with a regression test verified per CLAUDE.md → Testing Stack.
-- **Non-blocking** — design, performance, polish, debt. Open an issue, link it in
-  the thread, merge.
+- **Fix** — anything fixed on this branch. A real defect is fixed here unless
+  the human, confirming the table, defers it; anything else cheap enough is open
+  to fixing too. In code a real defect is correctness, data loss or something the
+  user can perceive, and its fix carries a regression test verified per
+  CLAUDE.md → Testing Stack. In a governing document it is a contradiction, a
+  broken reference, or a rule an agent cannot follow as written; no test applies,
+  and the *Documentation integrity* detectors are its check.
+- **Defer** — valid, and not fixed on this branch: design, performance, polish,
+  debt, and a real defect only when the human defers it. Open an issue labelled
+  `review-debt`, link it in the thread when there is one, merge. Every time, not
+  when remembered: the label is the only register of what a review found and
+  nobody fixed (`gh issue list --label review-debt`).
+- **Dismiss** — the finding is wrong. Verify the claim against the repo and
+  `gh api` first; the written reason is what that check showed. A bot finding is
+  answered in its thread, which is its record (§ Closing threads).
 
-Accessibility findings are non-blocking by default (CLAUDE.md → Accessibility),
+A local `/code-review` has no thread and runs before the PR exists, so its
+record is carried by hand. Save each round's raw output and, once confirmed, its
+table outside the repository — never only in the conversation, which a later
+session cannot read. Where is the human's choice, recorded in the agent's memory
+because it is a path on one machine; if memory names no place, ask before the
+first round. §4 copies its deferrals and dismissals into the PR body's
+`Deferred:` and `Dismissed:` lines from there.
+
+Accessibility findings are deferred by default (CLAUDE.md → Accessibility),
 *except* where a change removed an affordance that already worked — that is not
-new accessibility work, it is not regressing, and it is blocking.
+new accessibility work, it is not regressing, and it is a fix.
 
-Every finding is either fixed or dismissed **with a written reason**. A review
-whose findings are silently dropped is worse than none, because it looks like
-coverage. If a finding exposes code/doc drift, log it per the Self-Healing Loop.
+**Propose the triage, then wait.** Present the whole table — every finding, its
+bucket, its verified reason — before changing anything, and touch nothing until
+the human has confirmed the table. Choosing a bucket is plan-level (CLAUDE.md →
+Human-in-the-Loop): a defect filed as debt leaves the branch exactly as a
+dismissed one does, and a finding moved out on the agent's word alone is a
+finding silently dropped — worse than no review, because it looks like coverage.
+If a finding exposes code/doc drift, log it per the Self-Healing Loop.
 
-**Stopping rule:** a round producing only design or style suggestions is the
-signal to merge. A round producing a real defect earns another round.
+**A false positive that recurs is a gap in the document.** The reviewer reads the
+repository, not the records of earlier rounds — PR bodies, threads, the tables
+saved outside it — so only the text it does read can stop the same finding coming
+back. Fix that text until it answers the question itself. Keep no separate
+ledger: when a finding looks familiar, the record is in earlier PRs, open or
+merged — their `Deferred:` and `Dismissed:` lines and their review threads — and,
+for this branch's own rounds, in the saved tables.
+
+**Stopping rule:** a round whose confirmed table fixes no real defect on the
+branch — its findings design or style, deferred, dismissed, or none at all — is
+the signal to stop reviewing and go on to §4. A round that fixes a real defect
+earns another round — **unless its defects come mostly from the previous round's
+fixes.** That is the rule of
+three applied to rounds: the fixing has become the source of defects, so another
+round only feeds it. Stop and hand it back to the human. The trigger is that
+event, never a count of rounds. Stopping ends the rounds, not the triage: that
+round's findings still go through the table above, and the branch goes no
+further until the human decides what follows — redesign, another round, or §4.
 
 **Rule of three:** touching the same code a third time for the same class of
 defect means the design is the problem. Stop patching and redesign. A fix that
@@ -204,6 +246,12 @@ Use `.github/pull_request_template.md`. **Aim for one screen — about 40 lines.
 Three sections carry it: **what changed**, **why**, **how it was verified**. Add
 another heading when the PR genuinely needs one (a known limitation, a scope
 note, a decision taken deliberately) — but only then; the default is the three.
+
+Replace the `TODO` on the template's `Deferred:` and `Dismissed:` lines with
+the local `/code-review` rounds' issues and dismissals: `none` when the review
+ran and produced none, `not run — exempt: <the step-3 exemption>` only when
+step 3 exempted the branch. A review still to come is not an exemption: the
+`TODO` stays, visible, until the record is written.
 
 **`Why` defaults to one paragraph** — three to five sentences pointing at the
 decision, not narrating how it was reached. Expand past that only when the
