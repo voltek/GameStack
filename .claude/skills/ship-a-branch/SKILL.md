@@ -41,10 +41,14 @@ no SHA is shared and nothing can be orphaned. It is cosmetic there, and optional
   in scope more than its name gets revisited — the name was a guess made before
   the work existed, so nothing forces it to still be true at the end. If the
   final commits are about something else, rename before doing anything below:
-  `git branch -m <new-name>`. If already pushed, `git push -u origin <new-name>`
-  then `git push origin --delete <old-name>`. Do this before step 3's reviews,
-  not after — a PR opened under a stale name just drags the mismatch into the
-  PR title too.
+  `git branch -m <new-name>`. **Check for an open PR first: renaming its head
+  branch closes it**, by either route — deleting the old name, or GitHub's
+  branch-rename API (seen on PR #39). With no PR yet and the branch pushed,
+  `git push -u origin <new-name>` then `git push origin --delete <old-name>`.
+  With one, the rename means a new PR from the new name and a comment on the old
+  one pointing at it, so say so when proposing it. Do this before step 3's
+  reviews, not after — a PR opened under a stale name drags the mismatch into
+  its title too.
 - Does every commit exist *because of* this branch's unit of work? If not, park
   it (`git stash`) or `git cherry-pick` it onto a fresh branch off `main`.
 - **400 changed lines or 15 files is a smoke alarm**, not a limit. Past roughly
