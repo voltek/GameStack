@@ -25,9 +25,9 @@ somewhere else. It is not loaded every turn.
 
 ## 1. The gate, on CI
 **What.** A GitHub Actions workflow named *Gate* whose single job, `build / test /
-lint`, runs the three gate commands with `--continue` on every pull request
-against `main` and every push to `main`. Reports and test results upload as an
-artifact on failure only.
+lint`, runs the three gate commands with `--continue --stacktrace` on every pull
+request against `main` and every push to `main`. Reports and test results upload
+as an artifact on failure only.
 
 **Replaces.** Remembering to run the three commands by hand, and trusting that
 everyone else did.

@@ -67,13 +67,13 @@ jobs:
           key: robolectric-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml', 'app/src/test/resources/robolectric.properties') }}
           restore-keys: robolectric-${{ runner.os }}-
 
-      # `--continue` so one run reports every independent failure. Without it the
-      # gate stops at the first, and each further verdict costs another push.
+      # `--continue` so one run reports every independent failure, and `--stacktrace`
+      # so a CI-only one is traceable. Without them each further verdict costs a push.
       # One invocation, not three: Gradle deduplicates the task graph, so naming
       # all three costs nothing and keeps this readable as the gate CLAUDE.md defines.
       # No IGDB credentials needed — local.properties is optional and falls back to "".
       - name: Run the gate
-        run: ./gradlew build test lint --continue
+        run: ./gradlew build test lint --continue --stacktrace
 
       - name: Save the Robolectric SDK jar
         if: ${{ !cancelled() && steps.robolectric.outputs.cache-hit != 'true' }}

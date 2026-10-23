@@ -29,7 +29,7 @@ changelog, and the real one is `git log`.
 This is read on demand, not loaded every turn. Consult it when picking up
 harness work; there is no need to check it while writing product code.
 
-Seven deliverables, in priority order — except item 7, which is gated on a
+Eight deliverables, in priority order — except items 7 and 8, which are gated on a
 trigger rather than ranked.
 
 ## 1. Automate the regression-test verification
@@ -163,3 +163,30 @@ the same change, not afterwards.
 **Ruled out.** *Keeping the index by hand.* CLAUDE.md's Skills list drifted out
 of sync with `.claude/skills/` in exactly that way and had to be given its own
 drift detector. An index nobody verifies is just a second source of truth.
+
+## 8. Fix the gate's Gradle-cache packaging failure — once it recurs
+**What it does.** Stops the gate going red in `:app:packageDebug` or
+`:app:packageRelease` with `PackageAndroidArtifact$IncrementalSplitterRunnable`
+while tests and lint pass, on a diff that cannot touch packaging. It hit both
+attempts of PR #38's one run, after a restored `gradle-home-v2|…|gate[…]` entry,
+and stopped once that entry was deleted. The `transforms` and `dependencies`
+entries it restored passed under a fresh `gradle-home` entry, so they are not
+sufficient on their own; a combination with a stale one is not ruled out.
+
+**Replaces.** Deleting the entry by hand (`gh cache list`, `gh cache delete <id>`,
+with the owner's approval) each time it happens.
+
+**The trigger is concrete**, and it has not fired again: the next occurrence. The
+gate runs with `--stacktrace`, so that run carries the evidence the first one
+never printed. Before deleting the entry, read the trace and keep the run id and
+the entry's `gh cache list` line (key, size, dates): deletion destroys the entry,
+so that is all of it that survives. Then pick the fix.
+
+**Candidate shapes**, each to be chosen by the trace, not before it: excluding
+transforms from the cache, or a cache-key bump.
+
+**Ruled out.**
+- *Choosing a cache change without a trace.* Each candidate answers a cause
+  nobody established, and the deleted entry can no longer be inspected.
+- *Making `main` cache-read-only.* PR jobs already are, so no job would save:
+  existing entries keep being restored and never refreshed, a bad one included.
