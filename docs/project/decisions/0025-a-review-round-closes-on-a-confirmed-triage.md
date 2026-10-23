@@ -1,11 +1,12 @@
 # ADR 0025 — A review round closes on a confirmed triage
 
 Status: Accepted
+Status: Superseded by ADR-0029 — the loop ends on an event, never a number of rounds; a round whose defects come mostly from the previous round's fixes ends it
 Date: 2026-10-13
 Backfilled: no
 Supersedes: ADR-0015 — every finding fixed or dismissed with a written reason; a round producing a real defect earns another round
 Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — the human confirms the triage
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Triage every finding into one bucket, and say which) — the three buckets, the `review-debt` issue, the recurring false positive, the round that feeds itself
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Triage every finding into one bucket, and say which) — the three buckets, the `review-debt` issue, the recurring false positive
 Enforced by: none (prose only — .github/pull_request_template.md § Verification) — the `Deferred:` and `Dismissed:` lines
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 3. Reviews — all of them, before the PR exists) — `/code-review` on every branch but step 3's two exemptions
 

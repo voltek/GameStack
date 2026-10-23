@@ -166,7 +166,8 @@ below says when it runs).
 against the others, which is where governance drift lives. **If the branch touches
 `CLAUDE.md`, any `.md` under `docs/project/` or `.github/`, any Skill
 under `.claude/skills/`, or `.claude/settings.json` (ADR 0027), run the *Documentation integrity* detectors from
-`docs/project/DRIFT-CHECKLIST.md` before opening the PR**, and tick the box for
+`docs/project/DRIFT-CHECKLIST.md` before opening the PR, after the last round's
+fixes**, and tick the box for
 it in the PR body so the run leaves a trace. That shape is deliberate: a list of
 governing documents would be one more thing to keep in sync, and mockup and
 image assets are excluded because no detector reads them
@@ -181,13 +182,19 @@ skips what it cannot parse reports health it never established: one reported
 twenty ADRs clean while reading seventeen.
 
 ### Triage every finding into one bucket, and say which
-- **Fix** — anything fixed on this branch. A real defect is fixed here unless
-  the human, confirming the table, defers it; anything else cheap enough is open
-  to fixing too. In code a real defect is correctness, data loss or something the
-  user can perceive, and its fix carries a regression test verified per
-  CLAUDE.md → Testing Stack. In a governing document it is a contradiction, a
-  broken reference, or a rule an agent cannot follow as written; no test applies,
-  and the *Documentation integrity* detectors are its check.
+- **Fix** — anything fixed on this branch, in one of two kinds. The table says
+  which, because only the first can earn another round (stopping rule below):
+  - **Fix (defect)** — a real defect, fixed here unless the human, confirming
+    the table, defers it. In code it is correctness, data loss or something the
+    user can perceive, and its fix carries a regression test verified per
+    CLAUDE.md → Testing Stack. In a governing document it needs a failure
+    scenario in which an agent following the text *acts* wrongly, for example
+    two rules prescribing different actions, a broken reference, a missing
+    step, or a step that cannot be carried out. No test applies; the
+    *Documentation integrity* detectors are its check.
+  - **Fix (cheap)** — anything else cheap enough to fix here. Wording,
+    duplication, wrap width and friction with no such scenario go here or to
+    Defer.
 - **Defer** — valid, and not fixed on this branch: design, performance, polish,
   debt, and a real defect only when the human defers it. Open an issue labelled
   `review-debt`, link it in the thread when there is one, merge. Every time, not
@@ -207,11 +214,15 @@ first round. §4 copies its deferrals and dismissals into the PR body's
 
 Accessibility findings are deferred by default (CLAUDE.md → Accessibility),
 *except* where a change removed an affordance that already worked — that is not
-new accessibility work, it is not regressing, and it is a fix.
+new accessibility work, it is not regressing, and it is a Fix (defect).
 
 **Propose the triage, then wait.** Present the whole table — every finding, its
-bucket, its verified reason — before changing anything, and touch nothing until
-the human has confirmed the table. Choosing a bucket is plan-level (CLAUDE.md →
+bucket, its verified reason, and each `Fix (defect)` row's origin — before
+changing anything, and touch nothing until the human has confirmed the table.
+The table ends with the round's verdict, `Stopping rule: another round | stop,
+on to §4 | stop, back to the human, because …`, which the human confirms with
+it: after the fixes the natural next step is amend and push, and nothing there
+asks whether a round is owed. Choosing a bucket is plan-level (CLAUDE.md →
 Human-in-the-Loop): a defect filed as debt leaves the branch exactly as a
 dismissed one does, and a finding moved out on the agent's word alone is a
 finding silently dropped — worse than no review, because it looks like coverage.
@@ -225,16 +236,43 @@ ledger: when a finding looks familiar, the record is in earlier PRs, open or
 merged — their `Deferred:` and `Dismissed:` lines and their review threads — and,
 for this branch's own rounds, in the saved tables.
 
-**Stopping rule:** a round whose confirmed table fixes no real defect on the
-branch — its findings design or style, deferred, dismissed, or none at all — is
-the signal to stop reviewing and go on to §4. A round that fixes a real defect
-earns another round — **unless its defects come mostly from the previous round's
-fixes.** That is the rule of
-three applied to rounds: the fixing has become the source of defects, so another
-round only feeds it. Stop and hand it back to the human. The trigger is that
-event, never a count of rounds. Stopping ends the rounds, not the triage: that
-round's findings still go through the table above, and the branch goes no
-further until the human decides what follows — redesign, another round, or §4.
+**Stopping rule.** Every `Fix (defect)` row names its origin, spelled out in the
+table: `original diff` (already in the diff the first round read),
+`from a cheap fix` or `from a defect fix` (introduced by a `Fix (cheap)` or a
+`Fix (defect)` of an earlier round), or `other: <what>` (a merge of `main`, new
+work between rounds), which counts as `original diff`. Each saved table records
+the commit its round reviewed; check the origin with git against those commits.
+Then, in this order:
+- **No `Fix (defect)` row** (findings cheap, deferred, dismissed or none): stop,
+  on to §4.
+- **Origin `from a cheap fix`:** revert that cheap fix, unless the human
+  chooses another solution. A revert writes no new text, so it earns no round;
+  with no other `Fix (defect)` row left, stop, on to §4.
+- **Of the rows left, mostly `from a defect fix`:** the rule of three applied to
+  rounds — the fixing has become the source of defects. Stop, back to the
+  human: redesign, revert that part, cut it from the branch, or §4.
+- **Otherwise** the round earns another, with one cap: round three or later is
+  earned only by a defect in a file outside the governance shape (§ A
+  governance diff earns the checklist), because a prose reviewer always finds
+  one more. When the cap denies the round, stop, on to §4, and its fixes follow
+  *A fix no round will read*.
+
+Stopping ends the rounds, not the triage: that round's findings still go
+through the table above, and a branch stopped back to the human goes no further
+until the human decides. The human may always ask for another round; the saved
+table says so.
+
+**One redesign per branch.** It restarts the round count for what it rewrote. If
+the rule of three fires again on it, there is no second redesign: that part
+leaves the branch for a plan (CLAUDE.md → Human-in-the-Loop), and the rest goes
+on.
+
+**A fix no round will read** reverts the branch change that caused the defect
+where it can, and is otherwise the smallest change that removes it. Re-run the
+gate and the detectors after it, and list it under the PR body's Verification
+as fixed after the last round, for the human and the GitHub bot, when it runs.
+A fix that cannot be small goes back to the human: defer it, cut that part from
+the branch, or authorize another round.
 
 **Rule of three:** touching the same code a third time for the same class of
 defect means the design is the problem. Stop patching and redesign. A fix that
