@@ -25,16 +25,28 @@ somewhere else. It is not loaded every turn.
 
 ## 1. The gate, on CI
 **What.** A GitHub Actions workflow named *Gate* whose single job, `build / test /
-lint`, runs the three gate commands with `--continue` on every pull request
-against `main` and every push to `main`. Reports and test results upload as an
-artifact on failure only.
+lint`, runs the three gate commands with `--continue --stacktrace` on every pull
+request against `main` and every push to `main`. Reports and test results upload
+as an artifact on failure only.
 
 **Replaces.** Remembering to run the three commands by hand, and trusting that
 everyone else did.
 
 **Where.** `.github/workflows/gate.yml`.
 
+**Known failure.** `:app:packageDebug` or `:app:packageRelease` red in
+`PackageAndroidArtifact$IncrementalSplitterRunnable` while tests and lint pass, on
+a diff that cannot touch packaging. Seen once, on PR #38: it followed a restored
+`gradle-home-v2|…|gate[…]` entry and stopped once that entry was deleted
+(`gh cache list`, then `gh cache delete <id>`, with the owner's approval). The
+`transforms` and `dependencies` entries it shared with green runs were not the
+cause. The mechanism is unknown, so read the stack trace before deleting the
+entry: it is the evidence the first occurrence never produced.
+
 **Ruled out.**
+- *A cache fix chosen without a stack trace.* Excluding transforms,
+  `cache-read-only` on `main`, or a cache-key bump would each answer a cause
+  nobody established. The trace picks the fix, if one is needed at all.
 - *Caching only `~/.gradle`.* Robolectric fetches its ~204MB SDK jar at **test**
   runtime through its own Maven client, into `~/.m2`, never through Gradle's
   classpath. `~/.m2/repository/org/robolectric` is cached separately.

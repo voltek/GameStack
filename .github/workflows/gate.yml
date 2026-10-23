@@ -69,11 +69,13 @@ jobs:
 
       # `--continue` so one run reports every independent failure. Without it the
       # gate stops at the first, and each further verdict costs another push.
+      # `--stacktrace` for the same reason: it prints nothing on a green run, and a
+      # CI-only failure without it is a bare message no local run can reproduce.
       # One invocation, not three: Gradle deduplicates the task graph, so naming
       # all three costs nothing and keeps this readable as the gate CLAUDE.md defines.
       # No IGDB credentials needed — local.properties is optional and falls back to "".
       - name: Run the gate
-        run: ./gradlew build test lint --continue
+        run: ./gradlew build test lint --continue --stacktrace
 
       - name: Save the Robolectric SDK jar
         if: ${{ !cancelled() && steps.robolectric.outputs.cache-hit != 'true' }}
