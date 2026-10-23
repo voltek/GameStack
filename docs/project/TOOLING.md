@@ -54,7 +54,9 @@ everyone else did.
 ## 2. Branch protection on `main`
 **What.** `main` requires the `build / test / lint` check to pass and every review
 conversation to be resolved. Force-pushes and deletions are blocked; zero
-approving reviews are required, since the project has one author.
+approving reviews are required, since the project has one author. Administrators
+are bound too (`enforce_admins`), because the agent pushes with the owner's
+administrator credentials (ADR 0028).
 
 **Replaces.** The honour system — a red branch was previously merge-able.
 
@@ -73,6 +75,11 @@ silently drops conversation resolution.
   commit, so the check reflects `main` as of when it ran. `strict` only closes
   the gap between that moment and the merge, at the cost of re-updating every
   open PR whenever `main` moves.
+- *Leaving administrators out to keep an emergency path open.* With zero
+  required approvals nothing can lock the owner out, and the exit is one call:
+  `gh api -X DELETE repos/:owner/:repo/branches/main/protection/enforce_admins`,
+  then `-X POST` to the same path to turn it back on. The agent's settings deny
+  that call, so only the owner can use the exit.
 
 ## 3. Pull request template
 **What.** Three sections — what changed, why, how it was verified — with the gate
@@ -192,6 +199,38 @@ round is used and when to stop waiting for it.
 
 **Ruled out.** *Restating these triggers and signals in the skill.* A copy there
 came out incomplete twice; the skill keeps the rule and points here.
+
+## 10. Agent permissions
+**What.** `deny` and `ask` rules that stop the agent before a command runs. The
+`deny` list covers a push naming `main`, a bare force-push, `--no-verify`, any
+change to branch protection, `gh repo edit`/`rename`/`archive`/`delete`,
+`gh workflow disable`, `gh secret`, and printing the GitHub token. The `ask`
+list covers the common PR actions, deleting a remote branch, `git -C` with
+`push` or `commit`, and mutating `gh api` calls, which include turning
+auto-merge on. Each rule catches the common spellings of a mistake, never all
+of them. TOOLING-BACKLOG item 9 lists the spellings known to get through; where
+`main` is concerned, only §2 stops them. A rule also stays narrow enough not to
+catch reads: a prompt on every `git -C … log` was dropped for that reason.
+
+**Replaces.** A prompt before every `git push`, and the same rules kept only in a
+local file that one machine's global ignore kept out of git.
+
+**Where.** `.claude/settings.json`. Personal `allow` rules stay in
+`.claude/settings.local.json`, which `.gitignore` excludes; `deny` and `ask` win
+over them. PowerShell denies every `gh api` call, so read GitHub from Bash.
+
+**Ruled out.**
+- *Rules for Bash only.* The PowerShell tool runs the same commands, so every
+  rule that matters has a `PowerShell(...)` copy. For `gh api`, PowerShell is
+  denied outright.
+- *A rule ending in `:*` after another wildcard.* Claude Code reads that `*`
+  literally, and the rule never fires. A startup warning reports it.
+- *Trusting the patterns alone.* A pattern matches one spelling of a command.
+  The guard that holds for any spelling is §2's `enforce_admins`.
+- *Chasing every spelling.* Each review round widened the patterns and found
+  the next gap, and a rule matched anywhere in the command
+  (`core.hooksPath`, `-n`) denied reads and commit messages. The rule of three
+  stopped it. A hook that parses the command is TOOLING-BACKLOG item 9.
 
 ---
 

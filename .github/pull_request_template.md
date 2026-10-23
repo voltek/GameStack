@@ -11,7 +11,7 @@
 - [ ] `./gradlew build` `./gradlew test` `./gradlew lint` — all green
 - [ ] `/code-review` run and every finding triaged in a table the human confirmed (unless `ship-a-branch` step 3 exempts the branch)
 - [ ] Device pass on the emulator (UI changes only) — states checked:
-- [ ] Documentation-integrity detectors run (governing-document or Skill changes only) — conditional items run: / skipped: / found:
+- [ ] Documentation-integrity detectors run (governing-document, Skill or `.claude/settings.json` changes only) — conditional items run: / skipped: / found:
 
 Deferred: TODO <!-- local /code-review only: each review-debt issue (#n), "none", or "not run — exempt: <the step-3 exemption>". -->
 
