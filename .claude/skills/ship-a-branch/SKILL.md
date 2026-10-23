@@ -135,8 +135,8 @@ also makes step 2 impossible — no PR means the window stays open, and an open 
 is what lets a branch be folded into its final shape. The two rules hold each
 other up.
 
-The GitHub bot is the exception, since it needs a PR to run at all: request it
-once, when the PR opens, after the local rounds are done.
+The GitHub bot is the exception, since it needs a PR to run at all (its bullet
+below says when it runs).
 
 - **Run `/code-review` on every branch but two: a comments-only diff, and a
   docs-only diff outside the governing-document shape** (next subsection). Those
@@ -148,10 +148,14 @@ once, when the PR opens, after the local rounds are done.
   wait. Never tick that box, never excuse it, and never confuse it with the
   GitHub bot: they are different reviewers and the bot's quota says nothing about
   whether `/code-review` has run.
-- **The GitHub bot is an advisor, not a gatekeeper.** Request it once per PR when
-  the PR is ready. If it is unavailable, merge anyway — an external quota must
-  not decide whether work ships. Watch for its usage-limit comment and stop
-  waiting the moment it appears.
+- **The GitHub bot is an advisor, not a gatekeeper.** It gets one round per PR,
+  the one that starts on its own. Never start another by any trigger
+  `docs/project/TOOLING.md` §9 lists, and read its result by the signals listed
+  there. Fixes to its findings get the gate and, if the stopping rule earns one,
+  a local `/code-review`. If it is unavailable, merge anyway — an external quota
+  must not decide whether work ships. It is unavailable once its usage-limit
+  comment appears, or when no result has arrived 30 minutes after the trigger
+  that started its round, whatever else it has or has not posted.
 - **A subagent reviewer's claims about repo or remote state are findings to
   verify, not facts to relay.** Weigh its reasoning; check its assertions.
 
@@ -238,7 +242,7 @@ indistinguishable from an unnoticed one. `main` is protected with *require
 conversation resolution*, so an open thread blocks the merge button mechanically.
 
 Check which commit a bot review ran against before trusting it; it pins to a SHA
-and may already be stale. Re-request with `@codex review` after pushing fixes.
+and may already be stale.
 
 ## 4. Write the PR body
 Use `.github/pull_request_template.md`. **Aim for one screen — about 40 lines.**
