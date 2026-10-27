@@ -108,6 +108,11 @@ present, using the name GitHub's API uses, because that is what
 - `./gradlew lint`
 - `test: <TestName>#<caseName>`
 - `gate.yml`
+- `commits.yml` — a check on every commit, the title and the branch name of a
+  pull request. Until branch protection requires it, the line says
+  `(not a required check)` after the value.
+- `git hook — .githooks/<hook>` — binds anyone committing or pushing from a
+  clone where a Gradle build has set `core.hooksPath`; `--no-verify` skips it.
 - `branch protection` — a rule on the `main` branch, read with
   `gh api repos/{owner}/{repo}/branches/main/protection`. It binds
   administrators only while `enforce_admins` is on, so a rule an administrator
