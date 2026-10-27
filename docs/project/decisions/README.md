@@ -12,6 +12,10 @@ drift often produces both, and then the log row points at the ADR instead of
 restating it: two copies of the same reasoning drift apart, which is why
 CLAUDE.md already forbids writing it in both places.
 
+A Skill's procedure parameter is not a decision; where the line falls, and how
+to test a change against it, is
+[ADR 0032](0032-a-skill-parameter-is-not-a-decision.md).
+
 `../DRIFT-CHECKLIST.md` is the third file and the imperative one — the violation
 detectors you run to *find* drift.
 
