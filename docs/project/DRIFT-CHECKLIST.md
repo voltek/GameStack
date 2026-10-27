@@ -19,9 +19,9 @@
 >
 > When drift is found, resolve it per the Self-Healing Loop (CLAUDE.md): either
 > fix the code, OR update the document if the code turned out to be right and the
-> document is what's outdated. Log which direction was chosen in
-> `docs/project/DRIFT-LOG.md`; a decision that is born or changes goes to
-> `docs/project/decisions/` as an ADR instead.
+> document is what's outdated. Record which direction was chosen as a `Drift:`
+> trailer on the commit that resolves it (ADR 0033); a decision that is born or
+> changes is also an ADR under `docs/project/decisions/`.
 >
 > Every item carries a **`Verified by:`** line naming what checks it *today*,
 > not what could check it one day. The vocabulary is closed:
@@ -176,7 +176,7 @@ and items it read, so a silent skip shows.
       Verified by: human
 - [ ] Does any comment restate what the code says, narrate *how we got here*
       (a past bug, an earlier version, which review found it), or duplicate text
-      that already exists in a Skill, DRIFT-LOG or an ADR? Any comment block
+      that already exists in a Skill, an ADR or a commit message? Any comment block
       over 4 lines, or a file past ~15% comment lines, is where to look first.
       Verified by: subagent (interpretive)
 - [ ] Is there any hardcoded UI string in a ViewModel or UseCase instead of `UiText`?
@@ -247,15 +247,18 @@ A rename touches both its paths, so list the diff with `git fetch` and then
       `Enforced by:` value outside the closed vocabulary, several `Enforced by:`
       lines of which any names no scope, a scoped `Status:` line with no unscoped
       `Accepted` line beside it, a `Date:` that disagrees with the row
-      `Backfilled:` cites, or quoted opening words that no `grep -F` against
-      `DRIFT-LOG.md` resolves? Four addressing rules, each earned by a false
-      result: anchor `Enforced by:` at line start and read every one of them,
-      because ADR prose quotes the field name too and one ADR now carries several;
+      `Backfilled:` cites, quoted opening words that no `grep -F` against
+      `DRIFT-LOG.md` resolves, or a cited commit not on `main`
+      (`git merge-base --is-ancestor <sha> origin/main`) or PR that does not
+      exist (`gh pr view <n>`)? Or does the diff change the frozen `DRIFT-LOG.md`
+      at all, the change that froze it excepted (ADR 0033)? Four addressing
+      rules, each earned by a false result: anchor `Enforced by:` at line start
+      and read every one of them, because ADR prose quotes the field name too
+      and one ADR now carries several;
       match each value as a literal prefix of the vocabulary, because some values
-      contain ` — ` themselves; resolve *every* row a `Backfilled:` line cites,
-      not only the first; and take the cited date as the one immediately before
-      the quoted words, which may carry a date of their own. DRIFT-LOG is an
-      input because every `Backfilled:` line resolves against it.
+      contain ` — ` themselves; resolve *every* row, commit or PR a
+      `Backfilled:` line cites, not only the first; and take the cited date as the one immediately before
+      the quoted words, which may carry a date of their own.
       Runs when: `docs/project/decisions/` or `docs/project/DRIFT-LOG.md`
       Verified by: human
 - [ ] Does an ADR's `claude settings` line describe a rule that

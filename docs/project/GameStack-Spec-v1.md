@@ -238,7 +238,8 @@ non-Home tab returns to Home.
   screenshot costs to read
 - `docs/project/DESIGN.md` — visual design system (colors, typography, spacing)
 - `docs/project/DRIFT-CHECKLIST.md` — manual audit checklist against CLAUDE.md Tier 1 rules
-- `docs/project/DRIFT-LOG.md` — every drift found and which way it was resolved
+- `docs/project/DRIFT-LOG.md` — frozen archive of the drifts resolved before
+  2026-10-26; later ones are `Drift:` commit trailers (ADR 0033)
 - `docs/project/decisions/` — one ADR per architectural decision in force, each
   naming what enforces it
 - `docs/project/TOOLING-BACKLOG.md` — repository tooling planned but not built

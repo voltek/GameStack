@@ -1,6 +1,7 @@
 # ADR 0018 — Comments carry the why, never the what and never the history
 
 Status: Accepted
+Status: Superseded by ADR-0033 — "and the drift log, both of which this project maintains" (Decision, question 2)
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("The 2026-08-22 entry below already stated the rule")
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Code Conventions

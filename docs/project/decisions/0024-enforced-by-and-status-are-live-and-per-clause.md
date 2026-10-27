@@ -1,6 +1,7 @@
 # ADR 0024 — `Enforced by:` and `Status:` are live and take one line per clause
 
 Status: Accepted
+Status: Superseded by ADR-0033 — "or in `DRIFT-LOG.md`" as a home for a fact that can change (Decision, fifth paragraph)
 Date: 2026-09-01
 Backfilled: yes — DRIFT-LOG.md, row 2026-09-01 ("ADR 0008 bans `Rebase and merge`, and the button was still enabled")
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Documentation integrity — a `branch protection` or `repository settings` line the repository no longer backs
