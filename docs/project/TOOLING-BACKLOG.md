@@ -30,7 +30,8 @@ This is read on demand, not loaded every turn. Consult it when picking up
 harness work; there is no need to check it while writing product code.
 
 In priority order, except items 7, 8, 10 and 11, which are gated on a trigger
-rather than ranked.
+rather than ranked. A shipped item leaves a gap in the numbers, since frozen
+ADRs cite items by number.
 
 ## 1. Automate the regression-test verification
 **Ranked first.** CLAUDE.md → Testing Stack (Tier 1) requires every regression
@@ -103,36 +104,6 @@ configuration time.
 
 Do this before, not after, the post-edit hook in item 2 — that hook's whole
 premise is a quick loop, and without the split there is no quick loop to protect.
-
-## 5. A `commit-msg` hook for the mechanical half of the message rules
-Check each subject against ADR 0034: `type(scope): Summary` with the allowed
-types and the closed scope list, a capital first letter, no trailing period, 72
-characters at most. Check a body of 12 lines or fewer (trailers excluded), that
-a `Drift:` trailer holds `code fixed`, `doc updated` or `both` (ADR 0033), and
-that `Bypassed:` reads `enforce_admins — <reason>`. All are regex-checkable, and
-a git hook runs whether or not anyone remembers it — CLAUDE.md already forbids
-`--no-verify`, so it cannot be skipped either. Each failure names the rule, the
-value seen and the fix.
-
-Where each check runs: `commit-msg` for the message; `pre-push` for the branch
-name's shape, while a rename is still free; a `pull_request` workflow for every
-commit on the branch, for the PR title (form, no "and") and for its type against
-the branch prefix, since no local hook sees a PR title.
-
-The "and" check is the one that stands in for a judgement. It fails by the
-owner's choice (2026-10-26), accepting false positives such as an "and" inside
-one name; its message says to rephrase the title in that case.
-
-**A Skill was considered and rejected for this.** Skills load when a named task
-begins, and committing is decided by the agent mid-work rather than requested;
-an agent cutting corners is precisely the one that would not invoke it. That
-leaves a Skill on the same rung of the ladder as the prose, plus indirection. A
-hook is a rung up.
-
-Scope limit worth stating before anyone tries: the hook can only see **form**.
-"Does this commit exist because of this branch's unit of work" and "does the body
-carry the diagnosis" are judgement, and the rules covering them stay in CLAUDE.md
-regardless.
 
 ## 6. Make the project-coupled Skills exportable — lowest priority
 **No benefit to this project.** Purely to lift Skills into a separate reusable
@@ -216,8 +187,8 @@ and skipping hooks; ask for PR actions and remote-branch deletion.
 **Replaces.** The `deny` and `ask` patterns in `.claude/settings.json`, which
 match one spelling each (TOOLING §10). Those stay as the fallback.
 
-**Ranking.** Belongs with the hooks work (item 5 and items 1-2). It matters most
-for feature branches, where branch protection does not reach.
+**Ranking.** Belongs with the hooks work (items 1-2, and TOOLING §11). It
+matters most for feature branches, where branch protection does not reach.
 
 **Before it ships:** test it against one planted command per spelling below.
 Every one of them got past the patterns.

@@ -1,4 +1,6 @@
+import java.io.ByteArrayOutputStream
 import java.util.Properties
+import javax.inject.Inject
 
 plugins {
     alias(libs.plugins.android.application)
@@ -116,3 +118,50 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
+
+// Best-effort: commits.yml is the guarantee, so a machine without git on the
+// daemon's PATH still builds, with a warning instead of the hooks.
+abstract class InstallGitHooks @Inject constructor(
+    private val execOperations: ExecOperations,
+) : DefaultTask() {
+    @get:Internal
+    abstract val repositoryDir: DirectoryProperty
+
+    @TaskAction
+    fun install() {
+        val hooksPath = ".githooks"
+        try {
+            val current = ByteArrayOutputStream()
+            execOperations.exec {
+                workingDir = repositoryDir.get().asFile
+                commandLine("git", "config", "--get", "core.hooksPath")
+                standardOutput = current
+                isIgnoreExitValue = true
+            }
+            val previous = current.toString().trim()
+            if (previous == hooksPath) return
+            val ownHooks = repositoryDir.get().asFile.resolve(".git/hooks")
+                .listFiles { file -> !file.name.endsWith(".sample") }.orEmpty()
+            val replaced = previous.ifEmpty { ownHooks.joinToString { ".git/hooks/${it.name}" } }
+            if (replaced.isNotEmpty()) {
+                logger.warn("core.hooksPath set to '$hooksPath'; these hooks stop running: $replaced")
+            }
+            execOperations.exec {
+                workingDir = repositoryDir.get().asFile
+                commandLine("git", "config", "core.hooksPath", hooksPath)
+            }
+        } catch (e: Exception) {
+            logger.warn("Git hooks not installed (${e.message}); commits.yml still checks every PR.")
+        }
+    }
+}
+
+// A hook binds only once installed; installing it on every build means no
+// clone depends on someone remembering a setup step.
+val installGitHooks by tasks.registering(InstallGitHooks::class) {
+    val gitDir = rootProject.layout.projectDirectory.file(".git")
+    onlyIf("the project is a git checkout") { gitDir.asFile.exists() }
+    repositoryDir.set(rootProject.layout.projectDirectory)
+}
+
+tasks.named("preBuild") { dependsOn(installGitHooks) }

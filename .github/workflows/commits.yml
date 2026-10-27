@@ -1,0 +1,62 @@
+name: Commits
+
+# Separate from gate.yml so that editing a PR title reruns these checks and not
+# Gradle. Covers what no local hook sees: the PR title, and commits made in a
+# clone without the hooks or on the web.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, synchronize, reopened]
+
+concurrency:
+  group: commits-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  commits:
+    name: messages / title / branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Test the rules
+        run: sh .githooks/test-rules.sh
+
+      # The list is captured first: a failing substitution inside `for` does not
+      # stop bash -e, and the loop would check nothing and pass.
+      - name: Check every commit on the branch
+        if: ${{ !cancelled() }}
+        env:
+          BASE: origin/${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          shas=$(git rev-list "$BASE..$HEAD_SHA") || exit 1
+          status=0
+          for sha in $shas; do
+            echo "Checking $(git log -1 --format='%h %s' "$sha")"
+            git log -1 --format=%B "$sha" > "$RUNNER_TEMP/message"
+            merge=
+            git rev-parse -q --verify "$sha^2" > /dev/null && merge=merge
+            sh .githooks/rules.sh message "$RUNNER_TEMP/message" $merge || status=1
+          done
+          exit $status
+
+      # The title arrives through env, never interpolated into the script: a
+      # PR title is text anyone opening a PR controls.
+      - name: Check the PR title and the branch name
+        if: ${{ !cancelled() }}
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          status=0
+          sh .githooks/rules.sh title "$TITLE" || status=1
+          sh .githooks/rules.sh branch "$BRANCH" "$TITLE" || status=1
+          exit $status
