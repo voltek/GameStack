@@ -1,0 +1,8 @@
+root = true
+
+[*]
+end_of_line = lf
+
+# End-of-line exceptions mirror .gitattributes; change both.
+[*.{bat,cmd}]
+end_of_line = crlf
