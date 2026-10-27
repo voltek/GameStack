@@ -229,3 +229,10 @@ It must also let these reads through, since each was wrongly caught on the way:
 - *More patterns.* Each of three review rounds on `fix/agent-permissions` found
   either the next gap or a rule wide enough to catch reads; the rule of three
   closed that route.
+
+## 10. Check CLAUDE.md's size bound in the build — once it meets it
+A Gradle task that `check` depends on, counting as
+[ADR 0031](decisions/0031-claude-md-is-bounded.md) § Decision defines, so the
+gate stays three commands. **Gated on a trigger:** the first commit in which
+CLAUDE.md meets the bound, since a check added earlier would only fail. A
+ratchet for the interim rule was declined (ADR 0031 § Consequences).
