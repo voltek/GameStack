@@ -82,7 +82,30 @@ Typical end state for a feature branch: the production change, its tests, and th
 documentation — three commits, however many rounds it took to get there.
 
 ### Commit messages
-Subject: `type(scope): imperative summary`, lowercase, no trailing period.
+Subject: `type(scope): Imperative summary`, no trailing period, **72 characters at
+most**. Past 72 usually means two claims: split the commit before trimming words.
+The summary opens with its verb, capitalised; identifiers, filenames and proper
+nouns after it keep their spelling (`CLAUDE.md`, `ADR`, `PR`). Subjects git or
+GitHub writes itself, for a merge, a revert or a squash, are exempt.
+
+Scope names the area a change governs, not the file it touches, from this closed
+list (ADR 0034). A new scope joins the list in the commit that first uses it. A
+rule takes the scope of what it governs, not of where it is written: a commit
+rule is `ship` in CLAUDE.md, an ADR or a Skill.
+- Code: `search`, `home`, `library`, `detail`, `auth`, `nav`, `theme`, `core`,
+  `build` (Gradle build files, dependency versions, the wrapper).
+- Process: `governance` (CLAUDE.md's rules and bounds, ADRs, drift, the drift
+  checklist detectors), `skills` (the implementation Skills: `new-*`,
+  `write-tests`, `verify-on-device`, `discovery-feature`), `ship` (branch to
+  merge, review rounds, the PR template, commit messages, PR titles, branch
+  names), `gate` (CI workflows), `agent` (`.claude/` settings and agent hooks),
+  `repo` (`.gitattributes`, `.gitignore`, git hooks), `spec`, `design`,
+  `tooling` (the TOOLING documents), `readme`.
+
+The PR title takes the same form and states the branch's one claim; on a
+one-commit branch it is that commit's subject. GitHub writes it as the first
+line of the merge commit's body. The branch is named `{type}/{kebab-name}` with
+that title's type, `feature/` standing for `feat`.
 
 Body: **12 lines or fewer.** This project deliberately puts the *diagnosis* in
 commit messages rather than a summary of the diff (Spec → *Why this project
@@ -380,14 +403,20 @@ does not carry over to the merge.
 **`Create a merge commit` is the default.** The branch's commits are curated and
 are the unit that makes `blame` and `bisect` useful; the merge commit records
 what landed together as one reviewed unit. The repo has **Automatically delete
-head branches** enabled (GitHub → Settings → General → Pull Requests), so the
-remote branch is cleaned up on its own.
+head branches** enabled (GitHub → Settings → General → Pull Requests), so GitHub
+deletes the remote branch at the merge: **there is no remote half for you to
+delete.** If `git branch -r` still lists it after `git fetch --prune` (below),
+the setting was turned off (`gh api repos/{owner}/{repo} --jq
+.delete_branch_on_merge`, from Bash): tell the owner instead of deleting it, which would need their yes anyway
+(CLAUDE.md Tier 1).
 
 - **`Squash and merge`** is the fallback for a branch whose history is genuinely
   disposable, or the only remedy once the force-push window has closed on a messy
   branch. It keeps the message *text* and destroys the structure: per-commit
   SHAs, line-level `blame`, and every bisection point but one. Keep every
-  `Drift:` and `Bypassed:` line in the pre-filled message (ADR 0033).
+  `Drift:` and `Bypassed:` line in the pre-filled message (ADR 0033). There they
+  stop parsing as trailers; `git log --grep='^Drift:'`, the read ADR 0033 names,
+  still finds them.
 - **`Rebase and merge`: never.** Same reason as step 1, at merge scale.
 
 ADR 0028's emergency exit is the owner's alone; remind them that a merge or push
