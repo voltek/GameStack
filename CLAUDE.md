@@ -185,7 +185,7 @@ to keep:
   "am I behind".
 
 ### Tier 2 — Configurable within a defined range
-- Branch naming: `feature/{name}`, `fix/{name}`, `chore/{name}`, `docs/{name}`.
+- Branch naming: `{type}/{kebab-name}`, its PR title's type (`feature/` for `feat`).
 - **One branch per unit of work**, checked per commit: does this exist *because
   of* this branch's unit of work? A refactor that exists only because of a
   feature belongs on that feature's branch; anything else belongs on its own.
@@ -194,11 +194,11 @@ to keep:
   belonging to its feature.
 - Treat **400 changed lines or 15 files** as a smoke alarm, not a limit. If the
   PR title needs an "and", split it.
-- Commit messages follow **Conventional Commits**: `type(scope): imperative
-  summary`, lowercase, no trailing period. Types in use: `feat`, `fix`,
-  `refactor`, `docs`, `chore`, `test`. Scope is the feature or layer (`search`,
-  `auth`, `nav`) and is optional for repo-wide changes.
-  (Commits before 2026-08-22 predate this convention — do not rewrite them.)
+- Commit messages and PR titles: **Conventional Commits**, `type(scope):
+  Imperative summary` (verb first), no trailing period, 72 characters
+  at most. Types: `feat`, `fix`, `refactor`, `docs`, `chore`, `test`. Scope:
+  the closed list in `ship-a-branch`; optional if repo-wide. Commits before
+  2026-10-26 predate this; never rewrite them.
   The body carries the diagnosis the diff cannot show, in **12 lines or fewer**;
   anything already in a document is pointed at, not restated (`ship-a-branch`).
 - **Merge strategy: `Create a merge commit`.** `Rebase and merge` is never used —

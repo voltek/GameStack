@@ -105,11 +105,23 @@ Do this before, not after, the post-edit hook in item 2 — that hook's whole
 premise is a quick loop, and without the split there is no quick loop to protect.
 
 ## 5. A `commit-msg` hook for the mechanical half of the message rules
-Check `type(scope): imperative summary` against the allowed types, a body of
-12 lines or fewer (trailers excluded), and that a `Drift:` trailer holds
-`code fixed`, `doc updated` or `both` (ADR 0033). All are regex-checkable, and
+Check each subject against ADR 0034: `type(scope): Summary` with the allowed
+types and the closed scope list, a capital first letter, no trailing period, 72
+characters at most. Check a body of 12 lines or fewer (trailers excluded), that
+a `Drift:` trailer holds `code fixed`, `doc updated` or `both` (ADR 0033), and
+that `Bypassed:` reads `enforce_admins — <reason>`. All are regex-checkable, and
 a git hook runs whether or not anyone remembers it — CLAUDE.md already forbids
-`--no-verify`, so it cannot be skipped either.
+`--no-verify`, so it cannot be skipped either. Each failure names the rule, the
+value seen and the fix.
+
+Where each check runs: `commit-msg` for the message; `pre-push` for the branch
+name's shape, while a rename is still free; a `pull_request` workflow for every
+commit on the branch, for the PR title (form, no "and") and for its type against
+the branch prefix, since no local hook sees a PR title.
+
+The "and" check is the one that stands in for a judgement. It fails by the
+owner's choice (2026-10-26), accepting false positives such as an "and" inside
+one name; its message says to rephrase the title in that case.
 
 **A Skill was considered and rejected for this.** Skills load when a named task
 begins, and committing is decided by the agent mid-work rather than requested;
@@ -216,7 +228,7 @@ Every one of them got past the patterns.
   `-an`, `-anm`.
 - Reaching `main` without naming it: a bare `git push` or `git push origin HEAD`
   from `main`, or a quoted `'main'` or `"HEAD:main"`.
-- Deleting a branch outside the four prefixes: `git push origin :hotfix`,
+- Deleting a branch outside the six prefixes: `git push origin :hotfix`,
   `:refs/heads/fix/x`.
 - `gh` commands outside the lists: `gh pr revert`, `lock` and `unlock`;
   `gh variable`, `gh repo deploy-key`, `gh label`, `gh workflow enable` and

@@ -78,6 +78,8 @@
       "Bash(git push * :feature/*)",
       "Bash(git push * :chore/*)",
       "Bash(git push * :docs/*)",
+      "Bash(git push * :refactor/*)",
+      "Bash(git push * :test/*)",
       "Bash(git -C * push*)",
       "Bash(git -C * commit*)",
       "Bash(gh api *-X*)",
@@ -104,6 +106,8 @@
       "PowerShell(git push * :feature/*)",
       "PowerShell(git push * :chore/*)",
       "PowerShell(git push * :docs/*)",
+      "PowerShell(git push * :refactor/*)",
+      "PowerShell(git push * :test/*)",
       "PowerShell(git -C * push*)",
       "PowerShell(git -C * commit*)"
     ]
