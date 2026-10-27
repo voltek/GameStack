@@ -34,11 +34,11 @@ the rule exists to catch the next case, whatever it turns out to be.)
 ## What belongs in this document — Tier 1
 
 ### Every line here is loaded on every turn, forever
-This file is injected into the context of **every request**, whether or not the
-task touches what it says. A Skill loads only when invoked; the Spec, DESIGN.md
-and the drift documents are read on demand. So the question for anything proposed
-here is never "is this valuable?" — almost everything written here was — but
-**"is this needed on every turn?"**
+This file is loaded into **every request**; Skills and the other documents load
+on demand. So the question for anything proposed here is never "is this
+valuable?" — almost everything written here was — but **"is this needed on every
+turn?"** Bound: 200 lines, 18,000 characters; until met, an addition is offset
+in the same change (ADR 0031).
 
 ### Three questions before adding anything
 1. **Does it survive a clone?** If it names a path on one machine, a device
