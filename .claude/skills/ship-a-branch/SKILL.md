@@ -311,11 +311,15 @@ Check which commit a bot review ran against before trusting it; it pins to a SHA
 and may already be stale.
 
 ## 4. Write the PR body
-Use `.github/pull_request_template.md`. **Aim for one screen — about 40 lines.**
+Use `.github/pull_request_template.md`. **Aim for a body the human reads in a
+minute.** `What changed` states the one claim in one to three sentences and
+points at an ADR, if any, or the commits for the rest instead of restating
+them; the `Deferred:` and `Dismissed:` lines follow their own shape below.
 
 Three sections carry it: **what changed**, **why**, **how it was verified**. Add
 another heading when the PR genuinely needs one (a known limitation, a scope
-note, a decision taken deliberately) — but only then; the default is the three.
+note, a decision taken deliberately) — but only then, with `Why`'s bound; the
+default is the three.
 
 Replace the `TODO` on the template's `Deferred:` and `Dismissed:` lines with
 the local `/code-review` rounds' issues and dismissals, each dismissal as its
@@ -326,20 +330,20 @@ archived. Write `none` when the review ran and produced none, and
 A review still to come is not an exemption: the `TODO` stays, visible, until the
 record is written.
 
-**`Why` defaults to one paragraph** — three to five sentences pointing at the
-decision, not narrating how it was reached. Expand past that only when the
-decision has real nuance a reviewer can't get from the diff (a rejected
-alternative, a deferred consequence) — and even then prefer pointing at the
-commit message, DRIFT-LOG or the ADR over restating them here.
+**`Why` defaults to one to three sentences** pointing at the decision, not
+narrating how it was reached. Expand past that only when the decision has real
+nuance a reviewer can't get from the diff (a rejected alternative, a deferred
+consequence) — and even then prefer pointing at the commit message, DRIFT-LOG
+or the ADR over restating them here.
 
 Keep it short by *pointing* rather than repeating. The deep reasoning is already
 written twice — in the commit messages and in DRIFT-LOG —
 and the copy in the PR body is the one nobody updates. Same `never both` rule as
 code comments.
 
-**A body that needs more than one screen usually means the PR has more than one
-claim.** Treat length as the same smoke alarm as 400 lines / 15 files, measured
-in prose.
+**A `What changed` that needs more than three sentences usually means the PR has
+more than one claim.** Treat it as the same smoke alarm as 400 lines / 15 files,
+measured in prose.
 
 ### Screenshots
 UI changes need them. Generate locally, save outside the repo named for what
