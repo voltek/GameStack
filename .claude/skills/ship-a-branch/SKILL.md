@@ -403,8 +403,12 @@ does not carry over to the merge.
 **`Create a merge commit` is the default.** The branch's commits are curated and
 are the unit that makes `blame` and `bisect` useful; the merge commit records
 what landed together as one reviewed unit. The repo has **Automatically delete
-head branches** enabled (GitHub → Settings → General → Pull Requests), so the
-remote branch is cleaned up on its own.
+head branches** enabled (GitHub → Settings → General → Pull Requests), so GitHub
+deletes the remote branch at the merge: **there is no remote half for you to
+delete.** If `git branch -r` still lists it after `git fetch --prune` (below),
+the setting was turned off (`gh api repos/{owner}/{repo} --jq
+.delete_branch_on_merge`, from Bash): tell the owner instead of deleting it, which would need their yes anyway
+(CLAUDE.md Tier 1).
 
 - **`Squash and merge`** is the fallback for a branch whose history is genuinely
   disposable, or the only remedy once the force-push window has closed on a messy
