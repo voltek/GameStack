@@ -29,8 +29,8 @@ changelog, and the real one is `git log`.
 This is read on demand, not loaded every turn. Consult it when picking up
 harness work; there is no need to check it while writing product code.
 
-Eight deliverables, in priority order — except items 7 and 8, which are gated on a
-trigger rather than ranked.
+In priority order, except items 7, 8, 10 and 11, which are gated on a trigger
+rather than ranked.
 
 ## 1. Automate the regression-test verification
 **Ranked first.** CLAUDE.md → Testing Stack (Tier 1) requires every regression
