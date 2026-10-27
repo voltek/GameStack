@@ -191,12 +191,20 @@ twenty ADRs clean while reading seventeen.
     scenario in which an agent following the text *acts* wrongly, for example
     two rules prescribing different actions, a broken reference, a missing
     step, or a step that cannot be carried out. No test applies; the
-    *Documentation integrity* detectors are its check.
+    *Documentation integrity* detectors are its check. The row's reason quotes
+    that evidence — both clauses, the reference, the step — rather than
+    asserting it; a row that cannot quote it is not a defect.
   - **Fix (cheap)** — anything else cheap enough to fix here. Wording,
-    duplication, wrap width and friction with no such scenario go here or to
-    Defer.
-- **Defer** — valid, and not fixed on this branch: design, performance, polish,
-  debt, and a real defect only when the human defers it. Open an issue labelled
+    duplication, wrap width and friction with no such scenario go here, or to
+    Defer on one of its grounds.
+- **Defer** — valid, and not fixed on this branch, because it is outside the
+  branch's unit of work (CLAUDE.md → Git workflow), a document already defers it
+  (the Spec, the accessibility default below, an open issue), or its fix needs a
+  plan. A non-defect fix too large to be cheap is one that needs a plan. A
+  valid finding that meets none of the three is fixed here, and a real defect
+  is deferred only by the human. When the ground is an open issue, link that
+  issue, labelled `review-debt` if it was not, instead of opening another.
+  Otherwise open an issue labelled
   `review-debt`, link it in the thread when there is one, merge. Every time, not
   when remembered: the label is the only register of what a review found and
   nobody fixed (`gh issue list --label review-debt`).
@@ -205,20 +213,35 @@ twenty ADRs clean while reading seventeen.
   answered in its thread, which is its record (§ Closing threads).
 
 A local `/code-review` has no thread and runs before the PR exists, so its
-record is carried by hand. Save each round's raw output and, once confirmed, its
-table outside the repository — never only in the conversation, which a later
-session cannot read. Where is the human's choice, recorded in the agent's memory
-because it is a path on one machine; if memory names no place, ask before the
-first round. §4 copies its deferrals and dismissals into the PR body's
-`Deferred:` and `Dismissed:` lines from there.
+record is carried by hand. Save each round's raw output verbatim before writing
+any digest of it, then its table, outside the repository, as
+`YYYY-MM-DD-<topic>-r{k}.raw.txt` and `.triage.md` — never only in the
+conversation, which a later session cannot read. Where is the human's choice,
+recorded in the agent's memory because it is a path on one machine; if memory
+names no place, ask before the first round. §4 copies its deferrals and
+dismissals into the PR body's `Deferred:` and `Dismissed:` lines from there.
+The table file has this shape; Origin is filled for `Fix (defect)` rows only:
+
+```markdown
+# <branch> — round <k> triage (proposed | confirmed by the owner YYYY-MM-DD)
+Raw: <raw file> · Commit reviewed: <sha> (+ uncommitted changes, if the tree was dirty)
+
+| # | Finding | Bucket | Origin | Evidence / verified reason |
+|---|---|---|---|---|
+
+Stopping rule: <verdict>
+Owner decisions (YYYY-MM-DD): <confirmed as proposed, or each change>
+```
 
 Accessibility findings are deferred by default (CLAUDE.md → Accessibility),
 *except* where a change removed an affordance that already worked — that is not
 new accessibility work, it is not regressing, and it is a Fix (defect).
 
-**Propose the triage, then wait.** Present the whole table — every finding, its
-bucket, its verified reason, and each `Fix (defect)` row's origin — before
-changing anything, and touch nothing until the human has confirmed the table.
+**Propose the triage, then wait.** Write the whole table to its file — every
+finding, its bucket, its verified reason, and each `Fix (defect)` row's origin —
+before changing anything. In the chat give one line per finding (number, bucket,
+a reason of twelve words or fewer), then the verdict and the file's path. Touch
+nothing until the human has confirmed the table, every row of it.
 The table ends with the round's verdict, `Stopping rule: another round | stop,
 on to §4 | stop, back to the human, because …`, which the human confirms with
 it: after the fixes the natural next step is amend and push, and nothing there
@@ -295,10 +318,13 @@ another heading when the PR genuinely needs one (a known limitation, a scope
 note, a decision taken deliberately) — but only then; the default is the three.
 
 Replace the `TODO` on the template's `Deferred:` and `Dismissed:` lines with
-the local `/code-review` rounds' issues and dismissals: `none` when the review
-ran and produced none, `not run — exempt: <the step-3 exemption>` only when
-step 3 exempted the branch. A review still to come is not an exemption: the
-`TODO` stays, visible, until the record is written.
+the local `/code-review` rounds' issues and dismissals, each dismissal as its
+round and number, what it claimed and its verified reason, in about twenty
+words, so the line still answers a recurring finding once the saved table is
+archived. Write `none` when the review ran and produced none, and
+`not run — exempt: <the step-3 exemption>` only when step 3 exempted the branch.
+A review still to come is not an exemption: the `TODO` stays, visible, until the
+record is written.
 
 **`Why` defaults to one paragraph** — three to five sentences pointing at the
 decision, not narrating how it was reached. Expand past that only when the

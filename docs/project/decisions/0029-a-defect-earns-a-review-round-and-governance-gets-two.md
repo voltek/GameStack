@@ -1,6 +1,7 @@
 # ADR 0029 — A defect earns a review round, and governance text gets two
 
 Status: Accepted
+Status: Superseded by ADR-0030 — wording, duplication and friction without a failure scenario are cheap or deferred
 Date: 2026-10-23
 Backfilled: no
 Supersedes: ADR-0025 — the loop ends on an event, never a number of rounds; a round whose defects come mostly from the previous round's fixes ends it

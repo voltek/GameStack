@@ -15,7 +15,7 @@
 
 Deferred: TODO <!-- local /code-review only: each review-debt issue (#n), "none", or "not run — exempt: <the step-3 exemption>". -->
 
-Dismissed: TODO <!-- local /code-review only: each dismissed finding and its verified reason, "none", or "not run — exempt: <the step-3 exemption>". A bot finding's record lives in its thread. -->
+Dismissed: TODO <!-- local /code-review only: each dismissed finding as r<k>-<n>, what it claimed and its verified reason, in about twenty words, "none", or "not run — exempt: <the step-3 exemption>". A bot finding's record lives in its thread. -->
 
 ### Screenshots
 
