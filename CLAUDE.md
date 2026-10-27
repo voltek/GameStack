@@ -50,10 +50,10 @@ in the same change (ADR 0031).
    device, writing a mapper). **Procedures belong in Skills** — that is what
    Skills are for, and a procedure sitting here is paid for on every unrelated
    turn.
-3. **Is it a rule, or is it history?** The incident that produced a rule belongs
-   in DRIFT-LOG, and the decision itself in an ADR. Keep at most a clause of
-   *why* here — enough that the rule does not read as arbitrary and get
-   "improved" away — and let the log carry the account.
+3. **Is it a rule, or is it history?** The decision belongs in an ADR, and the
+   incident behind it in a commit body (ADR 0033). Keep at
+   most a clause of *why* here — enough that the rule does not read as arbitrary
+   and get "improved" away.
 
 If the answer sends it elsewhere, **write it elsewhere and, only when the rule
 itself would be incomplete without it, leave a one-line pointer.** A pointer is
@@ -101,9 +101,10 @@ which one was chosen:
    what's outdated (e.g. an implementation decision was made that the document
    never recorded).
 
-Either way, log it in `docs/project/DRIFT-LOG.md` — and when the resolution
-creates or changes a rule rather than restoring one, that rule is a new ADR
-under `docs/project/decisions/`, which the row then points at.
+Either way, the commit that resolves it carries a `Drift: code fixed | doc
+updated | both` trailer, and a rule that is born or changes is a new ADR under
+`docs/project/decisions/`, named in the commit body. `DRIFT-LOG.md` is a frozen
+archive (ADR 0033).
 Never leave a known contradiction unresolved on the grounds that "the code works" —
 an undocumented decision is invisible to the next agent, which is how the same
 drift returns.
@@ -523,9 +524,8 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
   questions before leaving one:
   1. Does it restate what the code already says? Delete it.
   2. Is it about *how we got here* rather than *what to do here*? That belongs in
-     the commit message and DRIFT-LOG, both of which this project already
-     maintains. Writing it in both places is duplication, and the copy in the
-     code is the one nobody updates.
+     the commit message. Writing it in both places is duplication, and the copy
+     in the code is the one nobody updates.
   3. Would it become false if someone refactored correctly? Then it is a
      chronicle, not a constraint — delete it or rewrite it as the constraint.
 

@@ -1,20 +1,13 @@
 # DRIFT-LOG — GameStack
 
-> Every time the code and the documentation disagreed, and in which direction it
-> was resolved — the code was fixed, or the document was updated. That is exactly
-> what CLAUDE.md's Self-Healing Loop requires be recorded, and this file is where
-> it goes.
+> **Frozen archive since 2026-10-26: no new rows, and no row is edited.** A drift
+> resolved from that date on is recorded as a `Drift:` trailer on the commit that
+> resolves it: `git log --grep='^Drift:'` (ADR 0033). The file stays at this path
+> because `Backfilled:` lines in `decisions/` address its rows.
 >
-> **A decision that is born or changes does not belong here: that is a new ADR
-> under `docs/project/decisions/`.** This file is written in the past tense and
-> is unbounded — it grows with every incident. Its neighbour
-> `DRIFT-CHECKLIST.md` is the imperative list of violation detectors, and grows
-> only when a new check is added.
->
-> **Rows are ordered newest first**, and a new one goes on top. The order is the
-> only thing a reader can use to see a pattern repeat, so it has to be true.
->
-> Dates are local calendar dates, never UTC (`decisions/README.md` § Dates).
+> Every time the code and the documentation disagreed before the freeze, and in
+> which direction it was resolved. Rows are ordered newest first. Dates are local
+> calendar dates, never UTC (`decisions/README.md` § Dates).
 
 | Date | Item | Resolution (code fixed / doc updated) |
 |---|---|---|

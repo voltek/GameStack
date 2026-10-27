@@ -1,13 +1,13 @@
 # ADR 0028 — The agent pushes its own branch without asking; `main` is guarded mechanically
 
 Status: Accepted
+Status: Superseded by ADR-0033 — "and log a DRIFT-LOG row" (Decision, second paragraph); the rest of that paragraph stands
 Date: 2026-10-23
 Backfilled: no
 Enforced by: branch protection — `required_pull_request_reviews` is set, `required_status_checks=build / test / lint` and `enforce_admins=true` (together they reject a direct push to `main` from everyone, administrators included)
 Enforced by: repository settings — `allow_auto_merge=false` (no push can turn into a merge)
 Enforced by: claude settings — `deny` on a push naming `main`; on changing branch protection, which keeps the emergency exit the owner's; on `gh repo edit`, `rename`, `archive` and `delete`, `gh workflow disable` and `gh secret`; and on printing the GitHub token (the agent only, common spellings)
 Enforced by: claude settings — `ask` on the common PR actions (create, edit, comment, review, ready, close, reopen, merge, update-branch), on deleting a remote branch, on `git -C` with `push` or `commit`, and on mutating `gh api` calls, which include turning auto-merge on and other repository settings (the agent only, common spellings)
-Enforced by: none (prose only — decisions/0028-the-agent-pushes-its-own-branch-without-asking.md § Decision) — the owner logs each use of the emergency exit
 
 ## Context
 CLAUDE.md had told the agent to ask before every `git push` since its first

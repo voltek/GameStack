@@ -19,7 +19,7 @@ belonging to the human's separate study programme, which is kept outside this
 repository entirely.
 
 **When an item ships, it leaves this file.** Its rule, if it has one, goes to
-CLAUDE.md; its procedure to a Skill; the incident to DRIFT-LOG; the decision to
+CLAUDE.md; its procedure to a Skill; the incident to its commit body; the decision to
 an ADR under `docs/project/decisions/`; the clauses it now polices to the
 `Enforced by:` line of every ADR that states them; and what it now *is* — its
 purpose, where it lives, and the shapes ruled out — to TOOLING.md. This file
@@ -105,10 +105,11 @@ Do this before, not after, the post-edit hook in item 2 — that hook's whole
 premise is a quick loop, and without the split there is no quick loop to protect.
 
 ## 5. A `commit-msg` hook for the mechanical half of the message rules
-Check `type(scope): imperative summary` against the allowed types, and a body of
-12 lines or fewer. Both are regex-checkable, and a git hook runs whether or not
-anyone remembers it — CLAUDE.md already forbids `--no-verify`, so it cannot be
-skipped either.
+Check `type(scope): imperative summary` against the allowed types, a body of
+12 lines or fewer (trailers excluded), and that a `Drift:` trailer holds
+`code fixed`, `doc updated` or `both` (ADR 0033). All are regex-checkable, and
+a git hook runs whether or not anyone remembers it — CLAUDE.md already forbids
+`--no-verify`, so it cannot be skipped either.
 
 **A Skill was considered and rejected for this.** Skills load when a named task
 begins, and committing is decided by the agent mid-work rather than requested;
@@ -236,3 +237,23 @@ A Gradle task that `check` depends on, counting as
 gate stays three commands. **Gated on a trigger:** the first commit in which
 CLAUDE.md meets the bound, since a check added earlier would only fail. A
 ratchet for the interim rule was declined (ADR 0031 § Consequences).
+
+## 11. Block edits to the frozen drift log — once one is caught
+**What it does.** Stops a change to `docs/project/DRIFT-LOG.md` before it lands,
+instead of finding it afterwards. Today the *Documentation integrity* detector on
+`Backfilled:` reports any diff that touches the log (ADR 0033), which catches the
+edit only at the next governance run, and only if that run happens.
+
+**The trigger is concrete:** the first change to the log after the freeze, caught
+by that detector or found later. Check with
+`git log --format='%as %h %s' -- docs/project/DRIFT-LOG.md`: the newest entry
+must be the commit that froze it. When it fires, revert the edit, and read how
+it was made before picking a shape.
+
+**Candidate shapes**, chosen by how the edit was made: an agent's Edit or Write
+→ a `deny` in `.claude/settings.json` (ADR 0027; adds a `claude settings` line
+to ADR 0033); a shell command or a person → a `gate.yml` step failing when the
+diff touches the path, or item 9's hook.
+
+**Ruled out.** *Building it before the trigger.* The detector already reports
+every case, and each shape is one more surface to keep in sync.

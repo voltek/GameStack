@@ -12,9 +12,10 @@ walking into the same dead end.
 
 **Out:** anything that already has a home. Rules constraining code on any turn are
 in CLAUDE.md; procedures for a named task are Skills; the product is the Spec;
-tooling *not yet built* is TOOLING-BACKLOG; how a drift was found and resolved is
-DRIFT-LOG, and a decision in force is an ADR under `decisions/`. This file does
-not restate them, and it is not a changelog — `git log` is the changelog. It
+tooling *not yet built* is TOOLING-BACKLOG; how a drift was resolved is a
+`Drift:` trailer on its commit, and a decision in force is an ADR under
+`decisions/`. This file does not restate them, and it is not a changelog —
+`git log` is the changelog. It
 answers the one question none of those do: **what is the harness made of,
 today.**
 
@@ -138,10 +139,9 @@ was bootstrapped is worth keeping.
 that constrain code on any turn, under a three-tier system saying what may be
 changed and who must agree; the Spec holds the product; `DESIGN.md` holds the visual system;
 `DRIFT-CHECKLIST.md` holds the violation detectors you run to *find* drift;
-`DRIFT-LOG.md` holds the incidents — every time code and documentation
-disagreed, and which of the two was changed; and `decisions/` holds one ADR per
-decision in force, each naming what enforces it. They grow at different rates,
-which is why they are separate files.
+`DRIFT-LOG.md` is a frozen archive of the drifts resolved before 2026-10-26;
+and `decisions/` holds one ADR per decision in force, each naming what enforces
+it. Different jobs and growth laws (the log no longer grows) keep them apart.
 
 **Replaces.** Rediscovering, per session, why the code looks the way it does.
 
@@ -156,6 +156,8 @@ which is why they are separate files.
 - *A hand-written index of the ADRs.* A second place to update per ADR, and the
   Skills list in CLAUDE.md already drifted out of sync with `.claude/skills/`
   exactly that way. `grep -H "^Enforced by:"` reads the set instead.
+- *A drift log that keeps growing.* Each row was a second copy of the resolving
+  commit's body, and nothing read the log to spot a pattern (ADR 0033).
 
 ## 8. Claude workflows on GitHub
 **What.** Two workflows, and their states differ on purpose. *Claude Code*

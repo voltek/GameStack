@@ -91,13 +91,22 @@ the reasoning the diff cannot show, not a retelling of it. Three tests:
 
 - Would a reader six months from now need this sentence to see why the change is
   right? If not, cut it.
-- Is it already in CLAUDE.md, the Spec, DRIFT-LOG or an ADR? Point at it.
+- Is it already in CLAUDE.md, the Spec or an ADR? Point at it.
 - Is it narrating the process ("first I tried X, then Y", "the reviewer found
-  this, I verified that")? Cut it. The review's account belongs in DRIFT-LOG;
-  the commit says *what is now true and why*.
+  this, I verified that")? Cut it. The review's account belongs in the PR body
+  (§4); the commit says *what is now true and why*.
 
 The diagnosis is of **the change**, not of how the change was arrived at. That
 distinction is what keeps 12 lines enough.
+
+Trailers go after the body, before `Co-Authored-By:` (ADR 0033):
+- `Drift: code fixed`, `Drift: doc updated` or `Drift: both` — only on a commit
+  that resolves a drift (CLAUDE.md § Self-Healing Loop). A code defect that no
+  document contradicted is not drift. A drift this branch introduced and folds
+  away never reached `main`: no trailer. A drift already on `main` is its own
+  claim: its own commit, carrying the trailer through every amend.
+- `Bypassed: enforce_admins — <reason>` — only on a commit that reached `main`
+  through ADR 0028's emergency exit.
 
 ### The force-push window
 `git push --force-with-lease` is allowed to clean **your own** feature branch
@@ -249,7 +258,8 @@ asks whether a round is owed. Choosing a bucket is plan-level (CLAUDE.md →
 Human-in-the-Loop): a defect filed as debt leaves the branch exactly as a
 dismissed one does, and a finding moved out on the agent's word alone is a
 finding silently dropped — worse than no review, because it looks like coverage.
-If a finding exposes code/doc drift, log it per the Self-Healing Loop.
+If a finding exposes code/doc drift, its fix carries a `Drift:` trailer (§2
+Commit messages).
 
 **A false positive that recurs is a gap in the document.** The reviewer reads the
 repository, not the records of earlier rounds — PR bodies, threads, the tables
@@ -333,13 +343,12 @@ record is written.
 **`Why` defaults to one to three sentences** pointing at the decision, not
 narrating how it was reached. Expand past that only when the decision has real
 nuance a reviewer can't get from the diff (a rejected alternative, a deferred
-consequence) — and even then prefer pointing at the commit message, DRIFT-LOG
-or the ADR over restating them here.
+consequence) — and even then prefer pointing at the commit message or the ADR
+over restating them here.
 
 Keep it short by *pointing* rather than repeating. The deep reasoning is already
-written twice — in the commit messages and in DRIFT-LOG —
-and the copy in the PR body is the one nobody updates. Same `never both` rule as
-code comments.
+written in the commit messages, and the copy in the PR body is the one nobody
+updates. Same `never both` rule as code comments.
 
 **A `What changed` that needs more than three sentences usually means the PR has
 more than one claim.** Treat it as the same smoke alarm as 400 lines / 15 files,
@@ -377,8 +386,12 @@ remote branch is cleaned up on its own.
 - **`Squash and merge`** is the fallback for a branch whose history is genuinely
   disposable, or the only remedy once the force-push window has closed on a messy
   branch. It keeps the message *text* and destroys the structure: per-commit
-  SHAs, line-level `blame`, and every bisection point but one.
+  SHAs, line-level `blame`, and every bisection point but one. Keep every
+  `Drift:` and `Bypassed:` line in the pre-filled message (ADR 0033).
 - **`Rebase and merge`: never.** Same reason as step 1, at merge scale.
+
+ADR 0028's emergency exit is the owner's alone; remind them that a merge or push
+through it carries `Bypassed: enforce_admins — <reason>` in its commit message.
 
 ### Then delete the local branch — `-d`, never `-D`
 The remote half is automatic; the local ref is the half that is not, and that

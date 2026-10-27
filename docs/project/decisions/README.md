@@ -4,13 +4,12 @@ One file per architectural decision that is in force: what was decided, what
 forced it, what it costs, and **who actually enforces it**.
 
 ## What belongs here
-A decision that is *born or changes*. That is the whole boundary, and it is the
-other half of `../DRIFT-LOG.md`, which records incidents — every time the code
-and a document disagreed, and which of the two was changed. An incident is past
-tense and belongs in the log; a decision is present tense and belongs here. One
-drift often produces both, and then the log row points at the ADR instead of
-restating it: two copies of the same reasoning drift apart, which is why
-CLAUDE.md already forbids writing it in both places.
+A decision that is *born or changes*. That is the whole boundary. Which way a
+drift was resolved is the other half: a `Drift:` trailer on the commit that
+resolved it, while `../DRIFT-LOG.md` is a frozen archive of the incidents
+recorded before that ([ADR 0033](0033-drift-is-a-commit-trailer.md)). One drift
+often produces both, and then the commit body names the ADR instead of
+restating it.
 
 A Skill's procedure parameter is not a decision; where the line falls, and how
 to test a change against it, is
@@ -66,9 +65,12 @@ past tense.
   the issue the rule already opens — leaves its `Status:` as it is.
 - **`Date:`** — the date of the *original* decision: the day it was approved,
   even when the file is written later. `Backfilled:` is what says that it was.
-- **`Backfilled:`** — `yes — DRIFT-LOG.md, row <date> ("<opening words>")`, or
-  `no`. Where one decision was backfilled from more than one row, the plural
-  form `rows <date> ("<first>") and ("<second>")` addresses them all. The quoted
+- **`Backfilled:`** — `yes — commit <sha>` (a commit on `main`) or
+  `yes — PR #<n>`, where the decision was taken;
+  `yes — DRIFT-LOG.md, row <date> ("<opening words>")` for one taken before the
+  log was frozen; or `no`. Several sources take a plural form that addresses
+  them all: `rows <date> ("<first>") and ("<second>")`, `PR #<n> and PR #<m>`,
+  `commit <sha> and commit <sha>`. The quoted
   opening words are what make an address resolve: 26 rows share 2026-08-23, so a
   bare date points at all of them. And without the field at all, a file written
   today looks like a decision taken today, which falsifies the record.
@@ -151,14 +153,14 @@ superseded ADR's `Enforced by:` is left as it was when it was superseded.
 Because frozen text cannot be corrected, it **holds no fact that can change**.
 Context and Consequences describe what was true when they were written, in the
 past tense, and so cannot go stale; a setting's value, a count or the state of a
-file belongs in a live field or in `../DRIFT-LOG.md`. Decision is the exception
+file belongs in a live field or in the commit that changed it. Decision is the exception
 to the tense rule, not to the principle: it states a rule in the imperative, and
 a rule is not a fact about the world
 ([ADR 0024](0024-enforced-by-and-status-are-live-and-per-clause.md)).
 
 ## Dates
-Every date in this repository — `Date:`, the row a `Backfilled:` line addresses,
-a `../DRIFT-LOG.md` row — is the **local calendar date**, never UTC. After
+Every date in this repository — `Date:`, the row a `Backfilled:` line addresses
+— is the **local calendar date**, never UTC. After
 roughly 18:00 local time, UTC is already tomorrow, and a date a day ahead cannot
 be renamed away afterwards: `Backfilled:` addresses log rows by date, so a wrong
 one points at a row that does not exist.
