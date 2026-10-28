@@ -53,8 +53,8 @@ everyone else did.
   stays on one line.
 
 ## 2. Branch protection on `main`
-**What.** `main` requires the `build / test / lint` check to pass and every review
-conversation to be resolved. Force-pushes and deletions are blocked; zero
+**What.** `main` requires the `build / test / lint` and `messages / title / branch`
+checks to pass and every review conversation to be resolved. Force-pushes and deletions are blocked; zero
 approving reviews are required, since the project has one author. Administrators
 are bound too (`enforce_admins`), because the agent pushes with the owner's
 administrator credentials (ADR 0028).

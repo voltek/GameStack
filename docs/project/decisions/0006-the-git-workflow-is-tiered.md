@@ -9,7 +9,7 @@ Enforced by: branch protection — `required_pull_request_reviews` is set and `e
 Enforced by: claude settings — `deny` on `--no-verify` for `git commit` and `git push`; `ask` on `git -C` (the agent only, common spellings)
 Enforced by: none (prose only — CLAUDE.md § Git workflow) — never `--no-verify` for a person, never commit directly to `main`, reading `git status` in full
 Enforced by: git hook — .githooks/commit-msg — Conventional Commits
-Enforced by: commits.yml (not a required check) — Conventional Commits on every commit of a PR
+Enforced by: commits.yml — Conventional Commits on every commit of a PR
 
 ## Context
 The Git workflow was the only section of CLAUDE.md with no Tier markers, so

@@ -6,7 +6,7 @@ Backfilled: no
 Supersedes: ADR-0006 — "branch names are `feature/`, `fix/`, `chore/` or `docs/{name}`" and "lowercase" (Decision, Tier 2 paragraph)
 Enforced by: git hook — .githooks/commit-msg — the subject form (a type, a scope from the closed list or none, a capital first letter, no trailing period, 72 code points), the exemption for subjects git or GitHub writes
 Enforced by: git hook — .githooks/pre-push — the branch name's shape
-Enforced by: commits.yml (not a required check) — the subject form of every commit on a PR, the PR title's form and its "and", the branch name's shape, its prefix against the title's type
+Enforced by: commits.yml — the subject form of every commit on a PR, the PR title's form and its "and", the branch name's shape, its prefix against the title's type
 Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — a verb opening the summary, a scope omitted only when the change is repo-wide
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 2) — a scope naming the area rather than the file, a new scope joining the list in the commit that first uses it, the PR title being the branch's one claim
 
