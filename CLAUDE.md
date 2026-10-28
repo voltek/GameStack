@@ -1,14 +1,10 @@
 # CLAUDE.md — GameStack
 
 ## What is this project
-GameStack is a native Android app for exploring video games using the IGDB API.
-Users can search, view game details, manage personal lists, and rate games.
-Not a store or gaming platform — a catalog and personal library app.
-
-Full product scope, MVP feature list, and backlog live in
-`docs/project/GameStack-Spec-v1.md` — consult it for product-level questions
-(what should exist, what's deferred). This document (CLAUDE.md) governs
-technical/architectural rules only.
+GameStack is a native Android app for exploring video games via the IGDB API:
+search, game details, personal lists and ratings. A catalog and personal library,
+not a store or gaming platform. Scope and what is deferred: the Spec
+(`docs/project/GameStack-Spec-v1.md`). This document governs technical rules.
 
 ## How to read this document — Three-Tier Boundary System
 Every rule below belongs to one of three tiers:
@@ -20,6 +16,14 @@ Every rule below belongs to one of three tiers:
   exists and is listed. Anything outside that stated bound still requires asking first.
 - **Tier 3 — Suggested.** Can be challenged with a stated justification. Propose
   the alternative and the reason — don't substitute silently.
+
+## Purpose — Tier 1
+Half product, half a harness meant for other projects, and both a case study
+(Spec → *Why this project exists*). Weigh every proposal and decision against
+both halves and say what it gives each. A harness decision lives where a clone
+reads it — an ADR, TOOLING.md, a Skill — never only outside the repo. Governance
+that serves neither the next product step nor what another project would take
+is a cost.
 
 ## Documentation completeness rule
 If this document (or a Skill) references a component that doesn't fully
@@ -600,10 +604,6 @@ If a task doesn't map to any Skill above, that's a coverage gap worth naming:
 do the work, then say so, so the gap can be closed deliberately rather than
 by improvising the same task differently every time.
 
-**Retired skills** — kept as a record, not invocable, not in `.claude/skills/`:
-- `project-scaffold` — bootstrapped this project (deps, folder skeleton, Hilt,
-  Theme, core test utilities). Ran once, at the start; retired 2026-08-22 because
-  a once-per-project skill has nothing left to do here and only added a dead
-  option to the listing. Archived at
-  `docs/project/retired-skills/project-scaffold.md`.
+**Retired skills** — not invocable, not in `.claude/skills/`: `project-scaffold`,
+archived at `docs/project/retired-skills/project-scaffold.md`.
 

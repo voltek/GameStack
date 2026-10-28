@@ -29,6 +29,13 @@ keep needing a justification, and without this section each one looks arbitrary:
 - **Process work is product work.** The Skills, the tiered rules, the drift
   log, the ADRs and the review loops are not overhead around the app — they are
   a second thing being built, and often the more valuable one.
+- **The harness is meant to leave.** What is built around the app — rules,
+  Skills, hooks, the review loop, the handoff (PENDING — not yet defined) —
+  is meant to be taken to other projects, new ones and ones already in
+  production. So a lesson counts once it is recorded where another project can
+  read it, as CLAUDE.md § Purpose says, never only outside the repository. And
+  product keeps moving because it is the part of the harness's test that
+  documentation branches cannot run.
 - **A decision is worth more written down than made quickly.** Where a
   conventional default exists, it is still stated explicitly, with the trade.
 
