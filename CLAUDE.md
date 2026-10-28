@@ -196,9 +196,9 @@ to keep:
   PR title needs an "and", split it.
 - Commit messages and PR titles: **Conventional Commits**, `type(scope):
   Imperative summary` (verb first), no trailing period, 72 characters
-  at most. Types: `feat`, `fix`, `refactor`, `docs`, `chore`, `test`. Scope:
-  the closed list in `ship-a-branch`; optional if repo-wide. Commits before
-  2026-10-26 predate this; never rewrite them.
+  at most. Types and scopes: the closed lists in `.githooks/rules.sh`; the
+  scope is optional if repo-wide. Commits before 2026-10-26 predate this;
+  never rewrite them.
   The body carries the diagnosis the diff cannot show, in **12 lines or fewer**;
   anything already in a document is pointed at, not restated (`ship-a-branch`).
 - **Merge strategy: `Create a merge commit`.** `Rebase and merge` is never used —

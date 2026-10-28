@@ -83,24 +83,23 @@ documentation — three commits, however many rounds it took to get there.
 
 ### Commit messages
 Subject: `type(scope): Imperative summary`, no trailing period, **72 characters at
-most**. Past 72 usually means two claims: split the commit before trimming words.
-The summary opens with its verb, capitalised; identifiers, filenames and proper
-nouns after it keep their spelling (`CLAUDE.md`, `ADR`, `PR`). Subjects git or
-GitHub writes itself, for a merge, a revert or a squash, are exempt.
+most**, counted in code points. Past 72 usually means two claims: split the
+commit before trimming words. The summary opens with its verb, capitalised;
+identifiers, filenames and proper nouns after it keep their spelling
+(`CLAUDE.md`, `ADR`, `PR`). Subjects git or GitHub writes itself, for a merge, a
+revert or a squash, are exempt.
 
-Scope names the area a change governs, not the file it touches, from this closed
-list (ADR 0034). A new scope joins the list in the commit that first uses it. A
+Scope names the area a change governs, not the file it touches, from the closed
+list in `.githooks/rules.sh` (ADR 0034), which prints each scope's meaning when a
+subject fails. A new scope joins the list in the commit that first uses it. A
 rule takes the scope of what it governs, not of where it is written: a commit
 rule is `ship` in CLAUDE.md, an ADR or a Skill.
-- Code: `search`, `home`, `library`, `detail`, `auth`, `nav`, `theme`, `core`,
-  `build` (Gradle build files, dependency versions, the wrapper).
-- Process: `governance` (CLAUDE.md's rules and bounds, ADRs, drift, the drift
-  checklist detectors), `skills` (the implementation Skills: `new-*`,
-  `write-tests`, `verify-on-device`, `discovery-feature`), `ship` (branch to
-  merge, review rounds, the PR template, commit messages, PR titles, branch
-  names), `gate` (CI workflows), `agent` (`.claude/` settings and agent hooks),
-  `repo` (`.gitattributes`, `.gitignore`, git hooks), `spec`, `design`,
-  `tooling` (the TOOLING documents), `readme`.
+
+The mechanical half of this section is checked, not trusted:
+`.githooks/commit-msg` on each commit, `.githooks/pre-push` on the branch name,
+and `commits.yml` on every commit of the PR, its title and the title's type
+against the branch prefix. Any Gradle build installs the hooks. A failure names
+the rule, what it saw and the fix: rewrite the message, never `--no-verify`.
 
 The PR title takes the same form and states the branch's one claim; on a
 one-commit branch it is that commit's subject. GitHub writes it as the first

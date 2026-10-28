@@ -53,8 +53,8 @@ everyone else did.
   stays on one line.
 
 ## 2. Branch protection on `main`
-**What.** `main` requires the `build / test / lint` check to pass and every review
-conversation to be resolved. Force-pushes and deletions are blocked; zero
+**What.** `main` requires the `build / test / lint` and `messages / title / branch`
+checks to pass and every review conversation to be resolved. Force-pushes and deletions are blocked; zero
 approving reviews are required, since the project has one author. Administrators
 are bound too (`enforce_admins`), because the agent pushes with the owner's
 administrator credentials (ADR 0028).
@@ -234,6 +234,50 @@ over them. PowerShell denies every `gh api` call, so read GitHub from Bash.
   (`core.hooksPath`, `-n`) denied reads and commit messages. The rule of three
   stopped it. A hook that parses the command is TOOLING-BACKLOG item 9.
 
+## 11. Commit message and branch name checks
+**What.** The mechanical half of ADR 0034 and the trailer forms of ADR 0033:
+the subject form, the type and scope against closed lists, a capital first
+letter, no trailing period, 72 code points, a blank second line, a body of 12
+non-blank lines with known trailers excluded, `Drift:` and `Bypassed:`
+values, the branch name's shape, and, on a PR, the title's form, an
+"and" in it, and its type against the branch prefix. Every failure names the
+rule, the value seen and the fix, and prints the scope list when the scope is
+at fault, so the error is the template.
+
+**Replaces.** Reading each subject against `ship-a-branch` § 2 by hand.
+
+**Where.** `.githooks/rules.sh` holds every check and both lists, and
+`.githooks/test-rules.sh` its cases. `.githooks/commit-msg` and
+`.githooks/pre-push` call it locally; `.github/workflows/commits.yml` runs the
+cases, then the checks, on every pull request event, including a title edit.
+`installGitHooks` in `app/build.gradle.kts`, run by `preBuild`, sets
+`core.hooksPath=.githooks`, warning when that stops other hooks running (another
+value, or a hook in `.git/hooks`) or when `git` cannot run; it never fails the
+build.
+
+**Ruled out.**
+- *A Skill.* Committing is decided mid-work, not requested, so an agent
+  cutting corners is the one that would not invoke it.
+- *A commit template.* The agent commits with `-F`, which never opens an
+  editor, and a pre-filled `Drift:` line is a line that gets left in.
+- *A README setup step for the hooks.* A step per clone is a suggestion.
+- *The checks inside `gate.yml`.* A title edit would rerun Gradle.
+- *Counting the subject in bytes.* An em dash is three bytes.
+- *Stripping `#` lines in CI.* Under `-F` git stores them, so CI reads the
+  stored message as it is; only the local hook strips the editor's comments.
+- *Guessing from the message's shape which lines git will strip.* Three review
+  rounds each found a shape it got wrong. git runs commit hooks with
+  `GIT_EDITOR=:` exactly when it opens no editor and keeps every comment line,
+  so the hook strips them only when that is not set.
+- *An opt-out from `installGitHooks`, or installing only when unset.* Either is
+  a setup step again, which installing on every build exists to remove; the
+  task warns about what it replaces instead.
+- *Git's own trailer detection.* `git interpret-trailers` accepts any
+  `Key: value` paragraph, so prose such as `Note: …` would leave the count.
+- *Checking a PR against `main`'s `rules.sh`.* A new scope joins the list in
+  the commit that first uses it (ADR 0034), which `main`'s list would fail.
+  An edit to the rules is a reviewed diff, as an edit to `gate.yml` is.
+
 ---
 
 ## Rebuilding this elsewhere
@@ -243,8 +287,9 @@ Order matters only where one piece depends on another:
    build that behaves the same on two machines.
 2. **The governing documents** next, even if thin. Rules written after the code
    are rules argued against the code.
-3. **The gate workflow**, and let it pass once.
-4. **Branch protection** only then, for the reason in entry 2.
+3. **The gate workflow** and **`commits.yml`** (entry 11), and let each pass once.
+4. **Branch protection** only then, requiring both checks, for the reason in
+   entry 2.
 5. **The PR template**, and **Skills** as procedures prove themselves repeatable —
    a Skill written before the second run of a task is a guess.
 

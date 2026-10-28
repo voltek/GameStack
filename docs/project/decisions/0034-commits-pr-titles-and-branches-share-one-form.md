@@ -4,8 +4,11 @@ Status: Accepted
 Date: 2026-10-26
 Backfilled: no
 Supersedes: ADR-0006 — "branch names are `feature/`, `fix/`, `chore/` or `docs/{name}`" and "lowercase" (Decision, Tier 2 paragraph)
-Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — the subject form (type, scope omitted only when repo-wide, verb-first capitalised summary, no trailing period, 72 characters), the branch name
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 2) — the closed scope list and how it grows, the PR title stating one claim with no "and", the exemption for subjects git or GitHub writes
+Enforced by: git hook — .githooks/commit-msg — the subject form (a type, a scope from the closed list or none, a capital first letter, no trailing period, 72 code points), the exemption for subjects git or GitHub writes
+Enforced by: git hook — .githooks/pre-push — the branch name's shape
+Enforced by: commits.yml — the subject form of every commit on a PR, the PR title's form and its "and", the branch name's shape, its prefix against the title's type
+Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — a verb opening the summary, a scope omitted only when the change is repo-wide
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 2) — a scope naming the area rather than the file, a new scope joining the list in the commit that first uses it, the PR title being the branch's one claim
 
 ## Context
 ADR 0006 adopted Conventional Commits on 2026-08-22 with a subject that was

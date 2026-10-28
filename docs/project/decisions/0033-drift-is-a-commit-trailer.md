@@ -7,9 +7,11 @@ Supersedes: ADR-0018 — "and the drift log, both of which this project maintain
 Supersedes: ADR-0020 — the `DRIFT-LOG.md` bullet, and "an incident is a log row, never an ADR. Where one drift produces both, the row points at the ADR instead of restating it" (Decision)
 Supersedes: ADR-0024 — "or in `DRIFT-LOG.md`" as a home for a fact that can change (Decision, fifth paragraph)
 Supersedes: ADR-0028 — "and log a DRIFT-LOG row" (Decision, second paragraph); the rest of that paragraph stands
-Enforced by: none (prose only — CLAUDE.md § Self-Healing Loop) — the `Drift:` trailer
+Enforced by: git hook — .githooks/commit-msg — the three values of a `Drift:` trailer, the form of a `Bypassed:` trailer
+Enforced by: commits.yml — the same two forms on every commit of a PR
+Enforced by: none (prose only — CLAUDE.md § Self-Healing Loop) — which commits carry a `Drift:` trailer
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Documentation integrity — the frozen log (any change to it), the commit and PR forms of `Backfilled:`
-Enforced by: none (prose only — decisions/0033-drift-is-a-commit-trailer.md § Decision) — the `Bypassed:` trailer, where history leaving a document goes
+Enforced by: none (prose only — decisions/0033-drift-is-a-commit-trailer.md § Decision) — which commits carry a `Bypassed:` trailer, where history leaving a document goes
 
 ## Context
 `DRIFT-LOG.md` had reached 70 rows and 67,885 bytes, about 950 characters a
