@@ -35,47 +35,25 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      # Robolectric fetches its android-all-instrumented SDK jar at *test* runtime
-      # through its own Maven client, into ~/.m2, never through Gradle's classpath.
-      # Caching only ~/.gradle re-downloads ~204MB every job.
-      #
-      # Both files belong in the key: robolectric.properties picks *which* SDK jar
-      # is fetched, libs.versions.toml picks the Robolectric version that fetches
-      # it. Miss either and a bump keeps the old key, which actions/cache reports
-      # as an exact hit — so it skips the save and re-downloads forever, silently.
-      # (The toml is hashed whole, so an unrelated bump also misses; restore-keys
-      # covers that, and over-invalidating is the safe direction.) The key stays
-      # on one line: wrapping it in a folded scalar keeps literal newlines inside
-      # the `${{ }}` unless every continuation sits at the same indent.
-      #
-      # Restore and save are split because the combined action saves in a post
-      # step that is skipped when the job fails — and a failing job is exactly
-      # when the next run comes soonest. Not `always()`: a run cancelled by the
-      # concurrency group could persist a half-written jar under the primary key,
-      # which then reads as an exact hit and is never overwritten.
-      #
-      # If caching ever stops being enough — a runner with no network at test
-      # time — the supported route is `robolectric.offline=true` plus
-      # `robolectric.dependency.dir` pointing at a resolved configuration.
-      # Declaring the jar as a `testImplementation` is NOT that route: it fetches
-      # a second copy nothing reads (tried 2026-08-23, reverted).
+      # Robolectric fetches its ~204MB SDK jar at test runtime into ~/.m2, outside
+      # Gradle's cache. Restore and save are split on purpose: TOOLING.md § 1.
       - name: Restore the Robolectric SDK jar
         id: robolectric
         uses: actions/cache/restore@v6
         with:
           path: ~/.m2/repository/org/robolectric
+          # Why both files, and why on one line: TOOLING.md § 1.
           key: robolectric-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml', 'app/src/test/resources/robolectric.properties') }}
           restore-keys: robolectric-${{ runner.os }}-
 
-      # `--continue` so one run reports every independent failure, and `--stacktrace`
-      # so a CI-only one is traceable. Without them each further verdict costs a push.
-      # One invocation, not three: Gradle deduplicates the task graph, so naming
-      # all three costs nothing and keeps this readable as the gate CLAUDE.md defines.
-      # No IGDB credentials needed — local.properties is optional and falls back to "".
+      # `--continue` reports every independent failure in one run, `--stacktrace`
+      # makes a CI-only one traceable. One invocation: Gradle deduplicates the task
+      # graph. No IGDB credentials needed: local.properties falls back to "".
       - name: Run the gate
         run: ./gradlew build test lint --continue --stacktrace
 
       - name: Save the Robolectric SDK jar
+        # `!cancelled()`, not `always()`: TOOLING.md § 1.
         if: ${{ !cancelled() && steps.robolectric.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v6
         with:

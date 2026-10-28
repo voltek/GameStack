@@ -176,9 +176,12 @@ and items it read, so a silent skip shows.
       Verified by: human
 - [ ] Does any comment restate what the code says, narrate *how we got here*
       (a past bug, an earlier version, which review found it), or duplicate text
-      that already exists in a Skill, an ADR or a commit message? Any comment block
-      over 4 lines, or a file past ~15% comment lines, is where to look first.
+      that already exists in a Skill, an ADR or a commit message, or sit away from
+      the line it constrains? A file past ~15% comment lines is where to look first.
       Verified by: subagent (interpretive)
+- [ ] Does any comment block run past 4 lines in a hand-written file other than
+      documentation, generated or template text excepted (ADR 0037)?
+      Verified by: human
 - [ ] Is there any hardcoded UI string in a ViewModel or UseCase instead of `UiText`?
       Verified by: human
 - [ ] Is any Hilt module named for a layer or lifetime rather than a concern

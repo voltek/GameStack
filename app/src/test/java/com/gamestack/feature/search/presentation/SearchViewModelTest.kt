@@ -44,16 +44,6 @@ class SearchViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
     }
 
-    // Regression: reverting to the previously searched text must not let the job
-    // scheduled for the intermediate query land, or it paints results for text
-    // the field no longer shows.
-    //
-    // Reverting does re-run the search for "zel". Suppressing that would require
-    // remembering which query the displayed results belong to, and every version
-    // of this ViewModel that kept such a field eventually let it disagree with
-    // what was on screen — three separate defects, all found in review. One extra
-    // request behind a 400ms debounce is the accepted price for deleting that
-    // field; the assertion below is deliberate, not a relaxed expectation.
     @Test
     fun `handleEvent OnQueryChanged should not dispatch an intermediate query when the text reverts`() =
         runTest {
@@ -66,6 +56,9 @@ class SearchViewModelTest {
             advanceDebounce()
 
             coVerify(exactly = 0) { searchGamesUseCase("zeld") }
+            // Two is deliberate, not relaxed: skipping the re-run needs a field naming
+            // which query the results belong to, and such a field drifts from what the
+            // screen shows. One extra debounced request is the accepted price.
             coVerify(exactly = 2) { searchGamesUseCase("zel") }
             assertEquals("zel", viewModel.uiState.value.query)
             assertFalse(viewModel.uiState.value.isLoading)

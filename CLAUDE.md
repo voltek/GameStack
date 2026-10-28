@@ -533,18 +533,15 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
   `should cancel an in-flight search immediately when the query changes` states
   the invariant *and fails when it breaks*, which no comment can do.
 
-  **Bounds:** no comment block longer than 4 lines in production code — anything
-  needing more belongs in the owning Skill with a one-line pointer — and treat
-  **15% comment lines in a file** as a smoke alarm worth looking at, not a hard
-  limit. Both numbers are heuristics; the three questions are the actual rule.
-  The percentage is meaningless below ~50 lines — one justified 5-line comment
-  puts a 30-line contract file over 15% — so read it as a signal on substantial
-  files and judge short ones by the block bound and the questions alone.
-
-  This is a known LLM failure mode, not a hypothetical: models narrate design
-  decisions into comments, and the words are free to produce and costly to read.
-  `SearchViewModel.kt` reached 25% and `SingleClick.kt` 35%, one sediment layer
-  per review round, while every other file in the project sat between 5% and 9%.
+  **Bound — a limit:** at most 4 lines per comment block, next to the line it
+  constrains, in every hand-written file except documentation: code (main and
+  test), build scripts and configuration, workflows, hooks and scripts.
+  Generated or template text is exempt. The warning stays inline; a reason that
+  needs more goes to a test that guards it, the ADR, TOOLING.md for a workflow
+  or the owning Skill for a procedure, named in a one-line pointer, or to the
+  commit body, which `git blame` on that line finds (ADR 0037). **15% comment
+  lines in a file** is only a smoke alarm, meaningless below ~50 lines. Models
+  narrate design decisions into comments, so the questions apply to every line.
 
 ### Tier 3 — Suggested, can be challenged with justification
 - Mapper file naming pattern (`{Name}Mapper.kt`) — consistency preference,
