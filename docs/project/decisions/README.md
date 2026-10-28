@@ -3,7 +3,17 @@
 One file per architectural decision that is in force: what was decided, what
 forced it, what it costs, and **who actually enforces it**.
 
-## What belongs here
+## What this README may hold
+Only the contract an ADR writer needs: what becomes an ADR, naming and
+numbering, the template, each field's format, the `Enforced by:` vocabulary,
+how to read the set, immutability and dates, pointers to the documents that take
+over where it stops, and at most a clause of why so a rule does not read as
+arbitrary. Not why a rule was adopted (the ADR that
+adopted it), history or incidents (commit bodies), or a fact that can change,
+such as a count or the state of the repository (a live field or git)
+([ADR 0036](0036-the-decisions-readme-holds-only-the-contract.md)).
+
+## What becomes an ADR
 A decision that is *born or changes*. That is the whole boundary. Which way a
 drift was resolved is the other half: a `Drift:` trailer on the commit that
 resolved it, while `../DRIFT-LOG.md` is a frozen archive of the incidents
@@ -24,11 +34,8 @@ detectors you run to *find* drift.
   number. Chronology is read from `Date:`, and `Backfilled:` explains any gap
   between when a decision was taken and when its file was written; neither is
   ever inferred from the number
-  ([ADR 0023](0023-adr-numbers-follow-recording-order.md)).
-- `0001`–`0019` were numbered by date during the backfill, so for those the two
-  orders happen to coincide. That is a fact about how they were written, not a
-  promise the numbering makes. There is no tie-break rule, because recording
-  order admits no ties.
+  ([ADR 0023](0023-adr-numbers-follow-recording-order.md)). There is no
+  tie-break rule, because recording order admits no ties.
 - **A file is never renamed** — not even once its decision is superseded. That
   is what makes the number a stable address.
 
@@ -99,11 +106,10 @@ present, using the name GitHub's API uses, because that is what
 `../DRIFT-CHECKLIST.md` compares with the repository.
 
 ### `Enforced by:` — closed vocabulary
-- `none (prose only — <document> § <section>)` — CLAUDE.md in almost every case;
-  name the document that actually carries the rule, since a few live in the Spec
-  rather than in CLAUDE.md (product scope, not a constraint on code), and a few in
-  a Skill (a procedure attached to a named task, which CLAUDE.md's three
-  questions send there rather than into CLAUDE.md itself).
+- `none (prose only — <document> § <section>)` — name the document that
+  actually carries the rule, such as CLAUDE.md, the Spec for product scope (not
+  a constraint on code), a Skill for a procedure attached to a named task
+  (CLAUDE.md's three questions send it there), or `decisions/README.md`.
 - `checklist detector — DRIFT-CHECKLIST.md § <section>`
 - `./gradlew lint`
 - `test: <TestName>#<caseName>`
@@ -127,11 +133,8 @@ present, using the name GitHub's API uses, because that is what
   so the line says `(the agent only, common spellings)`. A pattern misses other spellings
   of the same command: it stops a mistake, not an intent.
 
-This field is as much the point of the folder as the decision text is: **an ADR
-with no fitness function behind it is a wish.** This repository has already
-proved that — rules written in CLAUDE.md and still violated two and three times
-over. So `none` is the honest answer far more often than not, and it is a
-finding rather than a gap to paper over. Read the whole map with:
+**An ADR with no fitness function behind it is a wish**, so `none` is an honest
+answer: a finding, not a gap to paper over. Read the whole map with:
 
 ```bash
 grep -H "^Enforced by:" docs/project/decisions/[0-9]*.md
@@ -171,7 +174,5 @@ be renamed away afterwards: `Backfilled:` addresses log rows by date, so a wrong
 one points at a row that does not exist.
 
 ## No index
-There is deliberately no hand-written list of ADRs here. It would be a second
-place to update per ADR, and this repository has already been burned by exactly
-that: CLAUDE.md's Skills list drifted out of sync with `.claude/skills/` and
-needed its own drift detector to catch it. Use the `grep` above.
+None, deliberately: a second place to update per ADR
+([ADR 0020](0020-decisions-live-in-adrs.md)). Use the `grep` above.
