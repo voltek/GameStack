@@ -249,7 +249,8 @@ at fault, so the error is the template.
 **Where.** `.githooks/rules.sh` holds every check and both lists, and
 `.githooks/test-rules.sh` its cases. `.githooks/commit-msg` and
 `.githooks/pre-push` call it locally; `.github/workflows/commits.yml` runs the
-cases, then the checks, on every pull request event, including a title edit.
+cases, then the checks, when a pull request is opened, reopened, pushed to or
+edited.
 `installGitHooks` in `app/build.gradle.kts`, run by `preBuild`, sets
 `core.hooksPath=.githooks`, warning when that stops other hooks running (another
 value, or a hook in `.git/hooks`) or when `git` cannot run; it never fails the
