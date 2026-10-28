@@ -99,11 +99,10 @@ present, using the name GitHub's API uses, because that is what
 `../DRIFT-CHECKLIST.md` compares with the repository.
 
 ### `Enforced by:` — closed vocabulary
-- `none (prose only — <document> § <section>)` — CLAUDE.md in almost every case;
-  name the document that actually carries the rule, since a few live in the Spec
-  rather than in CLAUDE.md (product scope, not a constraint on code), and a few in
-  a Skill (a procedure attached to a named task, which CLAUDE.md's three
-  questions send there rather than into CLAUDE.md itself).
+- `none (prose only — <document> § <section>)` — name the document that
+  actually carries the rule, such as CLAUDE.md, the Spec for product scope (not
+  a constraint on code), a Skill for a procedure attached to a named task
+  (CLAUDE.md's three questions send it there), or `decisions/README.md`.
 - `checklist detector — DRIFT-CHECKLIST.md § <section>`
 - `./gradlew lint`
 - `test: <TestName>#<caseName>`
