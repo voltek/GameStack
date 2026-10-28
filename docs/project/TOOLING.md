@@ -249,8 +249,8 @@ at fault, so the error is the template.
 **Where.** `.githooks/rules.sh` holds every check and both lists, and
 `.githooks/test-rules.sh` its cases. `.githooks/commit-msg` and
 `.githooks/pre-push` call it locally; `.github/workflows/commits.yml` runs the
-cases, then the checks, when a pull request is opened, reopened, pushed to or
-edited.
+cases, then the checks, when a pull request is opened, reopened or pushed to,
+and on any edit of its title or body, or of its base onto `main`.
 `installGitHooks` in `app/build.gradle.kts`, run by `preBuild`, sets
 `core.hooksPath=.githooks`, warning when that stops other hooks running (another
 value, or a hook in `.git/hooks`) or when `git` cannot run; it never fails the
@@ -263,6 +263,9 @@ build.
   editor, and a pre-filled `Drift:` line is a line that gets left in.
 - *A README setup step for the hooks.* A step per clone is a suggestion.
 - *The checks inside `gate.yml`.* A title edit would rerun Gradle.
+- *Skipping the run when only the body changed.* A job skipped by its `if`
+  reports Success to a required check, so a body edit after a red run would
+  turn it green unchecked. The run is a shell script, not Gradle.
 - *Counting the subject in bytes.* An em dash is three bytes.
 - *Stripping `#` lines in CI.* Under `-F` git stores them, so CI reads the
   stored message as it is; only the local hook strips the editor's comments.
