@@ -1,8 +1,8 @@
 name: Commits
 
-# Separate from gate.yml so that editing a PR title reruns these checks and not
-# Gradle. Covers what no local hook sees: the PR title, and commits made in a
-# clone without the hooks or on the web.
+# Separate from gate.yml so that a PR title or body edit reruns these, on
+# purpose (TOOLING.md § 11), and not Gradle. Covers what no local hook sees:
+# the PR title, and commits made in a clone without the hooks or on the web.
 on:
   pull_request:
     branches: [main]
