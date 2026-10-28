@@ -12,8 +12,8 @@ walking into the same dead end.
 
 **Out:** anything that already has a home. Rules constraining code on any turn are
 in CLAUDE.md; procedures for a named task are Skills; the product is the Spec;
-tooling *not yet built* is TOOLING-BACKLOG; how a drift was resolved is a
-`Drift:` trailer on its commit, and a decision in force is an ADR under
+tooling *not yet built* is a GitHub issue (ADR 0038); how a drift was resolved
+is a `Drift:` trailer on its commit, and a decision in force is an ADR under
 `decisions/`. This file does not restate them, and it is not a changelog —
 `git log` is the changelog. It
 answers the one question none of those do: **what is the harness made of,
@@ -214,7 +214,7 @@ change to branch protection, `gh repo edit`/`rename`/`archive`/`delete`,
 list covers the common PR actions, deleting a remote branch, `git -C` with
 `push` or `commit`, and mutating `gh api` calls, which include turning
 auto-merge on. Each rule catches the common spellings of a mistake, never all
-of them. TOOLING-BACKLOG item 9 lists the spellings known to get through; where
+of them. Issue #71 lists the spellings known to get through; where
 `main` is concerned, only §2 stops them. A rule also stays narrow enough not to
 catch reads: a prompt on every `git -C … log` was dropped for that reason.
 
@@ -236,7 +236,7 @@ over them. PowerShell denies every `gh api` call, so read GitHub from Bash.
 - *Chasing every spelling.* Each review round widened the patterns and found
   the next gap, and a rule matched anywhere in the command
   (`core.hooksPath`, `-n`) denied reads and commit messages. The rule of three
-  stopped it. A hook that parses the command is TOOLING-BACKLOG item 9.
+  stopped it. A hook that parses the command is issue #71.
 
 ## 11. Commit message and branch name checks
 **What.** The mechanical half of ADR 0034 and the trailer forms of ADR 0033:
@@ -286,6 +286,30 @@ build.
   the commit that first uses it (ADR 0034), which `main`'s list would fail.
   An edit to the rules is a reviewed diff, as an edit to `gate.yml` is.
 
+## 12. Issue form
+**What.** One form for every pending item (ADR 0038): the title in the commit
+form, then source, problem with evidence, grounds, suggested fix, ruled out,
+trigger, where it lands, bucket and export value. Blank issues are off, so a
+person opening an issue on GitHub gets the form too. Its author sets the bucket,
+`export` and `gated`; a triage confirms them and sets `p1`–`p3`.
+
+**Replaces.** An issue body written however its author wrote it that day, and
+`TOOLING-BACKLOG.md`, the file that held unbuilt tooling until each of its items
+became an issue.
+
+**Where.** `.github/ISSUE_TEMPLATE/backlog.yml` and `config.yml`. The labels'
+names and meanings are ADR 0038 § Decision; on GitHub they are repository state
+that a new repository creates once (`gh label create`).
+
+**Ruled out.**
+- *A backlog file.* Cheaper for an agent to read, but it grows the way
+  TOOLING-BACKLOG did, links to no pull request, and binds nobody opening work
+  by hand.
+- *The file kept, with one issue per item.* A priority in a label and a
+  description in a file is a hand-kept index: two places per item.
+- *The bucket as a form field alone.* A dropdown cannot apply a label, and the
+  author's bucket is a proposal; the label records the triage's call.
+
 ---
 
 ## Rebuilding this elsewhere
@@ -298,8 +322,9 @@ Order matters only where one piece depends on another:
 3. **The gate workflow** and **`commits.yml`** (entry 11), and let each pass once.
 4. **Branch protection** only then, requiring both checks, for the reason in
    entry 2.
-5. **The PR template**, and **Skills** as procedures prove themselves repeatable —
-   a Skill written before the second run of a task is a guess.
+5. **The PR template**, **the issue form**, and **Skills** as procedures prove
+   themselves repeatable — a Skill written before the second run of a task is a
+   guess.
 
 If this section ever grows past ordering into actual steps, it has become a
 procedure and belongs in a Skill, not here.

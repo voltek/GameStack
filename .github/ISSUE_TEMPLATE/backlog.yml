@@ -1,0 +1,76 @@
+name: Pending work
+description: Anything not done yet — tooling, an improvement, an idea, a defect (ADR 0038).
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Every issue (ADR 0038).** Harness and repository work only: product scope deferred past the
+        MVP stays in the Spec's *Explicitly Deferred*.
+        One item per issue. **Title in the commit form** of ADR 0034, `type(scope): Imperative summary`
+        (`.githooks/rules.sh title "<title>"` checks it): it becomes the title of the pull request that
+        closes this issue with `Closes #n`. Labels: a bucket, `export` and `gated` when it is opened, a
+        priority at triage. Nothing from the human's separate study programme goes in an issue: this
+        repository is public.
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: A review round (branch and round), the owner (date), or an agent (branch or session).
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is wrong or missing, with its evidence — a file and line, a run id, a measurement.
+    validations:
+      required: true
+  - type: textarea
+    id: grounds
+    attributes:
+      label: Grounds
+      description: The rule, ADR or Spec section it rests on. "None" is an answer, and makes it an idea.
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested fix
+      description: The likeliest shape. A proposal; the triage and the branch decide.
+  - type: textarea
+    id: ruled-out
+    attributes:
+      label: Ruled out
+      description: Shapes already rejected, each with its reason — what saves the next attempt a dead end.
+  - type: textarea
+    id: trigger
+    attributes:
+      label: Trigger
+      description: Only for an item gated on an event — the event, and how to check whether it has fired.
+  - type: textarea
+    id: lands
+    attributes:
+      label: Where it lands when shipped
+      description: Its rule to CLAUDE.md, procedure to a Skill, decision to an ADR, a TOOLING.md entry, and the Enforced by line of every ADR it now polices.
+  - type: dropdown
+    id: bucket
+    attributes:
+      label: Bucket
+      description: The author's proposal; the triage's label is the decision.
+      options:
+        - blocks-product
+        - defect
+        - improvement
+        - idea
+    validations:
+      required: true
+  - type: dropdown
+    id: export
+    attributes:
+      label: Export value
+      description: Does the outcome change TOOLING.md § Rebuilding this elsewhere?
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true

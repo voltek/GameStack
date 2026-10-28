@@ -36,8 +36,8 @@
 > - `test: <TestName>#<caseName>` — spelled as `decisions/README.md` spells it,
 >   so the two vocabularies can be joined where they overlap.
 >
-> That is what makes this file the coverage map for the automated checker in
-> `docs/project/TOOLING-BACKLOG.md` (item 3) rather than just its wish list: the
+> That is what makes this file the coverage map for the automated checker of
+> issue #66 rather than just its wish list: the
 > `human` lines are the work it can take over, the `subagent (interpretive)`
 > lines are the work it cannot, and a line already naming a tool is work it does
 > not need to. Read the map with
@@ -275,8 +275,8 @@ A rename touches both its paths, so list the diff with `git fetch` and then
       Verified by: human
 - [ ] Does any item in this file lack a `Verified by:` line, carry more than one,
       or carry a value outside the closed vocabulary the header declares? An
-      unclassified item is invisible to the checker in `TOOLING-BACKLOG.md`
-      item 3, whose scope this file is. Under *Documentation integrity*, does an
+      unclassified item is invisible to the checker of issue #66,
+      whose scope this file is. Under *Documentation integrity*, does an
       item under *When the diff touches what it reads* lack exactly one
       `Runs when:` line (anchored at line start, since prose quotes the field), does one under *Every run* carry any, or does a
       `Runs when:` hold anything but paths as the section header defines them,

@@ -242,7 +242,7 @@ Then restore the line. Two rules make it worth as much as the stash version:
   nothing. If several fail, the mutation was too broad to attribute.
 
 This is hand-run mutation testing, which is also the automated technique (PIT)
-named in `docs/project/TOOLING-BACKLOG.md` — the manual version is what to
+named in issue #64 — the manual version is what to
 reach for until that lands.
 
 Writing the test first (watch it fail, then fix) gives you the same guarantee and
@@ -263,7 +263,7 @@ Android setup is awkward and slow — but it is the same question asked at scale
 - **Regression pillar.** This skill covers Requirements testing only (new code
   does what the Skill/Spec asked). Regression testing (confirm nothing else
   broke) is not enforced here — it will be automated via a Hook that runs the
-  affected suite after each agent edit — see `docs/project/TOOLING-BACKLOG.md`.
+  affected suite after each agent edit — see issue #65.
 - **Real persistence.** No test in this project touches real SQLite; see
   "Scope" above. An instrumented `androidTest/` suite covering DAO queries and
   Room migrations is backlog (Spec → Explicitly Deferred). `@TypeConverter`s

@@ -439,3 +439,10 @@ git branch -d <branch>
 history and deleting it makes those commits unreachable. So a refusal is
 information, not an obstacle — and `-D` is the key that disables the check. If
 `-d` refuses, find out why before reaching for it.
+
+### Then check whether a triage is owed
+Owed once a merge changes `app/src/main`, or three merges have landed since the
+last triage, whose commit the pinned `Triage log` issue records (ADR 0038).
+Before the next branch starts, propose to the owner what ADR 0038 § Decision
+lists for a triage, for every open issue but that log. Once the owner decides,
+rewrite the log's body as ADR 0038 shapes it; never append to it.

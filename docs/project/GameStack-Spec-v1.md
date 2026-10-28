@@ -151,7 +151,7 @@ non-Home tab returns to Home.
   Compose *screen* tests are **no longer part of this deferral**: they run under
   Robolectric on the JVM (CLAUDE.md → Testing Stack). They share the one Gradle
   task for now; splitting them out is queued as tooling work, triggered by the
-  second screen-test class (`docs/project/TOOLING-BACKLOG.md`).
+  second screen-test class (issue #67).
 - **Future:** KMP migration. The Data layer is architected for it —
   when the time comes, Retrofit → Ktor and Room → SQLDelight,
   without touching Domain or UI.
@@ -242,5 +242,6 @@ non-Home tab returns to Home.
   2026-10-26; later ones are `Drift:` commit trailers (ADR 0033)
 - `docs/project/decisions/` — one ADR per architectural decision in force, each
   naming what enforces it
-- `docs/project/TOOLING-BACKLOG.md` — repository tooling planned but not built
-  (review automation, hooks). Harness, not product, which is why it is not here
+- `docs/project/TOOLING-BACKLOG.md` — where each former backlog item went.
+  Harness work not yet done, tooling included, is a GitHub issue
+  (`gh issue list`, ADR 0038); product scope deferred is this Spec's own section
