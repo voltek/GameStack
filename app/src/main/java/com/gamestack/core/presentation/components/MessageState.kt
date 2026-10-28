@@ -45,11 +45,9 @@ fun MessageState(
     Column(
         modifier = modifier
             .fillMaxSize()
-            // Centred and roughly 280dp tall, so in landscape or with the
-            // keyboard raised the available height drops below the content and a
-            // non-scrollable column clips symmetrically — putting the CTA
-            // off-screen with no way to reach it. Scrolling keeps it reachable;
-            // the min height constraint survives, so short content stays centred.
+            // ~280dp of centred content: with the keyboard raised (ADR 0019), a
+            // non-scrollable column clips it symmetrically and puts the CTA out of
+            // reach. The min height survives scrolling, so short content stays centred.
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
