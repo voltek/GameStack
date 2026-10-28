@@ -2,6 +2,7 @@
 
 Status: Accepted
 Status: Superseded by ADR-0033 — "and the drift log, both of which this project maintains" (Decision, question 2)
+Status: Superseded by ADR-0037 — "Bounds, as smoke alarms rather than limits: no comment block longer than 4 lines in production code" (Decision) and "the two numbers are heuristics that will occasionally point at a file that is fine" … "the bounds only say where to look first" (Consequences)
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("The 2026-08-22 entry below already stated the rule")
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Code Conventions

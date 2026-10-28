@@ -48,6 +48,10 @@ everyone else did.
 - *Guarding that save with `always()`.* A run cancelled by the concurrency group
   can persist a half-written jar under the primary key, where it reads as an
   exact hit and is never overwritten. Uses `!cancelled()`.
+- *Keying on only one of the two files.* `robolectric.properties` picks which
+  SDK jar is fetched, `libs.versions.toml` the Robolectric version that fetches
+  it. Miss either and a bump keeps the old key, which `actions/cache` reports as
+  an exact hit, so it skips the save and re-downloads ~204MB on every job.
 - *Wrapping the cache key in a folded scalar.* YAML keeps literal newlines inside
   the expression unless every continuation line sits at the same indent. The key
   stays on one line.
