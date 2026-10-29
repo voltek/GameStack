@@ -2,7 +2,7 @@
 
 The harness around the product: what enforces the rules, what automates a pass
 that used to be manual, and what was deliberately ruled out along the way. One
-entry per piece, each naming the file that actually configures it.
+entry per piece, each naming the file or setting that actually configures it.
 
 ## What this file is, and what it is not
 **In:** repository tooling that exists *right now* — its purpose, the manual step
@@ -18,6 +18,18 @@ is a `Drift:` trailer on its commit, and a decision in force is an ADR under
 `git log` is the changelog. It
 answers the one question none of those do: **what is the harness made of,
 today.**
+
+**Admission:** an entry exists only for a piece configured by a file or setting
+it names under **Where.**, and it states the step it replaced, a shape it ruled
+out, or both. A state of the repository with no lesson is not an entry
+([ADR 0040](decisions/0040-the-harness-has-a-base-and-a-tooling-entry-a-lesson.md)).
+
+**Base:** the harness is built for a Gradle project for Android or Kotlin
+Multiplatform, with git and a shell; nothing is generalised past it. The forge,
+the agent CLI and the model may change, so a piece takes the mechanism that
+needs none of them when it costs about the same; otherwise it is built on the
+tool, and an adopter translates it. No existing piece is rebuilt only to drop a
+tool.
 
 Read on demand — when picking up harness work, or when rebuilding this setup
 somewhere else. It is not loaded every turn.
@@ -170,6 +182,10 @@ mentioning it. *Claude Code Review* (`claude-code-review.yml`) is **disabled** �
 via `gh workflow disable`, reversible with `gh workflow enable`, and free while
 off, since Actions bills executed minutes and not files present.
 
+**Where.** `.github/workflows/claude.yml` and
+`.github/workflows/claude-code-review.yml`; whether each is enabled is
+repository state, read with `gh workflow list --all`.
+
 **Why the file is still there.** Code review on this project is internal:
 `/code-review`, run by the human, before the PR exists. Its trigger fired on PR
 open, while local rounds could still be landing; rather than retrigger it, the
@@ -313,7 +329,8 @@ that a new repository creates once (`gh label create`).
 ---
 
 ## Rebuilding this elsewhere
-Order matters only where one piece depends on another:
+The copy generalised for export (issue #68) is made when a second project takes
+the harness, not before. Order matters only where one piece depends on another:
 
 1. **Version catalog and the Gradle pins** first — everything else assumes a
    build that behaves the same on two machines.

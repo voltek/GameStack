@@ -273,6 +273,12 @@ A rename touches both its paths, so list the diff with `git fetch` and then
       counts.
       Runs when: `.claude/settings.json` or `docs/project/decisions/`
       Verified by: human
+- [ ] Does any numbered entry in `TOOLING.md` carry other than exactly one
+      `**Where.**` line, or neither a `**Replaces.**` nor a `**Ruled out.**`
+      line, each counted anchored at line start, since prose quotes the fields
+      (ADR 0040)?
+      Runs when: `docs/project/TOOLING.md`
+      Verified by: human
 - [ ] Does any item in this file lack a `Verified by:` line, carry more than one,
       or carry a value outside the closed vocabulary the header declares? An
       unclassified item is invisible to the checker of issue #66,
