@@ -15,12 +15,17 @@ visible. Otherwise, list progress in plain text at each step.
 ## Steps
 
 ### 0. Confirm scope is clear (conditional)
-Check if the feature's scope is already unambiguous from the product Spec
+Check if the feature's scope is already unambiguous from its capability spec
+in `openspec/specs/`, if one exists, the product Spec
 (`docs/project/GameStack-Spec-v1.md`) and, if applicable, an existing
-approved design reference (`docs/project/design/{screen-name}/`). If yes
-— e.g. Home, Search, Library, Detail are already fully specced and
-designed — skip directly to step 1. If genuine ambiguity remains (a newer,
-less-defined feature idea), invoke the `discovery-feature` skill first.
+approved design reference (`docs/project/design/{screen-name}/`). If every
+state and behaviour is written down, skip discovery. The Spec's
+bullets for Home, Library and Detail do not reach that bar. If genuine
+ambiguity remains, invoke the `discovery-feature` skill first.
+
+Then a feature that adds or changes what the user sees opens its OpenSpec
+change (`openspec-propose`, ADR 0041), and the owner approves its proposal and
+delta spec before step 1. That approval is Plan-level, like step 5's.
 
 ### 1. Domain models
 Create the pure domain model(s) needed for this feature.

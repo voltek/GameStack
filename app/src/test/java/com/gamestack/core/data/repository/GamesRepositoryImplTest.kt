@@ -26,6 +26,17 @@ class GamesRepositoryImplTest {
         assertEquals("Elden Ring", result.getOrNull()?.first()?.name)
     }
 
+    // Spec: matches keep IGDB's relevance order; not alphabetical, so a sort would show.
+    @Test
+    fun `searchGames should keep the order IGDB returns`() = runTest {
+        coEvery { igdbApiService.searchGames(any()) } returns
+            listOf(GameDto(id = 2, name = "Zelda"), GameDto(id = 1, name = "Animal Crossing"))
+
+        val result = repository.searchGames("a")
+
+        assertEquals(listOf("Zelda", "Animal Crossing"), result.getOrNull()?.map { it.name })
+    }
+
     // Spec: a network failure surfaces as Result.failure, never an unhandled exception.
     @Test
     fun `searchGames should return failure when api call throws`() = runTest {

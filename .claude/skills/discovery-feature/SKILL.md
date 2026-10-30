@@ -1,6 +1,6 @@
 ---
 name: discovery-feature
-description: Asks a series of guided questions to turn a vague feature idea into a feature-scoped Spec draft, aware of existing project architecture. Use when adding a feature to a project that already has a Spec and a CLAUDE.md — not for defining a brand-new project from zero.
+description: Asks a series of guided questions to turn a vague feature idea into a feature-scoped spec draft for its OpenSpec change, aware of existing project architecture. Use when adding a feature to a project that already has a Spec and a CLAUDE.md — not for defining a brand-new project from zero.
 compatibility: Requires the target project to have a CLAUDE.md (or equivalent Constitution document).
 ---
 
@@ -37,12 +37,13 @@ addition, not an inconsistent process.
   (invoking `new-feature`). There is no architecture/blueprinting phase here —
   the project's stack and layering already exist and are governed by CLAUDE.md.
   This skill decides *what* the feature is, never *how* it's built.
-- Do not use this skill for the four MVP screens (Home, Search, Library,
-  Detail): they are already fully specced and have approved designs. Running
-  discovery on them re-opens settled decisions.
+- A screen with a capability spec in `openspec/specs/` is settled by it; reopen
+  nothing it answers. One without (Home, Library, Detail) is not settled by its
+  Spec bullets and mockups: check both, and turn every gap into minimum
+  behavior or an open question.
 
 ## Result
-A feature-scoped Spec draft with this structure:
+A feature-scoped spec draft with this structure:
 - What it is (one phrase)
 - Minimum behavior
 - What it is NOT
@@ -51,9 +52,12 @@ A feature-scoped Spec draft with this structure:
 - Data: new or reused
 - Pending / Open Questions
 
-Append this as a new section to the project's master Spec file — do not
-create a separate spec file per feature. One source of truth avoids the
-same drift risk that multiple scattered documents would create.
+Behaviour a user sees is no longer appended to the Spec: it goes into an
+OpenSpec change for the feature's branch (ADR 0041) — minimum behavior as
+requirements and scenarios, open questions under the proposal's
+`## Open Questions`. In the pilot on Detail's spec, `openspec-propose` writes
+the change and these answers feed it; whether this Skill survives is the
+pilot's verdict (TOOLING.md § 13, **Pilot.**).
 
 ## Quality criteria
 - The "touches existing systems" answer is explicit — never left ambiguous,

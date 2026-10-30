@@ -46,6 +46,20 @@ class SearchGamesUseCaseTest {
         assertEquals(games, result.getOrNull())
     }
 
+    // Spec: matches keep IGDB's relevance order; not alphabetical, so a sort would show.
+    @Test
+    fun `invoke should keep the order the repository returns`() = runTest {
+        val games = listOf(
+            Game(id = 2, name = "Zelda", coverUrl = null, genres = emptyList(), developer = null),
+            Game(id = 1, name = "Animal Crossing", coverUrl = null, genres = emptyList(), developer = null)
+        )
+        coEvery { gamesRepository.searchGames("a") } returns Result.success(games)
+
+        val result = useCase("a")
+
+        assertEquals(games, result.getOrNull())
+    }
+
     // Spec: repository failures propagate untouched, not swallowed.
     @Test
     fun `invoke should propagate failure when repository fails`() = runTest {

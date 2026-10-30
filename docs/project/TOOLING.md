@@ -135,8 +135,9 @@ makes `actions/setup-java` with `java-version: 21` the right answer rather than 
 guess; a mismatch means Gradle downloads a toolchain on every job.
 
 ## 6. Skills
-**What.** Fourteen procedures in `.claude/skills/`, one per repeatable task —
-each layer's scaffolding, tests, device verification, and shipping a branch. A
+**What.** Procedures in `.claude/skills/`, one per repeatable task —
+each layer's scaffolding, tests, device verification, and shipping a branch —
+plus the `openspec-*` Skills OpenSpec generates (entry 13). A
 Skill loads only when invoked, which is why procedures live there instead of in
 CLAUDE.md, which is loaded on every turn.
 
@@ -325,6 +326,45 @@ that a new repository creates once (`gh label create`).
   description in a file is a hand-kept index: two places per item.
 - *The bucket as a form field alone.* A dropdown cannot apply a label, and the
   author's bucket is a proposal; the label records the triage's call.
+
+## 13. Spec-driven changes
+**What.** OpenSpec (ADR 0041): a spec per capability under `openspec/specs/`,
+changed by one change folder per feature branch, verified before the reviews
+and archived before the merge. Seven of its generated Skills run the steps; the project schema
+adds a verifier to every scenario, assumptions and open questions to every
+proposal, the layer Skills to every task list, and makes a design optional.
+
+**Replaces.** A screen's behaviour as bullets in the Spec, written once before
+the build, with the states found later by review recorded afterwards, if at all.
+
+**Where.** `openspec/config.yaml` (project context and rules) and
+`openspec/schemas/gamestack/` (the fork of `spec-driven`), which `openspec
+update` leaves alone; `.claude/skills/openspec-*/`, which it rewrites, so they
+are never edited by hand. The CLI is pinned by hand, the version the Skills'
+`generatedBy` names: `npm install -g @fission-ai/openspec@<version>`, or
+`openspec install` for a standalone binary without Node. The profile is per
+machine and set once:
+`openspec config set profile custom`, `delivery skills` (no `/opsx:` commands
+duplicating the Skills), `workflows '["propose","explore","apply","update","sync","archive","verify"]'`
+and `telemetry.enabled false`, then `openspec update`.
+
+**Pilot.** Detail's spec is the first change run through these Skills. The
+owner then judges its output: assumptions visible rather than buried, every
+scenario with a verifier, no Tier 1 rule breached, and each Skill's steps still
+there after a compaction. Kept, `discovery-feature` retires; dropped, the
+format stays by hand and `discovery-feature` writes the change. The CLI stays
+only if `validate` or the archive merge caught something a hand edit would not.
+
+**Ruled out.**
+- *Spec Kit.* Eight files per feature, a `constitution.md` that would be a
+  second CLAUDE.md, numbered branches against ADR 0034, and a Python toolchain
+  for one step.
+- *Kiro and Tessl.* Kiro is its own IDE; Tessl makes the spec the source and
+  was in beta. Kiro's WHEN/SHALL form and its bugfix shape were kept.
+- *Editing a generated Skill.* `openspec update` overwrites it; the project's
+  specifics go to the schema and the config instead.
+- *Converting every screen at once.* A capability gets its spec from its first
+  change; Search was written as the worked example.
 
 ---
 

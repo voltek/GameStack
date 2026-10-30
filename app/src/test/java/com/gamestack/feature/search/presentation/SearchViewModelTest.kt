@@ -249,6 +249,18 @@ class SearchViewModelTest {
         assertTrue(state.games.isEmpty())
     }
 
+    // Spec: clearing returns the screen to its initial state, so a failure must not survive it.
+    @Test
+    fun `handleEvent OnClearQuery should return to the initial state after a failed search`() = runTest {
+        coEvery { searchGamesUseCase("mario") } returns Result.failure(RuntimeException("network down"))
+        viewModel.handleEvent(SearchUiEvent.OnQueryChanged("mario"))
+        advanceDebounce()
+
+        viewModel.handleEvent(SearchUiEvent.OnClearQuery)
+
+        assertEquals(SearchUiState(), viewModel.uiState.value)
+    }
+
     // Spec: refresh repeats the last query (pull-to-refresh pattern).
     @Test
     fun `handleEvent OnRefresh should repeat the last query`() = runTest {

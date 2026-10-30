@@ -36,4 +36,13 @@ class IgdbApiServiceQueryBuilderTest {
 
         assertFalse(text.contains("sort"))
     }
+
+    // Spec: a search shows at most 20 matches, with no paging.
+    @Test
+    fun `buildSearchGamesQuery should cap the results at 20`() {
+        val text = bodyText("zelda")
+
+        assertTrue("expected \"limit 20;\" in: $text", text.contains("limit 20;"))
+        assertFalse("expected no paging \"offset\" clause in: $text", text.contains("offset "))
+    }
 }
