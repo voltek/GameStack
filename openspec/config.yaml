@@ -5,6 +5,7 @@ context: |
   Product scope, and what is out of it: docs/project/GameStack-Spec-v1.md.
   Technical rules: CLAUDE.md, which wins over anything written in a change.
   Visual tokens: docs/project/DESIGN.md. Mockups: docs/project/design/<screen>/.
+  Where a mockup and a document disagree, the document wins (docs/project/decisions/0042-a-document-wins-over-a-mockup.md).
   A change's folder takes its branch's kebab name: feature/game-detail -> game-detail.
   Write every artifact in English.
 
