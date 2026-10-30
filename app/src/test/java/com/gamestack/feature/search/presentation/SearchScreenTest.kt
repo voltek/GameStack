@@ -6,6 +6,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -192,6 +194,29 @@ class SearchScreenTest {
         composeRule.onNodeWithTag(SearchLoadingGridTag).assertExists()
         assertAbsent(string(R.string.search_empty_title))
     }
+
+    // Spec: a card's merged text is exactly its genre chip, name and developer, so
+    // a second genre or an extra line would change the list.
+    @Test
+    fun `result card shows the first genre, the name and the developer`() {
+        val game = Game(3, "Hades", null, listOf("Roguelike", "Action"), "Supergiant Games")
+        setContent(SearchUiState(query = "had", games = listOf(game)))
+
+        assertEquals(listOf("ROGUELIKE", "Hades", "Supergiant Games"), cardTexts("Hades"))
+    }
+
+    // Spec: a missing genre or developer leaves its line out, never a placeholder.
+    @Test
+    fun `result card leaves out a missing genre and developer`() {
+        val game = Game(4, "Untitled", null, emptyList(), null)
+        setContent(SearchUiState(query = "unt", games = listOf(game)))
+
+        assertEquals(listOf("Untitled"), cardTexts("Untitled"))
+    }
+
+    private fun cardTexts(name: String): List<String> =
+        composeRule.onNode(hasClickAction() and hasText(name)).fetchSemanticsNode()
+            .config[SemanticsProperties.Text].map { it.text }
 
     // Spec: before any query is typed the screen shows guidance, not an empty grid.
     // The defect this guards was a blank canvas on first open.
