@@ -4,7 +4,7 @@ Status: Accepted
 Date: 2026-10-28
 Backfilled: no
 Enforced by: none (prose only — CLAUDE.md § Purpose — Tier 1) — weighing against both halves, where a harness decision lives
-Enforced by: none (prose only — GameStack-Spec-v1.md § Why this project exists, and what it optimises for) — the full statement, the harness meant to leave
+Enforced by: none (prose only — docs/project/PRODUCT.md § Why this project exists, and what it optimises for) — the full statement, the harness meant to leave
 
 ## Context
 The Spec's *Why this project exists* said GameStack was a product and a case

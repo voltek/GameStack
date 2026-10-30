@@ -107,7 +107,7 @@ present, using the name GitHub's API uses, because that is what
 
 ### `Enforced by:` — closed vocabulary
 - `none (prose only — <document> § <section>)` — name the document that
-  actually carries the rule, such as CLAUDE.md, the Spec for product scope (not
+  actually carries the rule, such as CLAUDE.md, PRODUCT.md for product scope (not
   a constraint on code), a Skill for a procedure attached to a named task
   (CLAUDE.md's three questions send it there), or `decisions/README.md`.
 - `checklist detector — DRIFT-CHECKLIST.md § <section>`

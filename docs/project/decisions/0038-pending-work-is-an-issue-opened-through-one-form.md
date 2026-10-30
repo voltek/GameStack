@@ -2,6 +2,7 @@
 
 Status: Accepted
 Status: Superseded by ADR-0041 — "its OpenSpec item included" (Decision)
+Status: Superseded by ADR-0043 — "Product scope deferred past the MVP is not this kind of work" (Decision)
 Date: 2026-10-28
 Backfilled: no
 Enforced by: none (prose only — TOOLING.md § 12. Issue form) — the title form, the body's sections, labels when opened

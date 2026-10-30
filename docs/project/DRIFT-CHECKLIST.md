@@ -235,11 +235,15 @@ A rename touches both its paths, so list the diff with `git fetch` and then
 
 ### When the diff touches what it reads
 - [ ] Does CLAUDE.md's "Available Skills" list differ from the actual contents
-      of `.claude/skills/`, or from the Spec's copy of that list? (Retired
-      Skills are listed separately in CLAUDE.md and archived under
-      `docs/project/retired-skills/` — one of those appearing as invocable is
-      the same drift.)
-      Runs when: `.claude/skills/`, `CLAUDE.md`, `docs/project/GameStack-Spec-v1.md` or `docs/project/retired-skills/`
+      of `.claude/skills/`? (Retired Skills are listed separately in CLAUDE.md
+      and archived under `docs/project/retired-skills/` — one of those
+      appearing as invocable is the same drift.)
+      Runs when: `.claude/skills/`, `CLAUDE.md` or `docs/project/retired-skills/`
+      Verified by: human
+- [ ] Does PRODUCT.md's *Capabilities* table name a spec folder that does not
+      exist under `openspec/specs/`, or leave out one that does (ADR 0043)?
+      Compare `ls openspec/specs/` with the table's *Spec* column.
+      Runs when: `docs/project/PRODUCT.md` or `openspec/specs/`
       Verified by: human
 - [ ] Does DESIGN.md's prose reference a token its own token block doesn't define,
       or state a value that contradicts it (colors, radii, type roles)?

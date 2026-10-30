@@ -2,7 +2,7 @@ schema: gamestack
 
 context: |
   GameStack is a native Android app for exploring video games through the IGDB API.
-  Product scope, and what is out of it: docs/project/GameStack-Spec-v1.md.
+  Product scope, and what is out of it: docs/project/PRODUCT.md.
   Technical rules: CLAUDE.md, which wins over anything written in a change.
   Visual tokens: docs/project/DESIGN.md. Mockups: docs/project/design/<screen>/.
   Where a mockup and a document disagree, the document wins (docs/project/decisions/0042-a-document-wins-over-a-mockup.md).
@@ -22,3 +22,4 @@ operations:
   archive:
     guidance:
       - Archive in the change's own branch, after its last review (the GitHub bot's, unless it is unavailable) and before the merge, and commit the archive with the specs it merged.
+      - A folder the archive creates under openspec/specs/ fills its capability's Spec cell in docs/project/PRODUCT.md and removes that capability's section, in the archive commit (ADR 0043).

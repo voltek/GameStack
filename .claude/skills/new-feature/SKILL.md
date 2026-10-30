@@ -16,12 +16,12 @@ visible. Otherwise, list progress in plain text at each step.
 
 ### 0. Confirm scope is clear (conditional)
 Check if the feature's scope is already unambiguous from its capability spec
-in `openspec/specs/`, if one exists, the product Spec
-(`docs/project/GameStack-Spec-v1.md`) and, if applicable, an existing
+in `openspec/specs/`, if one exists, the PRD
+(`docs/project/PRODUCT.md`) and, if applicable, an existing
 approved design reference (`docs/project/design/{screen-name}/`). If every
-state and behaviour is written down, skip discovery. The Spec's
-bullets for Home, Library and Detail do not reach that bar. If genuine
-ambiguity remains, invoke the `discovery-feature` skill first.
+state and behaviour is written down, skip discovery. The PRD's section for a
+capability whose *Spec* column says none yet does not reach that bar. If
+genuine ambiguity remains, invoke the `discovery-feature` skill first.
 
 Then a feature that adds or changes what the user sees opens its OpenSpec
 change (`openspec-propose`, ADR 0041), and the owner approves its proposal and
@@ -50,7 +50,7 @@ Invoke the `new-usecase` skill once for each Repository function the feature nee
 
 ### 5. Screen prototype
 Generate a visual prototype (Stitch or Claude Design) based on the
-Spec/discovery-feature output.
+spec/discovery-feature output.
 
 STOP HERE. Do not proceed to ViewModel/Screen until the human explicitly
 approves the prototype. Visual/UX judgment is not mechanical — this is a

@@ -72,9 +72,9 @@ Cover each state the screen declares, the same list the device pass uses
 is the only thing that sees the pixels.
 
 ## Oracle Problem — what "correct" means
-The source of truth for a test is the Skill or Spec that described the task —
+The source of truth for a test is the Skill or spec that described the task —
 never the implementation you just wrote. Before writing assertions, restate
-in a comment what the Skill/Spec required, then assert against that, not
+in a comment what the Skill/spec required, then assert against that, not
 against whatever the generated code currently returns.
 
 Red flag: if a test would still pass after silently breaking the intended
@@ -261,12 +261,12 @@ Android setup is awkward and slow — but it is the same question asked at scale
 
 ## Known gaps (deliberate, not oversights)
 - **Regression pillar.** This skill covers Requirements testing only (new code
-  does what the Skill/Spec asked). Regression testing (confirm nothing else
+  does what the Skill/spec asked). Regression testing (confirm nothing else
   broke) is not enforced here — it will be automated via a Hook that runs the
   affected suite after each agent edit — see issue #65.
 - **Real persistence.** No test in this project touches real SQLite; see
   "Scope" above. An instrumented `androidTest/` suite covering DAO queries and
-  Room migrations is backlog (Spec → Explicitly Deferred). `@TypeConverter`s
+  Room migrations is backlog (issue #132). `@TypeConverter`s
   are the exception — they're plain JVM functions and ARE directly unit-tested
   (see "TypeConverter" above); what remains untested pre-instrumentation is
   Room actually invoking them at runtime (registration on `@Database`) and the

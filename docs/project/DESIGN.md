@@ -140,7 +140,7 @@ these values only, and takes no `dynamicColor` parameter (CLAUDE.md, Tech Stack
 → Tier 1).
 
 **Dark only for MVP.** There is no Light ColorScheme, by decision, not by
-omission — see the Spec's "Explicitly Deferred". Do not add one, and do not
+omission — see PRODUCT.md's backlog. Do not add one, and do not
 treat its absence as drift.
 
 ## Typography

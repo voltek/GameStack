@@ -28,7 +28,7 @@ compile.
 Rebase is not wrong in general — "rebase to update, squash to merge" is a common
 and coherent industry standard that optimises for a `main` that reads as a list
 of features. This project optimises for something else: its history is study
-material (Spec → *Why this project exists, and what it optimises for*). That is
+material (PRD → *Why this project exists, and what it optimises for*). That is
 the whole reason for the difference; it is not a claim that rebase is inferior.
 
 `git rebase main` is acceptable on a branch that has **never been pushed**, where
@@ -107,13 +107,13 @@ line of the merge commit's body. The branch is named `{type}/{kebab-name}` with
 that title's type, `feature/` standing for `feat`.
 
 Body: **12 lines or fewer.** This project deliberately puts the *diagnosis* in
-commit messages rather than a summary of the diff (Spec → *Why this project
+commit messages rather than a summary of the diff (PRD → *Why this project
 exists*), which makes them longer than the usual convention — but that licenses
 the reasoning the diff cannot show, not a retelling of it. Three tests:
 
 - Would a reader six months from now need this sentence to see why the change is
   right? If not, cut it.
-- Is it already in CLAUDE.md, the Spec or an ADR? Point at it.
+- Is it already in CLAUDE.md, the PRD or an ADR? Point at it.
 - Is it narrating the process ("first I tried X, then Y", "the reviewer found
   this, I verified that")? Cut it. The review's account belongs in the PR body
   (§4); the commit says *what is now true and why*.
@@ -209,8 +209,10 @@ when the spec itself specified the wrong behaviour. No other branch does
    asking to merge: `openspec-verify-change` again, `openspec validate <change>
    --strict`, then archive with `openspec-archive-change`. No review reads the
    merge, so check it: `openspec validate --specs --strict`, and every
-   requirement and scenario the delta held is in the merged spec. Commit the
-   merged specs with the archive.
+   requirement and scenario the delta held is in the merged spec. A folder the
+   archive created under `openspec/specs/` fills its capability's *Spec* cell
+   in `PRODUCT.md` and removes that capability's section (ADR 0043). Commit the
+   merged specs and `PRODUCT.md` with the archive.
 
 A test is a reference, not behaviour: on any branch, the commit that renames or
 moves a test updates every `VERIFIED BY` line naming it. So `main` never holds
@@ -254,7 +256,7 @@ twenty ADRs clean while reading seventeen.
     Defer on one of its grounds.
 - **Defer** — valid, and not fixed on this branch, because it is outside the
   branch's unit of work (CLAUDE.md → Git workflow), a document already defers it
-  (the Spec, the accessibility default below, an open issue), or its fix needs a
+  (the PRD, the accessibility default below, an open issue), or its fix needs a
   plan. A non-defect fix too large to be cheap is one that needs a plan. A
   valid finding that meets none of the three is fixed here, and a real defect
   is deferred only by the human. When the ground is an open issue, link that
@@ -468,5 +470,12 @@ information, not an obstacle — and `-D` is the key that disables the check. If
 Owed once a merge changes `app/src/main`, or three merges have landed since the
 last triage, whose commit the pinned `Triage log` issue records (ADR 0038).
 Before the next branch starts, propose to the owner what ADR 0038 § Decision
-lists for a triage, for every open issue but that log. Once the owner decides,
-rewrite the log's body as ADR 0038 shapes it; never append to it.
+lists for a triage, for every open issue but that log and the `product` ones.
+For those (ADR 0043), read `PRODUCT.md`'s *First release*, *Backlog* and *Open
+questions*; add every open `product` issue missing from the `GameStack Product`
+Project (`gh project item-list 1 --owner voltek --limit 500 --format json`
+against `gh issue list --label product --limit 500`; `gh project item-add 1
+--owner voltek --url <issue>`), then propose each one's Horizon. These need the
+token's `project` scope, granted only through a browser: if they fail, ask the
+owner to run `! gh auth refresh -h github.com -s project`. Once the owner
+decides, rewrite the log's body as ADR 0038 shapes it; never append to it.
