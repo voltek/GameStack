@@ -15,7 +15,7 @@ description: Create a new UseCase that invokes a Repository function. Use when a
 - Feature-specific UseCase (used only within one feature):
   `feature/{feature-name}/domain/usecase/`
   Example: `feature/home/domain/usecase/GetPopularGamesUseCase.kt` — popular
-  games are a Home concern per the Spec; Search owns `SearchGamesUseCase`.
+  games are a Home concern per the PRD; Search owns `SearchGamesUseCase`.
 
 - Shared UseCase (used across multiple features):
   `core/domain/usecase/`

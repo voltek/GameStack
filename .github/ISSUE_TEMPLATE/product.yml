@@ -1,0 +1,49 @@
+name: Product item
+description: Something the app does not do yet, from docs/project/PRODUCT.md (ADR 0043).
+labels: [product]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Product scope only (ADR 0043).** Harness and repository work uses *Pending work* instead.
+        One item per issue. **Title in the commit form** of ADR 0034, `type(scope): Imperative summary`
+        (`.githooks/rules.sh title "<title>"` checks it): it becomes the title of the pull request that
+        closes this issue with `Closes #n`. Its horizon is a field of the product GitHub Project, set at
+        triage; the dropdown below is the author's proposal.
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: The owner (date), a review round (branch and round), or an agent (branch or session).
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: What the user gets
+      description: What the user can do or see once it ships, and what they do meanwhile.
+    validations:
+      required: true
+  - type: textarea
+    id: grounds
+    attributes:
+      label: Grounds
+      description: The PRODUCT.md section it comes from, a release criterion or a Backlog line.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: The likeliest shape, shapes ruled out with their reason, and its cost.
+  - type: dropdown
+    id: horizon
+    attributes:
+      label: Horizon
+      description: Now (the current cycle), Next (needed for the first release), Later (after it).
+      options:
+        - Now
+        - Next
+        - Later
+    validations:
+      required: true

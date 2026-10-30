@@ -3,7 +3,7 @@
 Status: Accepted
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Nothing said whether the app supports landscape")
-Enforced by: none (prose only — GameStack-Spec-v1.md § Explicitly Deferred)
+Enforced by: none (prose only — docs/project/PRODUCT.md § Capabilities)
 
 ## Context
 Nothing said whether the app supports landscape. Every screen had been designed

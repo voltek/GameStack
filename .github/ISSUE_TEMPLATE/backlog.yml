@@ -1,11 +1,11 @@
 name: Pending work
-description: Anything not done yet — tooling, an improvement, an idea, a defect (ADR 0038).
+description: Harness and repository work not done yet — tooling, an improvement, an idea, a defect (ADR 0038).
 body:
   - type: markdown
     attributes:
       value: |
-        **Every issue (ADR 0038).** Harness and repository work only: product scope deferred past the
-        MVP stays in the Spec's *Explicitly Deferred*.
+        **Every issue (ADR 0038).** Harness and repository work only: product work uses *Product item*
+        (ADR 0043).
         One item per issue. **Title in the commit form** of ADR 0034, `type(scope): Imperative summary`
         (`.githooks/rules.sh title "<title>"` checks it): it becomes the title of the pull request that
         closes this issue with `Closes #n`. Labels: a bucket, `export` and `gated` when it is opened, a
@@ -29,7 +29,7 @@ body:
     id: grounds
     attributes:
       label: Grounds
-      description: The rule, ADR or Spec section it rests on. "None" is an answer, and makes it an idea.
+      description: The rule, ADR or document section it rests on. "None" is an answer, and makes it an idea.
     validations:
       required: true
   - type: textarea

@@ -1,6 +1,6 @@
 ---
 name: discovery-feature
-description: Asks a series of guided questions to turn a vague feature idea into a feature-scoped spec draft for its OpenSpec change, aware of existing project architecture. Use when adding a feature to a project that already has a Spec and a CLAUDE.md — not for defining a brand-new project from zero.
+description: Asks a series of guided questions to turn a vague feature idea into a feature-scoped spec draft for its OpenSpec change, aware of existing project architecture. Use when adding a feature to a project that already has a PRD and a CLAUDE.md — not for defining a brand-new project from zero.
 compatibility: Requires the target project to have a CLAUDE.md (or equivalent Constitution document).
 ---
 
@@ -37,10 +37,10 @@ addition, not an inconsistent process.
   (invoking `new-feature`). There is no architecture/blueprinting phase here —
   the project's stack and layering already exist and are governed by CLAUDE.md.
   This skill decides *what* the feature is, never *how* it's built.
-- A screen with a capability spec in `openspec/specs/` is settled by it; reopen
-  nothing it answers. One without (Home, Library, Detail) is not settled by its
-  Spec bullets and mockups: check both, and turn every gap into minimum
-  behavior or an open question.
+- A capability with a spec in `openspec/specs/` is settled by it; reopen
+  nothing it answers. One whose *Spec* column in the PRD says none yet is not
+  settled by its PRD section and mockups: check both, and turn every gap into
+  minimum behavior or an open question.
 
 ## Result
 A feature-scoped spec draft with this structure:
@@ -52,7 +52,7 @@ A feature-scoped spec draft with this structure:
 - Data: new or reused
 - Pending / Open Questions
 
-Behaviour a user sees is no longer appended to the Spec: it goes into an
+Behaviour a user sees is never appended to the PRD: it goes into an
 OpenSpec change for the feature's branch (ADR 0041) — minimum behavior as
 requirements and scenarios, open questions under the proposal's
 `## Open Questions`. In the pilot on Detail's spec, `openspec-propose` writes

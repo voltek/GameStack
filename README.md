@@ -8,7 +8,7 @@ library, using the [IGDB API](https://api-docs.igdb.com/) as the data source.
 Search games, view details, organize personal lists, and rate what you've
 played. Not a store, not a gaming platform — a catalog and personal library app.
 
-Full product scope lives in [`docs/project/GameStack-Spec-v1.md`](docs/project/GameStack-Spec-v1.md).
+Full product scope lives in [`docs/project/PRODUCT.md`](docs/project/PRODUCT.md).
 Architectural/technical rules live in [`CLAUDE.md`](CLAUDE.md).
 The repository tooling — what enforces those rules, and what was ruled out on the
 way to it — is inventoried in [`docs/project/TOOLING.md`](docs/project/TOOLING.md).

@@ -11,7 +11,7 @@ That last field is the one worth writing: it is what stops the next project from
 walking into the same dead end.
 
 **Out:** anything that already has a home. Rules constraining code on any turn are
-in CLAUDE.md; procedures for a named task are Skills; the product is the Spec;
+in CLAUDE.md; procedures for a named task are Skills; the product is PRODUCT.md;
 tooling *not yet built* is a GitHub issue (ADR 0038); how a drift was resolved
 is a `Drift:` trailer on its commit, and a decision in force is an ADR under
 `decisions/`. This file does not restate them, and it is not a changelog —
@@ -154,7 +154,7 @@ was bootstrapped is worth keeping.
 ## 7. The governing documents
 **What.** Five files and a folder, with disjoint jobs: `CLAUDE.md` holds rules
 that constrain code on any turn, under a three-tier system saying what may be
-changed and who must agree; the Spec holds the product; `DESIGN.md` holds the visual system;
+changed and who must agree; `PRODUCT.md` holds the product; `DESIGN.md` holds the visual system;
 `DRIFT-CHECKLIST.md` holds the violation detectors you run to *find* drift;
 `DRIFT-LOG.md` is a frozen archive of the drifts resolved before 2026-10-26;
 and `decisions/` holds one ADR per decision in force, each naming what enforces
@@ -162,7 +162,7 @@ it. Different jobs and growth laws (the log no longer grows) keep them apart.
 
 **Replaces.** Rediscovering, per session, why the code looks the way it does.
 
-**Where.** `CLAUDE.md`, `docs/project/GameStack-Spec-v1.md`,
+**Where.** `CLAUDE.md`, `docs/project/PRODUCT.md`,
 `docs/project/DESIGN.md`, `docs/project/DRIFT-CHECKLIST.md`,
 `docs/project/DRIFT-LOG.md`, `docs/project/decisions/`.
 
@@ -308,15 +308,21 @@ build.
 form, then source, problem with evidence, grounds, suggested fix, ruled out,
 trigger, where it lands, bucket and export value. Blank issues are off, so a
 person opening an issue on GitHub gets the form too. Its author sets the bucket,
-`export` and `gated`; a triage confirms them and sets `p1`–`p3`.
+`export` and `gated`; a triage confirms them and sets `p1`–`p3`. Product work
+has a second form (ADR 0043): source, what the user gets, grounds in
+`PRODUCT.md`, notes and a proposed horizon, labelled `product`. Its horizon is
+the Horizon field (Now, Next, Later) of the `GameStack Product` GitHub Project,
+which holds product issues only; a triage sets it.
 
 **Replaces.** An issue body written however its author wrote it that day, and
 `TOOLING-BACKLOG.md`, the file that held unbuilt tooling until each of its items
-became an issue.
+became an issue; for product, the Spec's *Explicitly Deferred* section.
 
-**Where.** `.github/ISSUE_TEMPLATE/backlog.yml` and `config.yml`. The labels'
-names and meanings are ADR 0038 § Decision; on GitHub they are repository state
-that a new repository creates once (`gh label create`).
+**Where.** `.github/ISSUE_TEMPLATE/backlog.yml`, `product.yml` and `config.yml`.
+The labels' names and meanings are ADR 0038 § Decision and ADR 0043; on GitHub
+they are repository state that a new repository creates once (`gh label
+create`), and so are the Project and its field (`gh project create`, `gh
+project field-create`, `gh project link`; the token needs the `project` scope).
 
 **Ruled out.**
 - *A backlog file.* Cheaper for an agent to read, but it grows the way
@@ -326,6 +332,10 @@ that a new repository creates once (`gh label create`).
   description in a file is a hand-kept index: two places per item.
 - *The bucket as a form field alone.* A dropdown cannot apply a label, and the
   author's bucket is a proposal; the label records the triage's call.
+- *Horizon as a label.* Readable by `gh issue list` with no extra scope, but a
+  Project's board groups by its own fields, not by labels.
+- *Harness issues in the product Project.* They would carry two priorities, a
+  `p1`–`p3` label and a Horizon, for one item.
 
 ## 13. Spec-driven changes
 **What.** OpenSpec (ADR 0041): a spec per capability under `openspec/specs/`,
@@ -334,8 +344,9 @@ and archived before the merge. Seven of its generated Skills run the steps; the 
 adds a verifier to every scenario, assumptions and open questions to every
 proposal, the layer Skills to every task list, and makes a design optional.
 
-**Replaces.** A screen's behaviour as bullets in the Spec, written once before
-the build, with the states found later by review recorded afterwards, if at all.
+**Replaces.** A screen's behaviour as bullets in the Spec (now PRODUCT.md),
+written once before the build, with the states found later by review recorded
+afterwards, if at all.
 
 **Where.** `openspec/config.yaml` (project context and rules) and
 `openspec/schemas/gamestack/` (the fork of `spec-driven`), which `openspec

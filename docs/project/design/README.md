@@ -109,7 +109,7 @@ supposed to look like.
 
 The document wins ([ADR 0042](../decisions/0042-a-document-wins-over-a-mockup.md)),
 each for its own part: behaviour and content from the capability spec in
-`openspec/specs/` (the Spec where a screen has none yet), tokens from
-`../DESIGN.md`, and layout from the export. Fix the mismatch in the export's
+`openspec/specs/` (`../PRODUCT.md` where a capability has none yet), tokens
+from `../DESIGN.md`, and layout from the export. Fix the mismatch in the export's
 HTML by hand and re-render its PNG with the recipe above; never regenerate it
 through Stitch, which allows few edits and would reintroduce the disagreement.
