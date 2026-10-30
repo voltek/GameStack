@@ -192,6 +192,30 @@ below says when it runs).
 - **A subagent reviewer's claims about repo or remote state are findings to
   verify, not facts to relay.** Weigh its reasoning; check its assertions.
 
+### A branch with a change verifies it before the reviews, archives it before the merge
+A `feat` branch that adds or changes what the user sees carries an OpenSpec
+change in `openspec/changes/<branch-kebab-name>/`. A `fix` carries one when the
+bug was unspecified behaviour, its scenario what the regression test pins, or
+when the spec itself specified the wrong behaviour. No other branch does
+(ADR 0041). A branch that should carry one and does not stops here.
+
+1. Before the first review round, run `openspec-verify-change` and fix every
+   CRITICAL. Each test a scenario's `VERIFIED BY` names must exist under that
+   name; each `device` one joins the device pass.
+2. Until the archive, a fix that changes behaviour, from any reviewer, the
+   GitHub bot included, goes into the change's delta, never into
+   `openspec/specs/`.
+3. After the bot's round on the PR, or once it is unavailable, and before
+   asking to merge: `openspec-verify-change` again, `openspec validate <change>
+   --strict`, then archive with `openspec-archive-change`. No review reads the
+   merge, so check it: `openspec validate --specs --strict`, and every
+   requirement and scenario the delta held is in the merged spec. Commit the
+   merged specs with the archive.
+
+A test is a reference, not behaviour: on any branch, the commit that renames or
+moves a test updates every `VERIFIED BY` line naming it. So `main` never holds
+an open change of a merged branch.
+
 ### A governance diff earns the checklist
 `/code-review` judges whether a rule is sound; it does not check one document
 against the others, which is where governance drift lives. **If the branch touches

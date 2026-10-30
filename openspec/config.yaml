@@ -1,0 +1,23 @@
+schema: gamestack
+
+context: |
+  GameStack is a native Android app for exploring video games through the IGDB API.
+  Product scope, and what is out of it: docs/project/GameStack-Spec-v1.md.
+  Technical rules: CLAUDE.md, which wins over anything written in a change.
+  Visual tokens: docs/project/DESIGN.md. Mockups: docs/project/design/<screen>/.
+  A change's folder takes its branch's kebab name: feature/game-detail -> game-detail.
+  Write every artifact in English.
+
+rules:
+  specs:
+    - State behaviour only. How it came to be specified belongs in the commit body, never in the spec.
+  design:
+    - Write design.md only for a decision local to this change; a rule that outlives it is an ADR (docs/project/decisions/README.md).
+
+operations:
+  apply:
+    guidance:
+      - Commit as each task group passes the gate (./gradlew build, test, lint), never once at the end.
+  archive:
+    guidance:
+      - Archive in the change's own branch, after its last review (the GitHub bot's, unless it is unavailable) and before the merge, and commit the archive with the specs it merged.

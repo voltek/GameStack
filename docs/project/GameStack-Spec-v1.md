@@ -45,27 +45,9 @@ the MVP section below says it is.
 ## Core Features (MVP)
 
 ### Search
-- Search games by name via the IGDB API.
-- Each result shows the game's cover, name, primary genre, and developer
-  (IGDB's `genres` and `involved_companies` fields) — confirmed as part of
-  building the Search feature, matching the approved `docs/project/design/search/`
-  mockup. Distinct from search filters (letting the user filter results by
-  genre/platform), which remains backlog — see Explicitly Deferred.
-- The screen has four states, not three. Before any query is typed it shows an
-  **initial state** ("Search for games" + guidance), not a blank canvas; then
-  loading, results, or "No Results Found". The initial state was missing from
-  the original mockups — surfaced by code review of the Search PR, which found
-  the screen rendering an empty grid on first open — and is now specified in
-  `docs/project/design/search/search-initial.html`.
-- A **failed pull-to-refresh keeps the results already on screen** and reports the
-  failure as a banner above them, with Retry, rather than replacing them with the
-  error state — those results still answer the query, and losing them to a
-  transient network blip is worse than a stale list. The banner stays as long as
-  the situation does and disappears on its own when a refresh succeeds or the
-  query changes; it is not a transient toast, because "these results are stale"
-  is a condition, not a moment. A failed search for *new* text is not the same
-  case and does show the error state: the results still displayed answer the
-  previous query, so keeping them would misrepresent what was searched.
+Search games by name via the IGDB API. Its behaviour is specified in
+`openspec/specs/search/spec.md` (ADR 0041). Search filters (by genre or
+platform) remain backlog — see Explicitly Deferred.
 
 ### Game Detail
 - Name, description
@@ -206,10 +188,6 @@ non-Home tab returns to Home.
   the deferral expires before the first Play Store release — Google publishes
   accessibility expectations, and retrofitting semantics across a finished UI is
   a rewrite rather than an addition.
-- **Backlog (tooling):** consider adopting OpenSpec as an active change-tracking
-  layer alongside CLAUDE.md, IF the project grows beyond solo development or
-  manual tracking via Skills becomes a real pain point. Not worth the added
-  infrastructure at current scale.
 - **Backlog:** Light theme. MVP ships dark-only — the project's visual
   identity (confirmed via Stitch prototyping and the GameStack Core
   DESIGN.md) is dark-first, matching genre conventions (Steam, Xbox app,
@@ -231,10 +209,15 @@ non-Home tab returns to Home.
 
 ## Related Documents
 - `CLAUDE.md` — technical/architectural rules for AI agents working on this repo
+- `openspec/` — a spec per capability (what the app does) and the changes that
+  alter them, one per feature branch (ADR 0041)
 - `.claude/skills/` — reusable procedures (discovery-feature, new-feature,
   new-mapper, new-repository-interface, new-repository-impl, new-api-service,
   new-room-dao, new-hilt-module, new-usecase, new-viewmodel, new-screen,
-  write-tests, verify-on-device, ship-a-branch). CLAUDE.md's "Available Skills"
+  write-tests, verify-on-device, ship-a-branch, and OpenSpec's generated
+  openspec-propose, openspec-explore, openspec-update-change,
+  openspec-apply-change, openspec-verify-change, openspec-sync-specs,
+  openspec-archive-change). CLAUDE.md's "Available Skills"
   section is the authoritative list — if these two disagree, that is drift.
 - `docs/project/retired-skills/` — Skills that have been withdrawn from
   `.claude/skills/`, kept as a record of how the project was built. Not

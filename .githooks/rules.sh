@@ -28,7 +28,7 @@ ship        branch to merge: review rounds, PR template, commit messages, PR tit
 gate        CI workflows
 agent       .claude/ settings and agent hooks
 repo        .gitattributes, .gitignore, git hooks
-spec        the Spec
+spec        the Spec, openspec/ and its generated .claude/skills/openspec-*
 design      DESIGN.md and design/ mockups
 tooling     the TOOLING documents
 readme      README.md'
