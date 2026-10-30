@@ -37,9 +37,9 @@ addition, not an inconsistent process.
   (invoking `new-feature`). There is no architecture/blueprinting phase here —
   the project's stack and layering already exist and are governed by CLAUDE.md.
   This skill decides *what* the feature is, never *how* it's built.
-- Do not use this skill for the four MVP screens (Home, Search, Library,
-  Detail): they are already fully specced and have approved designs. Running
-  discovery on them re-opens settled decisions.
+- The four MVP screens (Home, Search, Library, Detail) are not settled by their
+  Spec bullets and mockups. Check both, and turn every gap into minimum
+  behavior or an open question; reopen only what neither of them answers.
 
 ## Result
 A feature-scoped Spec draft with this structure:

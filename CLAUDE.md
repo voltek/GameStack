@@ -579,8 +579,8 @@ This project uses Claude Code Skills for repeatable procedures. Prefer invoking
 these over improvising the same task differently each time:
 
 **Setup / planning**
-- `discovery-feature` — turns a vague feature idea into a Spec section. Only
-  needed when scope is genuinely ambiguous; the MVP screens are already specced.
+- `discovery-feature` — turns a vague feature idea into a Spec section, when
+  scope is genuinely ambiguous.
 
 **Implementation (in dependency order)**
 - `new-repository-interface` — Domain layer Repository contracts
