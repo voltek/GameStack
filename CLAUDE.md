@@ -598,11 +598,9 @@ from a change.
 - `verify-on-device` — emulator verification of a UI change
 - `ship-a-branch` — finished branch → merged PR (update, clean, PR body, reviews,
   merge strategy)
+- `checkpoint` — the session handoff and cycle, after a merge and at session end
 
 If a task doesn't map to any Skill above, that's a coverage gap worth naming:
 do the work, then say so, so the gap can be closed deliberately rather than
 by improvising the same task differently every time.
-
-**Retired skills** — not invocable, not in `.claude/skills/`: `project-scaffold`,
-archived at `docs/project/retired-skills/project-scaffold.md`.
 

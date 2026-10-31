@@ -395,6 +395,32 @@ only if `validate` or the archive merge caught something a hand edit would not.
 - *Converting every screen at once.* A capability gets its spec from its first
   change; Search was written as the worked example.
 
+## 14. Session handoff
+**What.** A SessionStart hook that injects two small files kept outside the
+repository — `HANDOFF.md` (the session's state) and `CYCLE.md` (the open
+cycle) — and facts it derives live: git state, the next ADR number, the issue
+pool and whether a triage is owed. The `checkpoint` Skill holds the rules both
+files follow and the steps to rewrite them (ADR 0045).
+
+**Replaces.** A 64 KB append-only handoff that every session re-read, mixing
+state with rules, design and history, reached through an agent-memory pointer
+that was itself stale.
+
+**Where.** `.claude/hooks/session-start.sh`, registered in
+`.claude/settings.json`, and `test-session-start.sh` beside it, its cases, run
+by `commits.yml`; `.claude/skills/checkpoint/`. The files are read from
+`$CLAUDE_HANDOFF_DIR`, or `~/Documents/<main checkout's folder name>`.
+
+**Ruled out.**
+- *The handoff inside the repository.* Every pull request diff would carry the
+  state churn of the session that opened it.
+- *The rules as each file's header.* The hook paid for them on every session,
+  and a clone never saw them.
+- *A Next list in the handoff.* What comes next is the cycle; the rest is an
+  issue (ADR 0038).
+- *Stored derived facts.* Branches, hashes and counts went stale between
+  sessions; the hook computes them instead.
+
 ---
 
 ## Rebuilding this elsewhere

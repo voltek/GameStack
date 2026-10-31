@@ -235,9 +235,8 @@ A rename touches both its paths, so list the diff with `git fetch` and then
 
 ### When the diff touches what it reads
 - [ ] Does CLAUDE.md's "Available Skills" list differ from the actual contents
-      of `.claude/skills/`? (Retired Skills are listed separately in CLAUDE.md
-      and archived under `docs/project/retired-skills/` — one of those
-      appearing as invocable is the same drift.)
+      of `.claude/skills/`? (A Skill archived under
+      `docs/project/retired-skills/` appearing as invocable is the same drift.)
       Runs when: `.claude/skills/`, `CLAUDE.md` or `docs/project/retired-skills/`
       Verified by: human
 - [ ] Does PRODUCT.md's *Capabilities* table name a spec folder that does not

@@ -29,6 +29,10 @@ jobs:
       - name: Test the rules
         run: sh .githooks/test-rules.sh
 
+      - name: Test the session-start hook
+        if: ${{ !cancelled() }}
+        run: sh .claude/hooks/test-session-start.sh
+
       # The list is captured first: a failing substitution inside `for` does not
       # stop bash -e, and the loop would check nothing and pass.
       - name: Check every commit on the branch
