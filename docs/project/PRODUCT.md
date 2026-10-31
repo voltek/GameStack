@@ -45,7 +45,7 @@ keep needing a justification, and without this section each one looks arbitrary:
   the review loops are not overhead around the app — they are a second thing
   being built, and often the more valuable one.
 - **The harness is meant to leave.** What is built around the app — rules,
-  Skills, hooks, the review loop, the handoff (PENDING — not yet defined) —
+  Skills, hooks, the review loop, the session handoff (`checkpoint`) —
   is meant to be taken to other projects, new ones and ones already in
   production. So a lesson counts once it is recorded where another project can
   read it, as CLAUDE.md § Purpose says, never only outside the repository. And

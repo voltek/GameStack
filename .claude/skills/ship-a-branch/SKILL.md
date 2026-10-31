@@ -479,3 +479,7 @@ against `gh issue list --label product --limit 500`; `gh project item-add 1
 token's `project` scope, granted only through a browser: if they fail, ask the
 owner to run `! gh auth refresh -h github.com -s project`. Once the owner
 decides, rewrite the log's body as ADR 0038 shapes it; never append to it.
+
+### Then checkpoint
+The merge changed a cycle status: run the `checkpoint` Skill, and end the
+session there (one task per session).
