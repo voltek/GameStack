@@ -48,8 +48,13 @@ jobs:
 
       # `--continue` reports every independent failure in one run, `--stacktrace`
       # makes a CI-only one traceable. One invocation: Gradle deduplicates the task
-      # graph. No IGDB credentials needed: local.properties falls back to "".
+      # graph. No IGDB credentials: local.properties falls back to "". The timeout
+      # and the GC log per JVM (%p): TOOLING.md § 1.
       - name: Run the gate
+        id: gate
+        timeout-minutes: 20
+        env:
+          JAVA_TOOL_OPTIONS: -Xlog:gc,gc+init:file=${{ runner.temp }}/gc-%p.log
         run: ./gradlew build test lint --continue --stacktrace
 
       - name: Save the Robolectric SDK jar
@@ -60,12 +65,22 @@ jobs:
           path: ~/.m2/repository/org/robolectric
           key: ${{ steps.robolectric.outputs.cache-primary-key }}
 
+      # Not `failure()`: whether a timed-out step counts as failed is undocumented.
       - name: Upload reports
-        if: failure()
+        if: ${{ always() && steps.gate.outcome != 'success' }}
         uses: actions/upload-artifact@v7
         with:
           name: gate-reports
           path: |
             app/build/reports/
             app/build/test-results/
+          retention-days: 7
+
+      # Every run, a pass included: a passing run is CI's heap baseline.
+      - name: Upload GC logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: gate-gc-logs
+          path: ${{ runner.temp }}/gc-*.log
           retention-days: 7
