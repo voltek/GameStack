@@ -40,7 +40,11 @@ somewhere else. It is not loaded every turn.
 **What.** A GitHub Actions workflow named *Gate* whose single job, `build / test /
 lint`, runs the three gate commands with `--continue --stacktrace` on every pull
 request against `main` and every push to `main`. Reports and test results upload
-as an artifact on failure only.
+as an artifact whenever the gate step does not succeed; a GC log per JVM, its
+heap ceiling included (`gc+init`), uploads on every run. The daemon heap is `-Xmx4g` (`gradle.properties`), a mitigation
+rather than a measured size: release packaging deflates a 32 MB `classes.dex` in
+one buffer while lint runs in the same daemon, and at 2048m that failed with
+`OutOfMemoryError` or hung on CI. The Kotlin daemon inherits the same `-Xmx`.
 
 **Replaces.** Remembering to run the three commands by hand, and trusting that
 everyone else did.
@@ -67,6 +71,20 @@ everyone else did.
 - *Wrapping the cache key in a folded scalar.* YAML keeps literal newlines inside
   the expression unless every continuation line sits at the same indent. The key
   stays on one line.
+- *Treating that packaging failure as a stale Gradle cache.* The same restored
+  entries hung one attempt and passed the next on the same commit; the
+  `--stacktrace` named the daemon's heap. Deleting cache entries fixes nothing.
+- *Sizing CI's heap from a local run.* Locally the gate passed at 768m, and at
+  1280m with no cached configuration, as on CI; CI still ran out at 2048m. Only
+  CI's own GC logs size it, a passing run's included.
+- *Uploading on `failure()` and relying on the job timeout.* A job timeout
+  cancels the job, and the docs say nothing about which status function a
+  timeout satisfies. The gate step gets a 20-minute timeout of its own, about
+  twice the slowest healthy run, so the job outlives a hang and the reports
+  upload by checking that step's `outcome`.
+- *A CI-only heap override.* `org.gradle.jvmargs` overrides as a whole value, so
+  a copy on the CI command line drifts from `gradle.properties`, and the local
+  gate stops running the daemon CI runs.
 
 ## 2. Branch protection on `main`
 **What.** `main` requires the `build / test / lint` and `messages / title / branch`
