@@ -133,6 +133,9 @@ MSYS_NO_PATHCONV=1 "$ADB" shell uiautomator dump /sdcard/d.xml
 MSYS_NO_PATHCONV=1 "$ADB" shell cat /sdcard/d.xml | tr '>' '\n' | grep -oE 'text="[^"]+"'
 ```
 
+A dump is one instant: a node still animating in is missing from it. Dump again
+before concluding that something is absent.
+
 **`"$ADB" exec-out screencap -p > <file>.png`**, read as an image — when the
 criterion is visual (clipping, spacing, contrast, alignment).
 
@@ -147,9 +150,11 @@ field may hold focus, ask the window manager:**
 ```
 
 Anything but `false`, no output included, counts as visible: take a screenshot.
-If `true`, `KEYCODE_BACK` hides the keyboard without navigating. Use this
-probe, not `dumpsys input_method`, which reported the keyboard hidden while it
-was up. When what the keyboard covers *is* the question, take a screenshot.
+If `true`, `KEYCODE_BACK` hides the keyboard without navigating. Never send it
+unless the probe says `true`: with the keyboard hidden it navigates, and twice
+leaves the app. Use this probe, not `dumpsys input_method`, which reported the
+keyboard hidden while it was up. When what the keyboard covers *is* the
+question, take a screenshot.
 
 ### The network
 Force network-dependent states, then restore the network before going on: it
@@ -203,8 +208,32 @@ MSYS_NO_PATHCONV=1 "$ADB" pull /sdcard/pass-1.mp4 .
 what nobody thought to assert, and a purely visual defect is the common case.
 
 ## Exploratory pass
-(PENDING — not yet defined: written from the first exploratory pass, on Search.)
-Each bug it confirms becomes a `defect` issue.
+A pass over a merged screen, for what no scenario names. Cover what the
+section above covers, then what has found defects before:
+
+- **The system in light mode** (`"$ADB" shell cmd uimode night no`): the app
+  is dark-only, but whatever it leaves to the system follows the system.
+- **A configuration change.** The app is portrait-only (ADR 0019), so toggle
+  `cmd uimode night yes` and back: the Activity is recreated and the screen's
+  state must survive it.
+- **Process death.** Home, `"$ADB" shell am kill com.gamestack`, then reopen
+  from Recents (`KEYCODE_APP_SWITCH`, tap the card). Not from a launcher
+  intent: a task started with `am start -n` has another root intent, so the
+  launcher opens a new task and nothing looks restored.
+- **From every state:** offline and back, Back, a tab switch and return, two
+  rapid taps, a tap while the keyboard is up.
+- **Every way to retry** (the Retry button, a pull, the keyboard's action key),
+  both still offline and once the network is back: a retry that changes nothing
+  on screen reads as a broken app.
+- **Input at the edges:** whitespace only, quotes, a long string. `input text`
+  types ASCII only.
+- **Wrong data is not yet a defect.** Send IGDB the same query (token from
+  `id.twitch.tv/oauth2/token` with the `local.properties` credentials, never
+  printed) to tell IGDB's own data from a mapping bug.
+
+Each confirmed defect becomes a `defect` issue with the capture that shows it,
+saying whether a spec covers the behaviour: if none does, its fix carries a
+scenario (`ship-a-branch`).
 
 ## Cost
 Screenshot cost is set by **aspect ratio, not AVD resolution** — the long edge is
