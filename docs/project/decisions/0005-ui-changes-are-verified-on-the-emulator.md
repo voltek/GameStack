@@ -1,6 +1,7 @@
 # ADR 0005 — A UI change is verified on the emulator before a merge is requested
 
 Status: Accepted
+Status: Superseded by ADR-0046 — "The emulator is *asked for*, never launched unprompted" (Decision)
 Date: 2026-08-22
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-22 ("CLAUDE.md defined")
 Enforced by: none (prose only — CLAUDE.md § Commands)
