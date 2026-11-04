@@ -8,8 +8,8 @@ body:
         **Product scope only (ADR 0043).** Harness and repository work uses *Pending work* instead.
         One item per issue. **Title in the commit form** of ADR 0034, `type(scope): Imperative summary`
         (`.githooks/rules.sh title "<title>"` checks it): it becomes the title of the pull request that
-        closes this issue with `Closes #n`. Its horizon is a field of the product GitHub Project, set at
-        triage; the dropdown below is the author's proposal.
+        closes this issue with `Closes #n`. Its horizon is a field of the product GitHub Project: its
+        opener adds it there with the dropdown's proposal below, and a triage confirms it (ADR 0047).
   - type: input
     id: source
     attributes:

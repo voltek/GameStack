@@ -3,10 +3,13 @@
 Status: Accepted
 Status: Superseded by ADR-0041 — "its OpenSpec item included" (Decision)
 Status: Superseded by ADR-0043 — "Product scope deferred past the MVP is not this kind of work" (Decision)
+Status: Superseded by ADR-0047 — "once a merge changes `app/src/main`, or three merges have landed since the last triage" (Decision)
+Status: Superseded by ADR-0047 — "the owner confirms the bucket and sets one priority within it" (Decision)
+Status: Superseded by ADR-0047 — "Labels when opened" (Decision)
 Date: 2026-10-28
 Backfilled: no
-Enforced by: none (prose only — TOOLING.md § 12. Issue form) — the title form, the body's sections, labels when opened
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Then check whether a triage is owed) — when a triage is owed, what it covers, the priorities
+Enforced by: none (prose only — TOOLING.md § 12. Issue form) — the title form, the body's sections
+Enforced by: none (prose only — .claude/skills/checkpoint/SKILL.md § Triage) — what a triage covers, the priorities
 Enforced by: none (prose only — TOOLING-BACKLOG.md § Where each item went) — the file holds only the table
 
 ## Context

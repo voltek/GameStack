@@ -466,20 +466,7 @@ history and deleting it makes those commits unreachable. So a refusal is
 information, not an obstacle — and `-D` is the key that disables the check. If
 `-d` refuses, find out why before reaching for it.
 
-### Then check whether a triage is owed
-Owed once a merge changes `app/src/main`, or three merges have landed since the
-last triage, whose commit the pinned `Triage log` issue records (ADR 0038).
-Before the next branch starts, propose to the owner what ADR 0038 § Decision
-lists for a triage, for every open issue but that log and the `product` ones.
-For those (ADR 0043), read `PRODUCT.md`'s *First release*, *Backlog* and *Open
-questions*; add every open `product` issue missing from the `GameStack Product`
-Project (`gh project item-list 1 --owner voltek --limit 500 --format json`
-against `gh issue list --label product --limit 500`; `gh project item-add 1
---owner voltek --url <issue>`), then propose each one's Horizon. These need the
-token's `project` scope, granted only through a browser: if they fail, ask the
-owner to run `! gh auth refresh -h github.com -s project`. Once the owner
-decides, rewrite the log's body as ADR 0038 shapes it; never append to it.
-
 ### Then checkpoint
-The merge changed a cycle status: run the `checkpoint` Skill, and end the
-session there (one task per session).
+The merge changed a cycle status: run the `checkpoint` Skill, which also says
+whether that leaves a triage owed, and end the session there (one task per
+session).

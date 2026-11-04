@@ -13,6 +13,7 @@ state_dir="$dir/.hook-state"
 max_lines=80
 max_bytes=6000
 max_cycle_lines=30
+max_insertions=3
 max_issues=300
 cap=10000
 
@@ -34,9 +35,12 @@ facts() {
   pool
 }
 
-# The issue queue and ADR 0038's triage rule, as of the last fetch. Facts only: counts and a merge count.
+# The issue queue as of the last fetch: counts, defects, and ADR 0047's issues awaiting a priority.
 pool() {
-  local rows bucket n last landed merges product
+  local rows b n missing buckets='blocks-product defect improvement idea'
+  # A label is matched in a row's label field only (num|,labels,|title), never in its title.
+  local f='^[0-9]+\|[^|]*,' any
+  any="$f($(printf '%s' "$buckets" | tr ' ' '|')),"
   rows=$(cd "$repo" && timeout 15 gh issue list --state open --limit $max_issues --json number,title,labels \
          --jq '.[] | select(.title != "Triage log") | "\(.number)|,\([.labels[].name]|join(",")),|\(.title)"' 2>/dev/null) \
     || { echo "Issue pool: gh unavailable, not read."; return; }
@@ -44,32 +48,42 @@ pool() {
   [ "$(printf '%s\n' "$rows" | grep -c .)" -ge $((max_issues - 1)) ] \
     && echo "Issue pool: only the first $max_issues open issues were read; every count below may be low."
   printf 'Product backlog (ADR 0043): %s open; horizons live in the GameStack Product Project.\n' \
-    "$(printf '%s\n' "$rows" | grep -c ',product,')"
-  rows=$(printf '%s\n' "$rows" | grep -v ',product,')
+    "$(printf '%s\n' "$rows" | grep -cE "${f}product,")"
+  rows=$(printf '%s\n' "$rows" | grep -vE "${f}product,")
   printf 'Issue pool: %s open —' "$(printf '%s\n' "$rows" | grep -c .)"
-  for bucket in blocks-product defect improvement idea; do
-    printf ' %s %s,' "$bucket" "$(printf '%s\n' "$rows" | grep -c ",$bucket,")"
+  for b in $buckets; do
+    printf ' %s %s,' "$b" "$(printf '%s\n' "$rows" | grep -cE "$f$b,")"
   done
-  n=$(printf '%s\n' "$rows" | grep -v -e ',blocks-product,' -e ',defect,' -e ',improvement,' -e ',idea,' | grep -c .)
-  printf ' no bucket %s; gated %s.\n' "$n" "$(printf '%s\n' "$rows" | grep -c ',gated,')"
-  printf '%s\n' "$rows" | grep -e ',blocks-product,' -e ',defect,' | grep -v ',gated,' \
+  n=$(printf '%s\n' "$rows" | grep . | grep -vcE "$any")
+  printf ' no bucket %s; gated %s.\n' "$n" "$(printf '%s\n' "$rows" | grep -cE "${f}gated,")"
+  printf '%s\n' "$rows" | grep -E "$f(blocks-product|defect)," | grep -vE "${f}gated," \
     | sed 's/^\([0-9]*\)|[^|]*|/  needs attention: #\1 /'
-  last=$(cd "$repo" && timeout 15 gh issue list --state open --search 'in:title "Triage log"' --json title,body,isPinned \
-         --jq '.[] | select(.title == "Triage log" and .isPinned) | .body' 2>/dev/null \
-         | sed -n 's/^Last triage: .*at main \([0-9a-f]\{7,40\}\).*/\1/p' | head -1)
-  if ! git -C "$repo" cat-file -e "${last:-x}^{commit}" 2>/dev/null; then
-    echo "TRIAGE: no 'Last triage:' line with a known commit in the pinned Triage log issue."; return
+  # An issue with no bucket waits for the triage, and is counted above as "no bucket".
+  missing=$(printf '%s\n' "$rows" | grep -E "$any" | grep -vE "$f(gated|p[123])," \
+            | sed 's/^\([0-9]*\)|.*/#\1/' | tr '\n' ' ')
+  [ -n "$missing" ] && echo "A bucket and no priority, ungated (ADR 0047): ${missing% }."
+}
+
+# ADR 0047: a triage is owed when no cycle is open or a breaker fires; the checkpoint Skill states the bounds.
+triage() {
+  local ins lines
+  # Only the machine that keeps the cycles (a CYCLE.md, or an archive of them) owes a triage for having none.
+  if [ ! -f "$cycle" ]; then
+    if [ -d "$dir/archive/cycles" ]; then echo "TRIAGE OWED (ADR 0047): no CYCLE.md, so no cycle is open."
+    else echo "No cycle is kept on this machine (no CYCLE.md or archive/cycles/ in $dir): cycles and triages run where they are kept."; fi
+    return
   fi
-  # Every first-parent commit on main is a pull request landing, a squash merge included.
-  landed=$(git -C "$repo" rev-list --first-parent "$last"..origin/main 2>/dev/null) \
-    || { echo "TRIAGE: could not count the merges since the last one against origin/main."; return; }
-  merges=$(printf '%s\n' "$landed" | grep -c .)
-  product=$(printf '%s\n' "$landed" | while read -r m; do [ -n "$m" ] || continue
-              git -C "$repo" diff --quiet "$m^1" "$m" -- app/src/main || echo x; done | grep -c x)
-  if [ "$product" -gt 0 ] || [ "$merges" -ge 3 ]; then
-    echo "TRIAGE OWED (ADR 0038): $merges merges since the last one, $product of them changed app/src/main."
+  # A breaker that cannot be read is owed, never assumed clear.
+  if ! grep -q '^## Insertions' "$cycle"; then
+    echo "TRIAGE OWED (ADR 0047): CYCLE.md has no '## Insertions' heading, so its breaker cannot be read (checkpoint Skill)."; return
+  fi
+  # Every row of the table under the heading but its header and separator, however it is numbered.
+  ins=$(sed -n '/^## Insertions/,/^## /p' "$cycle" | awk '/^\|/ { if (++n > 2) c++ } END { print c + 0 }')
+  lines=$(($(wc -l < "$cycle")))
+  if [ "$ins" -ge $max_insertions ] || [ "$lines" -gt $max_cycle_lines ]; then
+    echo "TRIAGE OWED (ADR 0047): a breaker fired, CYCLE.md has $ins insertions (stops at $max_insertions) and $lines lines (bound $max_cycle_lines)."
   else
-    echo "Triage not owed: $merges merges since the last one, none changed app/src/main."
+    echo "Triage not owed: the open cycle has $ins insertions and $lines lines."
   fi
 }
 
@@ -79,7 +93,7 @@ handoff_block() {
   cat "$handoff"
   echo
   if [ -f "$cycle" ]; then echo "== CYCLE.md ($cycle) =="; cat "$cycle"
-  else echo "No open cycle at $cycle: the next one is chosen at a triage."; fi
+  else echo "No CYCLE.md at $cycle."; fi
 }
 
 hash=$( [ -f "$handoff" ] && cat "$handoff" "$cycle" 2>/dev/null | cksum | cut -d' ' -f1 )
@@ -107,9 +121,7 @@ if [ -f "$handoff" ]; then
     warn="WARNING: HANDOFF.md is $lines lines / $bytes bytes, over its $max_lines / $max_bytes bound. Trim it at the next checkpoint."$'\n'
   fi
 fi
-if [ -f "$cycle" ] && [ "$(wc -l < "$cycle")" -gt $max_cycle_lines ]; then
-  warn+="WARNING: CYCLE.md is over $max_cycle_lines lines: a growing cycle is the circuit breaker, re-triage."$'\n'
-fi
 [ ${#body} -gt $((cap - 1000)) ] && warn+="WARNING: this hook output is ${#body} chars; above $cap Claude Code shows only a 2,000-char preview."$'\n'
 
-printf '%s%s\n' "$warn" "$body"
+# The triage line goes first, beside the warnings: a preview cut at 2,000 chars still shows it.
+printf '%s%s\n%s\n' "$warn" "$(triage)" "$body"

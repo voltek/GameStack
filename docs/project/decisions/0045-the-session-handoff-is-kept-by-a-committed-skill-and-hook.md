@@ -4,7 +4,9 @@ Status: Accepted
 Date: 2026-10-30
 Backfilled: no
 Enforced by: none (prose only — .claude/skills/checkpoint/SKILL.md § HANDOFF.md — session state only) — what the handoff holds, rewrite never append, the bound, nothing derivable, the repository winning
-Enforced by: none (prose only — .claude/skills/checkpoint/SKILL.md § CYCLE.md — one finite cycle) — admission, insertions, the breakers, closing a cycle
+Enforced by: none (prose only — .claude/skills/checkpoint/SKILL.md § CYCLE.md — one finite cycle) — admission, insertions, closing a cycle
+Enforced by: test: test-session-start.sh#a third insertion — the insertion breaker reported
+Enforced by: test: test-session-start.sh#a cycle over its line bound — the line breaker reported
 Enforced by: none (prose only — .claude/skills/checkpoint/SKILL.md § One task per session) — one branch per session, stopping at its merge
 Enforced by: none (prose only — .claude/skills/checkpoint/SKILL.md § When to checkpoint) — when a checkpoint runs
 Enforced by: none (prose only — docs/project/TOOLING.md § 14. Session handoff) — the hook's place and its registration
