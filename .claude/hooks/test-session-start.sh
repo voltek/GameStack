@@ -7,40 +7,29 @@ export LC_ALL
 GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
 export GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
 
-hook=$(cd "$(dirname "$0")" && pwd)/session-start.sh
+here=$(cd "$(dirname "$0")" && pwd)
+hook=$here/session-start.sh
+skill=$here/../skills/checkpoint/SKILL.md
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 failures=0
 repo=$tmp/repo
 dir=$tmp/handoff
 
-# A fake gh: the pool query gets one issue, the Triage log query its body. A newer
-# unpinned decoy names main's tip; only a jq select on .isPinned skips it.
+# A fake gh: one open issue per kind the pool tells apart, or a failure when FAKE_GH_FAIL is set.
 mkdir -p "$tmp/bin"
 cat >"$tmp/bin/gh" <<'EOF'
 #!/bin/sh
-case "$*" in
-    *--search*"and .isPinned"*) printf 'Last triage: 2026-10-30 at main %s.\n' "$FAKE_LAST" ;;
-    *--search*) printf 'Last triage: 2026-10-31 at main %s.\n' "$FAKE_DECOY" "$FAKE_LAST" ;;
-    *) printf '1|,defect,|fix(search): A defect\n' ;;
-esac
+[ -n "$FAKE_GH_FAIL" ] && exit 1
+printf '%s\n' '1|,defect,|fix(search): A defect' '2|,improvement,p2,|docs(x): Prioritised' \
+    '3|,idea,gated,|docs(x): Gated' '4|,product,|feat(detail): A product item' \
+    '5|,review-debt,|docs(x): Waiting for its bucket' '6|,improvement,|docs(x): Rename p1,p2,p3, a title only'
 EOF
 chmod +x "$tmp/bin/gh"
 
 g() { git -C "$repo" -c user.name=t -c user.email=t@t "$@"; }
-commit() { mkdir -p "$repo/$(dirname "$1")" && echo "$2" >"$repo/$1" && g add -A && g commit -qm "$2"; }
-
 git init -q -b main "$repo"
-commit README.md base
-FAKE_LAST=$(g rev-parse HEAD)
-export FAKE_LAST
-g switch -qc docs/x && commit docs/a.md doc && g switch -q main
-g merge -q --no-ff -m 'Merge docs/x' docs/x
-merged=$(g rev-parse HEAD)
-commit app/src/main/A.kt squashed
-squashed=$(g rev-parse HEAD)
-FAKE_DECOY=$squashed
-export FAKE_DECOY
+mkdir -p "$repo/docs" && echo base >"$repo/docs/a.md" && g add -A && g commit -qm base
 
 run() {
     printf '{"session_id":"%s","source":"%s"}' "$2" "$1" \
@@ -58,6 +47,13 @@ lacks() {
     printf 'FAIL %s: did not expect "%s"\n' "$1" "$2"
     sed 's/^/    /' "$tmp/out"
     failures=$((failures + 1))
+}
+# A cycle file with $1 insertion rows, padded with $2 blank lines.
+cycle() {
+    { echo '# Cycle'; echo '| # | Item |'; echo '|---|---|'; echo '| 1 | An item |'
+      echo; echo '## Insertions'; echo '| # | Item |'; echo '|---|---|'
+      i=0; while [ $i -lt "$1" ]; do i=$((i + 1)); echo "| $i | An insertion |"; done
+      i=0; while [ $i -lt "$2" ]; do i=$((i + 1)); echo; done; } >"$dir/CYCLE.md"
 }
 
 run startup s0
@@ -88,17 +84,55 @@ seq 81 >"$dir/HANDOFF.md"
 run startup s2
 has 'over the line bound' 'WARNING: HANDOFF.md is 81 lines'
 
-g update-ref refs/remotes/origin/main "$merged"
+has 'the product backlog counted apart' 'Product backlog (ADR 0043): 1 open'
+has 'an ungated issue with no priority' 'A bucket and no priority, ungated (ADR 0047): #1 #6.'
+has 'no cycle kept on this machine' 'No cycle is kept on this machine'
+lacks 'no cycle kept on this machine' 'TRIAGE OWED'
+mkdir -p "$dir/archive/cycles"
+run startup s2
+has 'no open cycle' 'TRIAGE OWED (ADR 0047): no CYCLE.md'
+t=$(grep -n -m1 'TRIAGE OWED' "$tmp/out" | cut -d: -f1)
+h=$(grep -n -m1 '== HANDOFF.md' "$tmp/out" | cut -d: -f1)
+[ "${t:-99999}" -lt "${h:-0}" ] \
+    || { printf 'FAIL the triage line before the handoff: line %s, handoff at %s\n' "$t" "$h"; failures=$((failures + 1)); }
+cycle 2 0
 run startup s3
-has 'one docs merge' 'Triage not owed: 1 merges'
-g update-ref refs/remotes/origin/main "$squashed"
+has 'two insertions' 'Triage not owed: the open cycle has 2 insertions'
+cycle 3 0
 run startup s3
-has 'a squash merge into app/src/main' 'TRIAGE OWED (ADR 0038): 2 merges'
-lacks 'an unpinned decoy Triage log' 'Triage not owed: 0 merges'
-g update-ref -d refs/remotes/origin/main
+has 'a third insertion' 'TRIAGE OWED (ADR 0047): a breaker fired, CYCLE.md has 3 insertions'
+# The fixture is 8 lines before its padding: 22 blank lines make 30, at the bound.
+cycle 0 22
 run startup s3
-lacks 'no origin/main' 'Triage not owed'
-has 'no origin/main' 'TRIAGE: could not count'
+has 'a cycle at its line bound' 'Triage not owed: the open cycle has 0 insertions and 30 lines'
+cycle 0 23
+run startup s3
+has 'a cycle over its line bound' 'TRIAGE OWED (ADR 0047): a breaker fired, CYCLE.md has 0 insertions (stops at 3) and 31 lines'
+lacks 'a cycle with its insertions heading' "has no '## Insertions' heading"
+printf '# Cycle\n### Insertions\n| 1 | An insertion |\n' >"$dir/CYCLE.md"
+run startup s3
+has 'a cycle with no insertions heading' "TRIAGE OWED (ADR 0047): CYCLE.md has no '## Insertions' heading"
+printf '## Insertions\n| # | Item |\n|---|---|\n| a1 | One |\n| I2 | Two |\n| - | Three |\n' >"$dir/CYCLE.md"
+run startup s3
+has 'insertions however numbered' 'TRIAGE OWED (ADR 0047): a breaker fired, CYCLE.md has 3 insertions'
+rm "$dir/CYCLE.md"
+FAKE_GH_FAIL=1
+export FAKE_GH_FAIL
+run startup s3
+unset FAKE_GH_FAIL
+has 'gh unavailable' 'Issue pool: gh unavailable'
+has 'gh unavailable' 'TRIAGE OWED (ADR 0047): no CYCLE.md'
+
+# The hook's bounds are constants; the checkpoint Skill states them in prose.
+bound() { sed -n "s/^$1=//p" "$hook"; }
+thousands() { echo "$1" | sed 's/\([0-9]\)\([0-9]\{3\}\)$/\1,\2/'; }
+case $(bound max_insertions) in 2) nth=second ;; 3) nth=third ;; 4) nth=fourth ;; *) nth="$(bound max_insertions)th" ;; esac
+for phrase in "Bound: $(bound max_lines) lines and $(thousands "$(bound max_bytes)") bytes." \
+              "past $(bound max_cycle_lines) lines" "A $nth insertion in one cycle stops it"; do
+    grep -qF "$phrase" "$skill" && continue
+    printf 'FAIL bounds match the checkpoint Skill: "%s" not in %s\n' "$phrase" "$skill"
+    failures=$((failures + 1))
+done
 
 # No CLAUDE_HANDOFF_DIR: a worktree reads ~/Documents/<main checkout's name>.
 mkdir -p "$tmp/home/Documents/repo"

@@ -324,13 +324,14 @@ build.
 ## 12. Issue form
 **What.** One form for every pending item (ADR 0038): the title in the commit
 form, then source, problem with evidence, grounds, suggested fix, ruled out,
-trigger, where it lands, bucket and export value. Blank issues are off, so a
-person opening an issue on GitHub gets the form too. Its author sets the bucket,
-`export` and `gated`; a triage confirms them and sets `p1`–`p3`. Product work
+trigger, where it lands, bucket, priority and export value. Blank issues are
+off, so a person opening an issue on GitHub gets the form too. Its author sets
+the bucket, a `p1`–`p3` unless the item is `gated`, `export` and `gated`; a
+triage confirms or changes them (ADR 0047). Product work
 has a second form (ADR 0043): source, what the user gets, grounds in
 `PRODUCT.md`, notes and a proposed horizon, labelled `product`. Its horizon is
 the Horizon field (Now, Next, Later) of the `GameStack Product` GitHub Project,
-which holds product issues only; a triage sets it.
+which holds product issues only; its opener sets it and a triage confirms it.
 
 **Replaces.** An issue body written however its author wrote it that day, and
 `TOOLING-BACKLOG.md`, the file that held unbuilt tooling until each of its items
@@ -420,6 +421,9 @@ by `commits.yml`; `.claude/skills/checkpoint/`. The files are read from
   issue (ADR 0038).
 - *Stored derived facts.* Branches, hashes and counts went stale between
   sessions; the hook computes them instead.
+- *A triage owed by counting merges* (ADR 0038, until ADR 0047). A one-line
+  `.gitignore` merge made it fire mid-cycle, and a product cycle would owe one
+  per pull request; skipping merges by path needed a hand-kept list.
 
 ---
 

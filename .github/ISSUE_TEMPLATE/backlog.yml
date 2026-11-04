@@ -8,9 +8,10 @@ body:
         (ADR 0043).
         One item per issue. **Title in the commit form** of ADR 0034, `type(scope): Imperative summary`
         (`.githooks/rules.sh title "<title>"` checks it): it becomes the title of the pull request that
-        closes this issue with `Closes #n`. Labels: a bucket, `export` and `gated` when it is opened, a
-        priority at triage. Nothing from the human's separate study programme goes in an issue: this
-        repository is public.
+        closes this issue with `Closes #n`. Labels when it is opened: a bucket, a priority unless `gated`,
+        `export` and `gated`; a triage confirms or changes them (ADR 0047). The fields below apply no
+        label: an opener who cannot set labels leaves them to the triage, which reads these fields.
+        Nothing from the human's separate study programme goes in an issue: this repository is public.
   - type: input
     id: source
     attributes:
@@ -62,6 +63,18 @@ body:
         - defect
         - improvement
         - idea
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: The author's proposal, by ADR 0038's meanings; a gated item takes none. The triage's label is the decision.
+      options:
+        - p1
+        - p2
+        - p3
+        - none (gated)
     validations:
       required: true
   - type: dropdown

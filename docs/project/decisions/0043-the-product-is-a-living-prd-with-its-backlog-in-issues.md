@@ -7,7 +7,7 @@ Supersedes: ADR-0038 — "Product scope deferred past the MVP is not this kind o
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Documentation integrity — the *Capabilities* table's *Spec* column names exactly the folders under `openspec/specs/`
 Enforced by: none (prose only — docs/project/PRODUCT.md § How this document changes) — when it is read and when it is edited, a technical deferral kept out of it
 Enforced by: none (prose only — docs/project/TOOLING.md § 12. Issue form) — the product form, the `product` label, the Horizon field, the Project holding product issues only
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Then check whether a triage is owed) — a triage adds missing product issues to the Project, then sets or confirms each horizon
+Enforced by: none (prose only — .claude/skills/checkpoint/SKILL.md § Triage) — a triage adds missing product issues to the Project, then sets or confirms each horizon
 
 ## Context
 The Spec was named v1 and edited in place. It held product scope beside a tech
