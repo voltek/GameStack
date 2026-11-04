@@ -1,11 +1,11 @@
 name: Pending work
-description: Harness and repository work not done yet — tooling, an improvement, an idea, a defect (ADR 0038).
+description: Harness and repository work not done yet — tooling, an improvement, an idea, a harness defect (ADR 0038).
 body:
   - type: markdown
     attributes:
       value: |
-        **Every issue (ADR 0038).** Harness and repository work only: product work uses *Product item*
-        (ADR 0043).
+        **Every issue (ADR 0038).** Harness and repository work only: product work uses *Product item*,
+        and a defect in the app *App defect* (ADR 0043, ADR 0048).
         One item per issue. **Title in the commit form** of ADR 0034, `type(scope): Imperative summary`
         (`.githooks/rules.sh title "<title>"` checks it): it becomes the title of the pull request that
         closes this issue with `Closes #n`. Labels when it is opened: a bucket, a priority unless `gated`,
@@ -26,6 +26,11 @@ body:
       description: What is wrong or missing, with its evidence — a file and line, a run id, a measurement.
     validations:
       required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: A capture that proves the problem, if one does, dragged in here.
   - type: textarea
     id: grounds
     attributes:

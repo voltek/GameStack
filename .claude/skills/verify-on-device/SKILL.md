@@ -231,7 +231,10 @@ section above covers, then what has found defects before:
   `id.twitch.tv/oauth2/token` with the `local.properties` credentials, never
   printed) to tell IGDB's own data from a mapping bug.
 
-Each confirmed defect becomes a `defect` issue with the capture that shows it,
+Each confirmed defect becomes an issue in the shape of
+`.github/ISSUE_TEMPLATE/bug.yml` (ADR 0048), opened with `--label product
+--label bug`, since `gh issue create` applies no form's labels, its Horizon
+proposed under the form's heading, with the capture that shows it,
 saying whether a spec covers the behaviour: if none does, its fix carries a
 scenario (`ship-a-branch`).
 

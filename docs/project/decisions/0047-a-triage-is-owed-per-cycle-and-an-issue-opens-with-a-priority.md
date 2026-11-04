@@ -1,6 +1,7 @@
 # ADR 0047 — A triage is owed per cycle, and an issue opens with a priority
 
 Status: Accepted
+Status: Superseded by ADR-0048 — "A harness issue, an app defect among them, opens with one bucket" (Decision)
 Date: 2026-11-01
 Backfilled: no
 Supersedes: ADR-0038 — "once a merge changes `app/src/main`, or three merges have landed since the last triage" (Decision)
