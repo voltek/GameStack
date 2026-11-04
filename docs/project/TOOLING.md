@@ -323,25 +323,33 @@ build.
 
 ## 12. Issue form
 **What.** One form for every pending item (ADR 0038): the title in the commit
-form, then source, problem with evidence, grounds, suggested fix, ruled out,
-trigger, where it lands, bucket, priority and export value. Blank issues are
-off, so a person opening an issue on GitHub gets the form too. Its author sets
-the bucket, a `p1`–`p3` unless the item is `gated`, `export` and `gated`; a
-triage confirms or changes them (ADR 0047). Product work
-has a second form (ADR 0043): source, what the user gets, grounds in
-`PRODUCT.md`, notes and a proposed horizon, labelled `product`. Its horizon is
-the Horizon field (Now, Next, Later) of the `GameStack Product` GitHub Project,
-which holds product issues only; its opener sets it and a triage confirms it.
+form, then source, problem with evidence, screenshots, grounds, suggested fix,
+ruled out, trigger, where it lands, bucket, priority and export value. Blank
+issues are off, so a person opening an issue on GitHub gets the form too. Its
+author sets the bucket, a `p1`–`p3` unless the item is `gated`, `export` and
+`gated`; a triage confirms or changes them (ADR 0047). Product work has a
+second form (ADR 0043): source, what the user gets, grounds in `PRODUCT.md`,
+notes and a proposed horizon, labelled `product`. An app defect has a third
+(ADR 0048): source, steps with expected and actual, device and build,
+screenshots, grounds and a proposed horizon, labelled `product` and `bug`. A
+product issue's horizon is the Horizon field (Now, Next, Later) of the
+`GameStack Product` GitHub Project, which holds product issues only and adds
+each one by its label; its opener sets the horizon and a triage confirms it.
 
 **Replaces.** An issue body written however its author wrote it that day, and
 `TOOLING-BACKLOG.md`, the file that held unbuilt tooling until each of its items
-became an issue; for product, the Spec's *Explicitly Deferred* section.
+became an issue; for product, the Spec's *Explicitly Deferred* section; for an
+app defect, the harness form and its `defect` bucket.
 
-**Where.** `.github/ISSUE_TEMPLATE/backlog.yml`, `product.yml` and `config.yml`.
-The labels' names and meanings are ADR 0038 § Decision and ADR 0043; on GitHub
-they are repository state that a new repository creates once (`gh label
-create`), and so are the Project and its field (`gh project create`, `gh
-project field-create`, `gh project link`; the token needs the `project` scope).
+**Where.** `.github/ISSUE_TEMPLATE/backlog.yml`, `product.yml`, `bug.yml` and
+`config.yml`. The labels' names and meanings are ADR 0038 § Decision, ADR 0043
+and ADR 0048; on GitHub they are repository state that a new repository creates
+once (`gh label create`), `bug` included, since a form drops a label that does
+not exist; and so are the Project and its field (`gh project
+create`, `gh project field-create`, `gh project link`; the token needs the
+`project` scope). The Project's auto-add workflow, filter `is:issue
+label:product`, is set by hand in its *Workflows* settings: GitHub Free allows
+one, and it adds an older issue only once that issue is next updated.
 
 **Ruled out.**
 - *A backlog file.* Cheaper for an agent to read, but it grows the way
@@ -355,6 +363,16 @@ project field-create`, `gh project link`; the token needs the `project` scope).
   Project's board groups by its own fields, not by labels.
 - *Harness issues in the product Project.* They would carry two priorities, a
   `p1`–`p3` label and a Horizon, for one item.
+- *A harness Project.* A board or a view groups by a single-select or iteration
+  field, never by a label, so it needs fields that mirror the labels (a second
+  source of priority) or replace them (`gh issue list` and the hook go blind).
+  The triage's grouped read covers it; reopens when more than one person works
+  the pool, or a view can group by label.
+- *App defects in the harness pool under `defect`*, or in one product form
+  widened to cover them: the counts mix, or optional fields fit neither kind.
+- *An issue type `bug`*, defined per organization only, or *a form's
+  `projects:` key*, which covers that form alone and writes one owner's Project
+  number into every clone.
 
 ## 13. Spec-driven changes
 **What.** OpenSpec (ADR 0041): a spec per capability under `openspec/specs/`,
@@ -425,6 +443,14 @@ by `commits.yml`; `.claude/skills/checkpoint/`. The files are read from
   `.gitignore` merge made it fire mid-cycle, and a product cycle would owe one
   per pull request; skipping merges by path needed a hand-kept list.
 
+**Known limit.** The cycle is one machine's file, so on a team nobody else sees
+it. With a second person or machine keeping cycles, each cycle is a milestone:
+its description holds the goal, the exit, each item's clause and the
+insertions, its issues are the items, and closing it archives it. Not built
+while one owner works on one machine: every status change would be a GitHub
+write, and every session a `gh` read, with no other reader. The candidates
+weighed are in the `gated` issue #159.
+
 ---
 
 ## Rebuilding this elsewhere
@@ -441,6 +467,8 @@ the harness, not before. Order matters only where one piece depends on another:
 5. **The PR template**, **the issue form**, and **Skills** as procedures prove
    themselves repeatable — a Skill written before the second run of a task is a
    guess.
+6. **With more than one person or machine, give the cycle its shared home
+   before the first cycle**: entry 14's known limit, and #159 for its shape.
 
 If this section ever grows past ordering into actual steps, it has become a
 procedure and belongs in a Skill, not here.

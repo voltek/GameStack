@@ -1,6 +1,7 @@
 # ADR 0043 — The product is a living PRD, and its backlog is product issues
 
 Status: Accepted
+Status: Superseded by ADR-0048 — "opened through `.github/ISSUE_TEMPLATE/product.yml`" (Decision), for a bug
 Date: 2026-10-30
 Backfilled: no
 Supersedes: ADR-0038 — "Product scope deferred past the MVP is not this kind of work" (Decision)

@@ -69,10 +69,20 @@ beside the handoff; a shared home for a team's cycle is #134's question.
   for a triage, for every open issue but the `Triage log` and the `product`
   ones. Each ungated issue's priority, proposed when it opened, is confirmed or
   changed. Then the next cycle (§ CYCLE.md), its items admitted by the clauses.
-- **Product issues** (ADR 0043): read `PRODUCT.md`'s *First release*, *Backlog*
-  and *Open questions*, add every open `product` issue its opener left out of
-  the `GameStack Product` Project, then confirm or change each one's Horizon:
-  Now for the new cycle's product issues, Next or Later for the rest. The owner
+  Show the owner the pool grouped by bucket and priority, its board (ADR 0048):
+  ```bash
+  gh issue list --state open --limit 500 --json number,title,labels --jq '
+    map({n: .number, t: .title, l: [.labels[].name]} | select(.t != "Triage log" and (.l | index("product") | not))
+      | .b = (first(.l[] | select(test("^(blocks-product|defect|improvement|idea)$"))) // "no-bucket")
+      | .p = (if .l | index("gated") then "gated" else first(.l[] | select(test("^p[123]$"))) // "none" end))
+    | sort_by(.b, {p1: 1, p2: 2, p3: 3, none: 4, gated: 5}[.p], .n) | .[] | "\(.b) \(.p) #\(.n) \(.t)"'
+  ```
+- **Product issues** (ADR 0043), app bugs among them (ADR 0048): read
+  `PRODUCT.md`'s *First release*, *Backlog* and *Open questions*, add every open
+  `product` issue the `GameStack Product` Project lacks (its auto-add workflow
+  adds an older one only once it is next updated), then confirm or change each
+  one's Horizon: Now for the new cycle's product issues, Next or Later for the
+  rest. The owner
   and number, the Project's items against the open product issues, and the add:
   ```bash
   o=$(gh repo view --json owner --jq .owner.login)

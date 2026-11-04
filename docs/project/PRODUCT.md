@@ -144,7 +144,8 @@ the public `GameStack Product` Project
 (https://github.com/users/voltek/projects/1) is **Now** (in the current cycle), **Next**
 (needed for the first release) or **Later** (after it). This section holds one
 line per Later item, pointing at its issue; the issue holds the detail. Next
-items are the release criteria above.
+items are the release criteria above, and the bugs one of them needs. An app
+defect is a product issue labelled `bug` too, and never a line here (ADR 0048).
 
 - Landscape, tablets and foldables, revisited together (ADR 0019) — #120
 - A "Dropped" list for games left unfinished — #121
@@ -194,5 +195,5 @@ deferral that no release criterion needs is a harness issue, never a line here.
 - `docs/project/decisions/` — one ADR per decision in force, each naming what
   enforces it
 - `docs/project/TOOLING.md` — the harness: what each tool is and why
-- GitHub issues — all pending work: `product` for this document's backlog, the
-  rest for the harness (ADR 0038)
+- GitHub issues — all pending work: `product` for this document's backlog and
+  the app's bugs (ADR 0048), the rest for the harness (ADR 0038)

@@ -37,7 +37,7 @@ facts() {
 
 # The issue queue as of the last fetch: counts, defects, and ADR 0047's issues awaiting a priority.
 pool() {
-  local rows b n missing buckets='blocks-product defect improvement idea'
+  local rows product b n missing buckets='blocks-product defect improvement idea'
   # A label is matched in a row's label field only (num|,labels,|title), never in its title.
   local f='^[0-9]+\|[^|]*,' any
   any="$f($(printf '%s' "$buckets" | tr ' ' '|')),"
@@ -47,8 +47,9 @@ pool() {
   # The Triage log is fetched and then dropped, so a capped list holds one row fewer.
   [ "$(printf '%s\n' "$rows" | grep -c .)" -ge $((max_issues - 1)) ] \
     && echo "Issue pool: only the first $max_issues open issues were read; every count below may be low."
-  printf 'Product backlog (ADR 0043): %s open; horizons live in the GameStack Product Project.\n' \
-    "$(printf '%s\n' "$rows" | grep -cE "${f}product,")"
+  product=$(printf '%s\n' "$rows" | grep -E "${f}product,")
+  printf 'Product backlog (ADR 0043): %s open, %s of them bugs (ADR 0048); horizons live in the GameStack Product Project.\n' \
+    "$(printf '%s\n' "$product" | grep -c .)" "$(printf '%s\n' "$product" | grep -cE "${f}bug,")"
   rows=$(printf '%s\n' "$rows" | grep -vE "${f}product,")
   printf 'Issue pool: %s open —' "$(printf '%s\n' "$rows" | grep -c .)"
   for b in $buckets; do

@@ -1,0 +1,57 @@
+name: App defect
+description: Something the app does wrong — a product bug, with its Horizon as its priority (ADR 0048).
+labels: [product, bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **App defects only (ADR 0048).** A defect in the gate, the rules or the tooling uses *Pending
+        work*; something the app does not do yet uses *Product item*.
+        One defect per issue. **Title in the commit form** of ADR 0034, `type(scope): Imperative summary`
+        (`.githooks/rules.sh title "<title>"` checks it), usually `fix(<screen>)`: it becomes the title
+        of the pull request that closes this issue with `Closes #n`. The Project adds it by its `product`
+        label: its opener sets the dropdown's proposal below there, and a triage confirms it (ADR 0047).
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: A verify-on-device pass (branch), a review round (branch and round), the owner (date), or an agent (branch or session).
+    validations:
+      required: true
+  - type: textarea
+    id: behaviour
+    attributes:
+      label: What happens
+      description: Steps to reproduce, numbered; then what was expected and what happened instead.
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and build
+      description: Device or AVD and its API level, system mode (dark, light) if it matters, and the commit built.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: The capture that shows it, dragged in here.
+  - type: textarea
+    id: grounds
+    attributes:
+      label: Grounds
+      description: The spec scenario or PRODUCT.md line it breaks. "None" means its fix adds a scenario.
+    validations:
+      required: true
+  - type: dropdown
+    id: horizon
+    attributes:
+      label: Horizon
+      description: Now (enters the open cycle as an insertion), Next (a release criterion needs it), Later (after the first release).
+      options:
+        - Now
+        - Next
+        - Later
+    validations:
+      required: true

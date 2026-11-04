@@ -23,6 +23,7 @@ cat >"$tmp/bin/gh" <<'EOF'
 [ -n "$FAKE_GH_FAIL" ] && exit 1
 printf '%s\n' '1|,defect,|fix(search): A defect' '2|,improvement,p2,|docs(x): Prioritised' \
     '3|,idea,gated,|docs(x): Gated' '4|,product,|feat(detail): A product item' \
+    '7|,product,bug,|fix(search): An app defect' \
     '5|,review-debt,|docs(x): Waiting for its bucket' '6|,improvement,|docs(x): Rename p1,p2,p3, a title only'
 EOF
 chmod +x "$tmp/bin/gh"
@@ -84,7 +85,9 @@ seq 81 >"$dir/HANDOFF.md"
 run startup s2
 has 'over the line bound' 'WARNING: HANDOFF.md is 81 lines'
 
-has 'the product backlog counted apart' 'Product backlog (ADR 0043): 1 open'
+has 'the product backlog counted apart' 'Product backlog (ADR 0043): 2 open'
+has 'bugs counted in the product backlog' '2 open, 1 of them bugs (ADR 0048)'
+has 'product issues kept out of the harness pool' 'Issue pool: 5 open'
 has 'an ungated issue with no priority' 'A bucket and no priority, ungated (ADR 0047): #1 #6.'
 has 'no cycle kept on this machine' 'No cycle is kept on this machine'
 lacks 'no cycle kept on this machine' 'TRIAGE OWED'

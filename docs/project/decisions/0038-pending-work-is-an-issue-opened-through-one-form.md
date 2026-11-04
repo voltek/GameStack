@@ -6,6 +6,7 @@ Status: Superseded by ADR-0043 — "Product scope deferred past the MVP is not t
 Status: Superseded by ADR-0047 — "once a merge changes `app/src/main`, or three merges have landed since the last triage" (Decision)
 Status: Superseded by ADR-0047 — "the owner confirms the bucket and sets one priority within it" (Decision)
 Status: Superseded by ADR-0047 — "Labels when opened" (Decision)
+Status: Superseded by ADR-0048 — "an idea, a defect, a deferred review finding" (Decision), for a defect in the app
 Date: 2026-10-28
 Backfilled: no
 Enforced by: none (prose only — TOOLING.md § 12. Issue form) — the title form, the body's sections
