@@ -49,7 +49,7 @@ artifacts:
       change; an accepted behavioural assumption becomes a requirement in the
       delta. A visual or UX choice, product scope, or the name of a
       user-facing concept is never an assumption: ask the owner and wait
-      (CLAUDE.md § Human-in-the-Loop principle). One the owner leaves
+      (CLAUDE.md § Working here). One the owner leaves
       unanswered goes under `## Open Questions`, and a change with an open
       question is not approved.
 

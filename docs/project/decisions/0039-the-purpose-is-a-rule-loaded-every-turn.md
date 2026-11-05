@@ -1,9 +1,10 @@
 # ADR 0039 — The project's purpose is a rule loaded on every turn
 
 Status: Accepted
+Status: Superseded by ADR-0050 — "as a Tier 1 rule" (Decision)
 Date: 2026-10-28
 Backfilled: no
-Enforced by: none (prose only — CLAUDE.md § Purpose — Tier 1) — weighing against both halves, where a harness decision lives
+Enforced by: none (prose only — CLAUDE.md § Purpose) — weighing against both halves, where a harness decision lives
 Enforced by: none (prose only — docs/project/PRODUCT.md § Why this project exists, and what it optimises for) — the full statement, the harness meant to leave
 
 ## Context

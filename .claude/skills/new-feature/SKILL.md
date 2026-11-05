@@ -25,7 +25,7 @@ genuine ambiguity remains, invoke the `discovery-feature` skill first.
 
 Then a feature that adds or changes what the user sees opens its OpenSpec
 change (`openspec-propose`, ADR 0041), and the owner approves its proposal and
-delta spec before step 1. That approval is Plan-level, like step 5's.
+delta spec before step 1. That approval is an ask-first decision, like step 5's.
 
 ### 1. Domain models
 Create the pure domain model(s) needed for this feature.
@@ -53,9 +53,10 @@ Generate a visual prototype (Stitch or Claude Design) based on the
 spec/discovery-feature output.
 
 STOP HERE. Do not proceed to ViewModel/Screen until the human explicitly
-approves the prototype. Visual/UX judgment is not mechanical — this is a
-Plan-level decision (CLAUDE.md → "Human-in-the-Loop principle"), not an
-Implement-level one. The agent proposes, the human decides.
+approves the prototype. Visual/UX judgment is not mechanical — this is an
+ask-first decision (CLAUDE.md § Working here). The agent proposes, the human
+decides. Running this Skill in Plan Mode enforces the pause mechanically
+(read-only until approved).
 
 Note: the four MVP screens (Home, Search, Library, Detail) already have approved
 exports in `docs/project/design/`, and the shared loading/empty/error states in

@@ -26,7 +26,7 @@ model and its output never leaves the Data layer (see CLAUDE.md's Mapper rule).
   Domain model (`dto.toDomain().toEntity()`), so a change to the API shape can't
   silently reshape the database.
 - **Domain → DTO**: not applicable in this project. IGDB is read-only (CLAUDE.md,
-  Tier 1) — nothing is ever serialized back to it. If you think you need one, the
+  Data Sources) — nothing is ever serialized back to it. If you think you need one, the
   requirement is wrong; stop and ask.
 
 ## Location
@@ -79,7 +79,7 @@ fun GameDto.toDomain() = Game(
 A `toEntity()` mapper is a **pure field-for-field conversion**. It must not
 compute values that depend on stored state or on the clock:
 `updatedAt` and `completedAt` on `UserGameEntity` are stamped by the Repository
-during its read-modify-write cycle (CLAUDE.md, Data Sources → Tier 2), because
+during its read-modify-write cycle (CLAUDE.md, Data Sources), because
 deciding them requires comparing against the row already in the database.
 
 If the Domain model does not carry those values, take them as parameters —

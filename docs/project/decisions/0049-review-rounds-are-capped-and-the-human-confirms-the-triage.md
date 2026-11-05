@@ -9,7 +9,9 @@ Supersedes: ADR-0029
 Supersedes: ADR-0030
 Enforced by: branch protection — `required_conversation_resolution=true` (every review thread resolved before the merge; "answered" is prose; for everyone, administrators included, while `enforce_admins=true`)
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Testing Stack — a regression test that was never seen to fail
-Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — the human confirms the triage, the rule of three, `/code-review` run by the human
+Enforced by: none (prose only — CLAUDE.md § Working here) — the rule of three
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Triage every finding into one bucket, and say which) — the human confirms the triage
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 3. Reviews — all of them, before the PR exists) — `/code-review` run by the human
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 3. Reviews — all of them, before the PR exists) — the GitHub bot as an advisor, the exemptions, the buckets and their grounds, the stopping rule, the cap, the round past it, a fix no round will read, a branch working `review-debt`, the rows that go to the human, the records
 Enforced by: none (prose only — .github/pull_request_template.md § Verification) — the `Deferred:` and `Dismissed:` lines
 

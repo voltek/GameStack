@@ -11,7 +11,7 @@ Turbine, MockK, TestDispatcher
 Everything this skill writes goes under `test/` and runs on the JVM via
 `./gradlew test`: no emulator, no real database, no real network. That boundary
 is what keeps the suite fast enough to gate every change (CLAUDE.md, Testing
-Stack → Tier 1).
+Stack).
 
 **Robolectric is permitted for Compose screen tests, and only those** — see
 "Screen tests" below. Not for DAOs against real SQLite, and never as a
@@ -189,7 +189,7 @@ Pattern: `{method or event} should {expected result} when {condition}`
 A test written after the fix can pass whether or not the fix is present. That
 test is worse than no test: it looks like coverage and proves nothing. Every
 regression test must be *seen* to fail against the code it guards (CLAUDE.md →
-Testing Stack, Tier 1).
+Testing Stack).
 
 ```bash
 # 1. Test and fix are both written and green.

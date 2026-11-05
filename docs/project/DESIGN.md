@@ -136,8 +136,7 @@ The color system follows M3's tonal palette logic, defaulting to a **Dark Mode**
 truth for what renders. Material You's wallpaper-based theming would let the OS
 override the violet that anchors the "Stack" identity, and would make this
 document non-authoritative — so `GameStackTheme` uses `darkColorScheme()` with
-these values only, and takes no `dynamicColor` parameter (CLAUDE.md, Tech Stack
-→ Tier 1).
+these values only, and takes no `dynamicColor` parameter (CLAUDE.md, Tech Stack).
 
 **Dark only for MVP.** There is no Light ColorScheme, by decision, not by
 omission — see PRODUCT.md's backlog. Do not add one, and do not

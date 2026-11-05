@@ -3,7 +3,7 @@
 Status: Accepted
 Date: 2026-10-26
 Backfilled: no
-Enforced by: none (prose only — CLAUDE.md § What belongs in this document — Tier 1)
+Enforced by: none (prose only — .claude/rules/governance.md § What earns a line in CLAUDE.md)
 
 ## Context
 CLAUDE.md had reached 612 lines and 35,950 characters, about 12,700 tokens,

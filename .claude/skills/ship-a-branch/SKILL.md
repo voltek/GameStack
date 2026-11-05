@@ -7,17 +7,22 @@ description: Take a finished branch through to a merged PR — updating against 
 The work is written and the gate is green. Everything below is procedure for
 getting it merged; the *rules* that constrain code on any turn stay in CLAUDE.md.
 
-CLAUDE.md → Git workflow Tier 1 governs every step below. It is not negotiable,
-and it is not restated here: read it there.
+CLAUDE.md § Working here and the `deny` and `ask` rules in `.claude/settings.json`
+govern every step below. They are not restated here.
 
 ## 1. Update the branch against main
 **Use `git merge main`. Do not rebase a branch that has been pushed.**
 
 ```bash
 git fetch origin
-git rev-list --left-right --count origin/main...main   # check BOTH directions
+git rev-list --left-right --count origin/main...main   # check BOTH directions, and act on it first
 git merge main
 ```
+
+If local `main` is behind `origin/main`, fast-forward it first with
+`git fetch origin main:main`, or `git merge main` finds nothing to bring in. If it is
+ahead, those commits skipped a PR: move them to a branch and reset `main` to
+`origin/main` before merging, and never push `main`.
 
 Rebase rebuilds each commit on a new base, so the commits that get replayed are
 not the ones that passed the gate — only the final tip is ever compiled. A
@@ -87,11 +92,12 @@ most**, counted in code points. Past 72 usually means two claims: split the
 commit before trimming words. The summary opens with its verb, capitalised;
 identifiers, filenames and proper nouns after it keep their spelling
 (`CLAUDE.md`, `ADR`, `PR`). Subjects git or GitHub writes itself, for a merge, a
-revert or a squash, are exempt.
+revert or a squash, are exempt. Commits before 2026-10-26 predate this form; never
+rewrite them.
 
 Scope names the area a change governs, not the file it touches, from the closed
 list in `.githooks/rules.sh` (ADR 0034), which prints each scope's meaning when a
-subject fails. A new scope joins the list in the commit that first uses it. A
+subject fails. A repo-wide change may omit it. A new scope joins the list in the commit that first uses it. A
 rule takes the scope of what it governs, not of where it is written: a commit
 rule is `ship` in CLAUDE.md, an ADR or a Skill.
 
@@ -123,7 +129,7 @@ distinction is what keeps 12 lines enough.
 
 Trailers go after the body, before `Co-Authored-By:` (ADR 0033):
 - `Drift: code fixed`, `Drift: doc updated` or `Drift: both` — only on a commit
-  that resolves a drift (CLAUDE.md § Self-Healing Loop). A code defect that no
+  that resolves a drift (CLAUDE.md § Working here). A code defect that no
   document contradicted is not drift. A drift this branch introduced and folds
   away never reached `main`: no trailer. A drift already on `main` is its own
   claim: its own commit, carrying the trailer through every amend.
@@ -178,9 +184,10 @@ below says when it runs).
   change can break, not what file extension it touches: a workflow, a hook or a
   build file can break the gate, and a governing document is what the agent
   executes, so it can break every later change.
-- **`/code-review` is run by the human — the agent cannot invoke it.** So ask and
-  wait. Never tick that box, never excuse it, and never confuse it with the
-  GitHub bot: they are different reviewers and the bot's quota says nothing about
+- **`/code-review` is the human's call: a round starts only when the human asks,
+  whoever launches it** (PENDING — #74 decides whether the agent starts one itself).
+  So ask and wait. Never tick that box, never excuse it, and
+  never confuse it with the GitHub bot: they are different reviewers and the bot's quota says nothing about
   whether `/code-review` has run.
 - **The GitHub bot is an advisor, not a gatekeeper.** It gets one round per PR,
   the one that starts on its own. Never start another by any trigger
@@ -223,7 +230,8 @@ an open change of a merged branch.
 `/code-review` judges whether a rule is sound; it does not check one document
 against the others, which is where governance drift lives. **If the branch touches
 `CLAUDE.md`, any `.md` under `docs/project/` or `.github/`, any Skill
-under `.claude/skills/`, or `.claude/settings.json` (ADR 0027), run the *Documentation integrity* detectors from
+under `.claude/skills/`, any file under `.claude/rules/` (ADR 0050), or
+`.claude/settings.json` (ADR 0027), run the *Documentation integrity* detectors from
 `docs/project/DRIFT-CHECKLIST.md` before opening the PR, after the last round's
 fixes**, and tick the box for
 it in the PR body so the run leaves a trace. That shape is deliberate: a list of
@@ -256,7 +264,7 @@ twenty ADRs clean while reading seventeen.
     duplication, wrap width and friction with no such scenario go here, or to
     Defer on one of its grounds.
 - **Defer** — valid, and not fixed on this branch, because it is outside the
-  branch's unit of work (CLAUDE.md → Git workflow), a document already defers it
+  branch's unit of work (CLAUDE.md § Working here), a document already defers it
   (the PRD, the accessibility default below, an open issue), its fix needs a
   plan, or it is a cheap fix no round will read that fails *A fix no round will
   read*. A non-defect fix too large to be cheap is one that needs a plan. A
@@ -317,8 +325,9 @@ verdict and the rows shown confirms the table. A row goes to the human when:
 The table ends with the round's verdict, `Stopping rule: another round | stop,
 on to §4 | stop, back to the human, because …`, which the human confirms with
 it: after the fixes the natural next step is amend and push, and nothing there
-asks whether a round is owed. Choosing a bucket is plan-level (CLAUDE.md →
-Human-in-the-Loop), so a row leaves the human's view only under that narrowing:
+asks whether a round is owed. Choosing a bucket is an ask-first decision
+(CLAUDE.md § Working here), so a row leaves the human's view only under that
+narrowing:
 a defect filed as debt leaves the branch exactly as a
 dismissed one does, and a finding moved out on the agent's word alone is a
 finding silently dropped — worse than no review, because it looks like coverage.
@@ -371,7 +380,7 @@ The saved table records the decision.
 **One redesign per branch.** It restarts the round count, under the same cap, for
 what it rewrote only; a fix outside that follows *A fix no round will read*. If
 the rule of three fires again on it, there is no second redesign: that part
-leaves the branch for a plan (CLAUDE.md → Human-in-the-Loop), and the rest goes
+leaves the branch for a plan (CLAUDE.md § Working here), and the rest goes
 on.
 
 **A fix no round will read** is any fix of the round that ends the rounds, and
@@ -475,8 +484,8 @@ naming a mechanism the branch went on to delete has happened here already. Updat
 it surgically; never `--body` wholesale if the human has added screenshots or text.
 
 ## 6. Merge
-**Ask first (CLAUDE.md → Git workflow Tier 1).** The yes given for opening the PR
-does not carry over to the merge.
+**Ask first (CLAUDE.md § Working here).** The yes given for
+opening the PR does not carry over to the merge.
 
 **`Create a merge commit` is the default.** The branch's commits are curated and
 are the unit that makes `blame` and `bisect` useful; the merge commit records
@@ -485,8 +494,7 @@ head branches** enabled (GitHub → Settings → General → Pull Requests), so 
 deletes the remote branch at the merge: **there is no remote half for you to
 delete.** If `git branch -r` still lists it after `git fetch --prune` (below),
 the setting was turned off (`gh api repos/{owner}/{repo} --jq
-.delete_branch_on_merge`, from Bash): tell the owner instead of deleting it, which would need their yes anyway
-(CLAUDE.md Tier 1).
+.delete_branch_on_merge`, from Bash): tell the owner, because the setting needs turning back on.
 
 - **`Squash and merge`** is the fallback for a branch whose history is genuinely
   disposable, or the only remedy once the force-push window has closed on a messy

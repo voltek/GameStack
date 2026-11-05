@@ -39,7 +39,7 @@ override suspend fun searchGames(query: String): Result<List<Game>> =
 
 `runCatching` catches `Throwable`, so it swallows `CancellationException` too and
 reports a merely-cancelled coroutine as a genuine failure — the caller then shows
-an error for work nobody was waiting on any more (CLAUDE.md, Architecture → Tier 1).
+an error for work nobody was waiting on any more (CLAUDE.md, Architecture).
 
 ## Write operations — read-modify-write and persistence invariants
 Writes to `UserGameEntity` are never blind upserts. The Repository:
@@ -51,7 +51,7 @@ Writes to `UserGameEntity` are never blind upserts. The Repository:
 
 These timestamp rules are **persistence invariants and belong here** — an explicitly
 documented exception to "Repositories contain no business logic" (CLAUDE.md, Data
-Sources → Tier 2). They live here because detecting a *transition* requires comparing
+Sources). They live here because detecting a *transition* requires comparing
 against stored state, and Entities never leave the Data layer, so no UseCase can see it.
 Nor is it the DAO's job: the rule spans a read *and* a write, and a DAO method is one
 statement. Those two exclusions are why the exception exists at all — without it the
@@ -63,7 +63,7 @@ ordering "Recently Interacted" is Domain/UI work. If a rule ever needs more than
 comparing old and new persisted state, it is real business logic — stop and ask.
 
 Because rating and list-status writes touch the same row, keep this cycle in one
-private helper rather than duplicating it per write function (CLAUDE.md, Tier 3:
+private helper rather than duplicating it per write function (CLAUDE.md, Code Conventions:
 avoid duplicating logic that could drift out of sync).
 
 ## Local Data Conventions (Room)
