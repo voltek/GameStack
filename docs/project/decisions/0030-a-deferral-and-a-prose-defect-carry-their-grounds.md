@@ -1,6 +1,6 @@
 # ADR 0030 — A deferral and a prose defect carry their grounds
 
-Status: Accepted
+Status: Superseded by ADR-0049
 Date: 2026-10-23
 Backfilled: no
 Supersedes: ADR-0029 — wording, duplication and friction without a failure scenario are cheap or deferred

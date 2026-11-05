@@ -1,7 +1,6 @@
 # ADR 0025 — A review round closes on a confirmed triage
 
-Status: Accepted
-Status: Superseded by ADR-0029 — the loop ends on an event, never a number of rounds; a round whose defects come mostly from the previous round's fixes ends it
+Status: Superseded by ADR-0049
 Date: 2026-10-13
 Backfilled: no
 Supersedes: ADR-0015 — every finding fixed or dismissed with a written reason; a round producing a real defect earns another round
