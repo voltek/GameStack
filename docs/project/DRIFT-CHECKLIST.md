@@ -1,10 +1,10 @@
 # DRIFT-CHECKLIST — GameStack
 
-> Manual audit checklist derived from CLAUDE.md's Tier 1 (Immutable) rules. It
+> Manual audit checklist derived from CLAUDE.md's rules. It
 > detects drift between the code and the Project Constitution, and it runs on
 > either of two events. A pull request touches `CLAUDE.md`, any `.md` under
-> `docs/project/` or `.github/`, any Skill under `.claude/skills/`, or
-> `.claude/settings.json` — a diff
+> `docs/project/` or `.github/`, any Skill under `.claude/skills/`, any file under
+> `.claude/rules/`, or `.claude/settings.json` — a diff
 > shows you that outright — and what runs then is the *Documentation
 > integrity* set, fired by `ship-a-branch`
 > ([ADR 0022](decisions/0022-a-governance-diff-triggers-the-checklist.md)) and
@@ -17,7 +17,7 @@
 > that "no" is the healthy answer** — a "yes" means drift was found. Read them as
 > violation detectors, not as goals.
 >
-> When drift is found, resolve it per the Self-Healing Loop (CLAUDE.md): either
+> When drift is found, resolve it per CLAUDE.md § Working here: either
 > fix the code, OR update the document if the code turned out to be right and the
 > document is what's outdated. Record which direction was chosen as a `Drift:`
 > trailer on the commit that resolves it (ADR 0033); a decision that is born or

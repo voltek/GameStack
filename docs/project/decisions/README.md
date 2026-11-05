@@ -49,7 +49,7 @@ Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Two workflow rules were producing the mess")
 Supersedes: ADR-0007
 Enforced by: branch protection — `allow_force_pushes=false` (no force-push to `main`)
-Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — the `--force-with-lease` window, bare `--force`
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § The force-push window) — the `--force-with-lease` window, bare `--force`
 
 ## Context
 What situation existed and what forced it. 3-6 sentences, in the past tense.
@@ -95,7 +95,7 @@ scope. An ADR whose clauses differ carries one line per group of clauses, and
 
 ```
 Enforced by: repository settings — `allow_rebase_merge=false` (the Rebase and merge button)
-Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — `git merge main` instead of `rebase`, the 400-line alarm
+Enforced by: none (prose only — CLAUDE.md § Working here) — `git merge main` instead of `rebase`
 ```
 
 Some values contain ` — ` themselves, so match a line against the vocabulary as
@@ -109,7 +109,7 @@ present, using the name GitHub's API uses, because that is what
 - `none (prose only — <document> § <section>)` — name the document that
   actually carries the rule, such as CLAUDE.md, PRODUCT.md for product scope (not
   a constraint on code), a Skill for a procedure attached to a named task
-  (CLAUDE.md's three questions send it there), or `decisions/README.md`.
+  (`.claude/rules/governance.md` sends it there), or `decisions/README.md`.
 - `checklist detector — DRIFT-CHECKLIST.md § <section>`
 - `./gradlew lint`
 - `test: <TestName>#<caseName>`

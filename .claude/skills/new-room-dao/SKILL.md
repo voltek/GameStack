@@ -19,7 +19,7 @@ conversion (`new-mapper`), or the DI bindings (`new-hilt-module`).
   `UserGameEntity` that's `gameId` — the IGDB id, not a generated one, so a game
   the user interacts with twice updates one row instead of creating a second.
 - Entities are Data-layer types. They never appear in a Domain or UI signature
-  (CLAUDE.md, Code Conventions → Tier 1).
+  (CLAUDE.md, Code Conventions).
 - Store timestamps as `Long` (epoch millis), nullable when the event may not have
   happened. Do not store formatted date strings — formatting is a UI concern and
   a stored string can't be re-formatted for another locale.

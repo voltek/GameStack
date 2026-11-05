@@ -5,7 +5,7 @@ Status: Superseded by ADR-0023 — numbering ADRs by the date of the original de
 Status: Superseded by ADR-0033 — the `DRIFT-LOG.md` bullet, and "an incident is a log row, never an ADR. Where one drift produces both, the row points at the ADR instead of restating it" (Decision)
 Date: 2026-08-31
 Backfilled: no
-Enforced by: none (prose only — CLAUDE.md § Self-Healing Loop)
+Enforced by: none (prose only — CLAUDE.md § Working here)
 
 ## Context
 `DRIFT-CHECKLIST.md` had grown to 193 lines and roughly 58KB while holding three

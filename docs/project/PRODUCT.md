@@ -41,7 +41,7 @@ keep needing a justification, and without this section each one looks arbitrary:
   default merge strategy, why a branch showing "patch, patch, patch, redesign"
   was kept intact rather than squashed, and why commit messages carry diagnosis
   rather than a summary of the diff.
-- **Process work is product work.** The Skills, the tiered rules, the ADRs and
+- **Process work is product work.** The Skills, the rules, the ADRs and
   the review loops are not overhead around the app — they are a second thing
   being built, and often the more valuable one.
 - **The harness is meant to leave.** What is built around the app — rules,
@@ -172,7 +172,7 @@ its answer belongs.
 - **How the Twitch client secret leaves the APK.** `local.properties` keeps it
   out of git, but the build compiles it into `BuildConfig`, readable from any
   published APK, and every user would share one rate limit. Likely a small proxy
-  that holds the secret; deciding it changes CLAUDE.md § Data Sources (Tier 1).
+  that holds the secret; deciding it changes CLAUDE.md § Data Sources.
   Blocks the first release — #111.
 - **Whether to measure use after the first release**, once real users exist.
 

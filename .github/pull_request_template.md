@@ -12,7 +12,7 @@
 - [ ] `/code-review` run and every finding triaged in a table the human confirmed (unless `ship-a-branch` step 3 exempts the branch)
 - [ ] OpenSpec change verified and archived (branches that carry one, `ship-a-branch` step 3) — archived at:
 - [ ] Device pass on the emulator (UI changes only) — scenarios and states checked:
-- [ ] Documentation-integrity detectors run (governing-document, Skill or `.claude/settings.json` changes only) — conditional items run: / skipped: / found:
+- [ ] Documentation-integrity detectors run (governing-document, Skill, `.claude/rules/` or `.claude/settings.json` changes only) — conditional items run: / skipped: / found:
 
 Deferred: TODO <!-- local /code-review only: each review-debt issue (#n), "none", or "not run — exempt: <the step-3 exemption>". -->
 

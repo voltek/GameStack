@@ -22,7 +22,7 @@ nav         navigation graphs, routes, the bottom bar
 theme       ui/theme
 core        core/ packages shared by two or more features
 build       Gradle build files, dependency versions, the wrapper
-governance  CLAUDE.md rules and bounds, ADRs, drift, the drift checklist
+governance  CLAUDE.md rules and bounds, .claude/rules, ADRs, drift, the drift checklist
 skills      implementation Skills: new-*, write-tests, verify-on-device, discovery-feature
 ship        branch to merge: review rounds, PR template, commit messages, PR titles, branch names
 gate        CI workflows
@@ -175,7 +175,7 @@ check_form() {
             print count + 0
         }')
     if [ "$body_lines" -gt "$BODY_LIMIT" ]; then
-        fail "Body is $body_lines lines, the limit is $BODY_LIMIT, trailers and blank lines excluded (CLAUDE.md § Git workflow)." \
+        fail "Body is $body_lines lines, the limit is $BODY_LIMIT, trailers and blank lines excluded (ship-a-branch § Commit messages)." \
             "$body_lines non-blank lines" \
             "Keep the diagnosis the diff cannot show; point at a document instead of restating it."
     fi

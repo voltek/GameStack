@@ -170,9 +170,9 @@ it should never pick. It is archived rather than deleted, because how the projec
 was bootstrapped is worth keeping.
 
 ## 7. The governing documents
-**What.** Five files and a folder, with disjoint jobs: `CLAUDE.md` holds rules
-that constrain code on any turn, under a three-tier system saying what may be
-changed and who must agree; `PRODUCT.md` holds the product; `DESIGN.md` holds the visual system;
+**What.** Five files and two folders, with disjoint jobs: `CLAUDE.md` holds rules
+an agent needs on any turn, and `.claude/rules/` holds those that bind one kind
+of file, loaded by path when one is touched; `PRODUCT.md` holds the product; `DESIGN.md` holds the visual system;
 `DRIFT-CHECKLIST.md` holds the violation detectors you run to *find* drift;
 `DRIFT-LOG.md` is a frozen archive of the drifts resolved before 2026-10-26;
 and `decisions/` holds one ADR per decision in force, each naming what enforces
@@ -180,7 +180,7 @@ it. Different jobs and growth laws (the log no longer grows) keep them apart.
 
 **Replaces.** Rediscovering, per session, why the code looks the way it does.
 
-**Where.** `CLAUDE.md`, `docs/project/PRODUCT.md`,
+**Where.** `CLAUDE.md`, `.claude/rules/`, `docs/project/PRODUCT.md`,
 `docs/project/DESIGN.md`, `docs/project/DRIFT-CHECKLIST.md`,
 `docs/project/DRIFT-LOG.md`, `docs/project/decisions/`.
 
@@ -398,7 +398,7 @@ and `telemetry.enabled false`, then `openspec update`.
 
 **Pilot.** Detail's spec is the first change run through these Skills. The
 owner then judges its output: assumptions visible rather than buried, every
-scenario with a verifier, no Tier 1 rule breached, and each Skill's steps still
+scenario with a verifier, no rule in CLAUDE.md breached, and each Skill's steps still
 there after a compaction. Kept, `discovery-feature` retires; dropped, the
 format stays by hand and `discovery-feature` writes the change. The CLI stays
 only if `validate` or the archive merge caught something a hand edit would not.

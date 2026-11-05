@@ -23,7 +23,7 @@ description: Create a ViewModel following the MVI pattern for a GameStack screen
 - ViewModel: `feature/{feature-name}/presentation/{ScreenName}ViewModel.kt`
 - Contracts: `feature/{feature-name}/presentation/{ScreenName}Contract.kt`
   (all three in one file — the one-class-per-file exception in CLAUDE.md,
-  Code Conventions → Tier 2)
+  Code Conventions)
 
 ## Naming convention
 `{ScreenName}ViewModel`, `{ScreenName}UiState`, `{ScreenName}UiEvent`, `{ScreenName}UiEffect`

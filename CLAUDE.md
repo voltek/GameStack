@@ -6,18 +6,7 @@ search, game details, personal lists and ratings. A catalog and personal library
 not a store or gaming platform. Scope and what is deferred: the PRD
 (`docs/project/PRODUCT.md`). This document governs technical rules.
 
-## How to read this document — Three-Tier Boundary System
-Every rule below belongs to one of three tiers:
-
-- **Tier 1 — Immutable.** Breaking this rule either breaks the system mechanically,
-  or contradicts a deliberate foundational decision. Never deviate without an
-  explicit conversation first.
-- **Tier 2 — Configurable within a defined range.** A bounded exception already
-  exists and is listed. Anything outside that stated bound still requires asking first.
-- **Tier 3 — Suggested.** Can be challenged with a stated justification. Propose
-  the alternative and the reason — don't substitute silently.
-
-## Purpose — Tier 1
+## Purpose
 Half product, half a harness meant for other projects, and both a case study
 (PRD → *Why this project exists*). Weigh every proposal and decision against
 both halves and say what it gives each. A harness decision lives where a clone
@@ -25,93 +14,32 @@ reads it — an ADR, TOOLING.md, a Skill — never only outside the repo. Govern
 that serves neither the next product step nor what another project would take
 is a cost.
 
-## Documentation completeness rule
-If this document (or a Skill) references a component that doesn't fully
-exist or isn't fully specified yet, that reference must either be fully
-specified in the same edit, or explicitly marked `(PENDING — not yet
-defined)`. A vague reference that looks complete is worse than an honest
-gap — it hides the missing piece until an agent trips over it mid-task.
-(This is the exact pattern that happened with AuthRepository — referenced
-in this document before its behavior was written down anywhere. Now fixed;
-the rule exists to catch the next case, whatever it turns out to be.)
-
-## What belongs in this document — Tier 1
-
-### Every line here is loaded on every turn, forever
-This file is loaded into **every request**; Skills and the other documents load
-on demand. So the question for anything proposed here is never "is this
-valuable?" — almost everything written here was — but **"is this needed on every
-turn?"** Bound: 200 lines, 18,000 characters; until met, an addition is offset
-in the same change (ADR 0031).
-
-### Three questions before adding anything
-1. **Does it survive a clone?** If it names a path on one machine, a device
-   serial, or anything that exists only in one person's environment, it is not
-   project knowledge. It belongs in agent memory or a Skill, never here.
-2. **Is it a rule, or is it a procedure?** A *rule* constrains code that could be
-   written on any turn (layer boundaries, naming, MVI, the tiers). A *procedure*
-   is a sequence followed while doing one named task (opening a PR, verifying on
-   device, writing a mapper). **Procedures belong in Skills** — that is what
-   Skills are for, and a procedure sitting here is paid for on every unrelated
-   turn.
-3. **Is it a rule, or is it history?** The decision belongs in an ADR, and the
-   incident behind it in a commit body (ADR 0033). Keep at
-   most a clause of *why* here — enough that the rule does not read as arbitrary
-   and get "improved" away.
-
-If the answer sends it elsewhere, **write it elsewhere and, only when the rule
-itself would be incomplete without it, leave a one-line pointer.** A pointer is
-not free either.
-
-### The trade this makes, stated honestly
-Pruning the scars weakens the rules: a rule with an incident attached gets
-obeyed, a bare rule gets "improved". That is why the pointer exists, and why
-this is falsifiable — **if an agent starts violating a rule whose story was
-moved, that story was load-bearing and belongs back inline.** Restore it rather
-than re-deriving the rule.
-
-## Human-in-the-Loop principle
-
-### Tier 1 — Immutable
-Decisions split into two kinds, and they are handled differently:
-
-- **Plan-level decisions** — anything requiring judgment that isn't mechanically
-  derivable from this document, the PRD, or DESIGN.md: visual/UX choices,
-  product scope, naming of a user-facing concept, or any trade-off with no
-  single correct answer. **The agent proposes, the human decides.** Stop and
-  wait for explicit approval; do not proceed on a "reasonable default".
-- **Implement-level decisions** — anything already determined by the documents
-  or by an existing pattern in the codebase. The agent proceeds without asking.
-
-When a step is Plan-level, the Skill that owns it says so explicitly and names
-the checkpoint (e.g. `new-feature` step 5, the screen prototype). Running such a
-Skill in Claude Code's Plan Mode enforces the pause mechanically (read-only until
-approved) rather than relying on the agent to honor it.
-
-Related but distinct: the Tier system governs *rules* (what may be changed and
-who must agree). This principle governs *steps in a procedure* (when to stop and
-ask mid-task). A Tier 1 rule can only be changed by conversation; a Plan-level
-step must be approved every single time it runs.
-
-## Self-Healing Loop
-
-### Tier 1 — Immutable
-When code and documentation disagree, that mismatch is **drift**, and drift is
-never resolved silently. Resolve it in one of exactly two directions, and state
-which one was chosen:
-
-1. **Fix the code** — the document was right; the code deviated.
-2. **Fix the document** — the code turned out to be right and the document is
-   what's outdated (e.g. an implementation decision was made that the document
-   never recorded).
-
-Either way, the commit that resolves it carries a `Drift: code fixed | doc
-updated | both` trailer, and a rule that is born or changes is a new ADR under
-`docs/project/decisions/`, named in the commit body. `DRIFT-LOG.md` is a frozen
-archive (ADR 0033).
-Never leave a known contradiction unresolved on the grounds that "the code works" —
-an undocumented decision is invisible to the next agent, which is how the same
-drift returns.
+## Working here
+- Before committing, run `./gradlew build`, `./gradlew test` and `./gradlew lint`;
+  all three must be green. A lint Error fails the gate, a warning does not.
+- Put code and its documentation in the same commit.
+- Before pushing, `git fetch` and reconcile with `origin/main`.
+- One branch per unit of work, checked per commit: does this exist because of this
+  branch? Anything else goes on its own branch.
+- Push your own feature branch without asking. Ask before every PR action GitHub
+  shows.
+- Never commit on `main`: branch first.
+- Never use `--no-verify`, never force-push `main` or a branch another person may
+  hold, and never use bare `--force`, which overwrites the remote without checking.
+  `--force-with-lease` may clean your own feature branch until it merges.
+- Never change branch protection or repository settings.
+- Update a pushed branch with `git merge main`, never `git rebase`.
+- Touching the same code a third time for the same class of defect means the design
+  is the problem: stop patching and redesign.
+- Ask first: any decision the documents or an existing code pattern do not settle,
+  such as a visual or UX choice, product scope, the name of a user-facing concept, or a trade-off with no
+  single answer. Propose it and wait for approval, even when the request looks small.
+- When code and a document disagree, say which is right and why, and put
+  `Drift: code fixed`, `Drift: doc updated` or `Drift: both` on the commit that
+  resolves it. A rule that is born or changes is a new ADR.
+- A rule changes only with the owner's agreement, through an ADR. A rule under a
+  "Prefer" heading may be challenged with a stated reason.
+- Run the `ship-a-branch` Skill to take a finished branch to a merged PR.
 
 ## Commands
 - Build: `./gradlew build`
@@ -123,7 +51,7 @@ drift returns.
   (`.github/workflows/gate.yml`). It is the backstop, not the first run — the
   gate is still green locally before you commit.
 
-### Device verification — Tier 2
+### Device verification
 The gate above is necessary but **not sufficient for UI work**: it proves the
 code compiles and that the logic does what a test asserts, never that a screen
 looks right or that a control is reachable. Every change that adds or alters a
@@ -138,7 +66,7 @@ Run the `verify-on-device` Skill for the procedure.
   `.html` and `.png`, in that screen's folder, in the same change that ships it.
   Recipe and naming: `docs/project/design/README.md`.
 
-### Accessibility — Tier 2
+### Accessibility
 **MVP does not target accessibility.** TalkBack passes, large-font and contrast
 audits, and touch-target sizing are deferred until the first release (PRD). So an
 accessibility finding from a review is **deferred by default** (`ship-a-branch`
@@ -158,95 +86,8 @@ to keep:
   publishes accessibility expectations and where retrofitting semantics across a
   finished UI is a rewrite. Revisit before the first public release, not after.
 
-## Git workflow
-
-### Tier 1 — Immutable
-- **Ask before every PR action GitHub shows, from opening to merging, and before
-  deleting a remote branch.** A PR is
-  outward-facing, a merge is the point of no return for the branch, and deleting
-  an open PR's head branch closes it.
-- **Push your own feature branch without asking; never change branch protection
-  or repository settings** (ADR 0028).
-- **Never `--no-verify`.**
-- **Never force-push `main`, nor any branch another person may have pulled, and
-  never bare `--force` anywhere.** `--force` overwrites whatever is on the remote
-  without checking. A bounded exception for cleaning your own unreviewed feature
-  branch is defined in Tier 2 below; nothing outside that exception is allowed.
-- **The gate is all three green:** `./gradlew build`, `./gradlew test`,
-  `./gradlew lint`. A lint *Error* fails the gate; warnings do not. `git commit`
-  freely once it passes.
-- **Never commit directly to `main`** — branch first.
-- **Code and its documentation land in the same commit.** A commit that changes
-  an architectural rule carries its CLAUDE.md/PRD/ADR update with it
-  (Documentation completeness rule). Never code now, docs next commit.
-- **Read `git status` in full before committing.** Untracked source files are
-  invisible to `git add -u` and silently break the build for everyone else.
-- **Before pushing, `git fetch` and reconcile with `origin/main`.** Rebase or
-  merge if the branch is behind. If local `main` is ahead of `origin/main`, those
-  commits skipped a PR: move them to a branch and reset `main` to `origin/main`
-  (never push `main`), or the PR will carry commits that have nothing to do with it.
-  Divergence in either direction is a problem — check both, not just
-  "am I behind".
-
-### Tier 2 — Configurable within a defined range
-- Branch naming: `{type}/{kebab-name}`, its PR title's type (`feature/` for `feat`).
-- **One branch per unit of work**, checked per commit: does this exist *because
-  of* this branch's unit of work? A refactor that exists only because of a
-  feature belongs on that feature's branch; anything else belongs on its own.
-  What inflates a PR is how long the branch stays open, not how hard the feature
-  is — PR #3 reached 1,992 additions across 46 files with only two commits
-  belonging to its feature.
-- Treat **400 changed lines or 15 files** as a smoke alarm, not a limit. If the
-  PR title needs an "and", split it.
-- Commit messages and PR titles: **Conventional Commits**, `type(scope):
-  Imperative summary` (verb first), no trailing period, 72 characters
-  at most. Types and scopes: the closed lists in `.githooks/rules.sh`; the
-  scope is optional if repo-wide. Commits before 2026-10-26 predate this;
-  never rewrite them.
-  The body carries the diagnosis the diff cannot show, in **12 lines or fewer**;
-  anything already in a document is pointed at, not restated (`ship-a-branch`).
-- **Merge strategy: `Create a merge commit`.** `Rebase and merge` is never used —
-  replaying commits onto a new base produces intermediate states that never
-  existed and never passed the gate. `Squash and merge` is a fallback, not the
-  default. The reasoning rests on what this project optimises for: see PRD →
-  *Why this project exists*.
-- **Update a pushed branch with `git merge main`, never `git rebase`** — same
-  reason as above. Rebase is fine on a branch that has never been pushed.
-- **Force-push is allowed to clean your own feature branch until it merges**,
-  always with `--force-with-lease` and never bare `--force`. Rewriting can orphan
-  a bot thread's diff anchor, and that is accepted: branch history is permanent
-  and drives `blame` and `bisect`, while a review thread is read once and
-  effectively never revisited after merge. Reply in the thread before rewriting —
-  the reply is the history, the anchor is not. The absolute bans stand: never
-  `main`, and never a branch another person may hold.
-- **Never overwrite an open PR body wholesale.** `gh pr edit --body` replaces
-  everything, screenshots the human dragged in included.
-- **Every review finding is triaged, and the human confirms the triage**
-  (`ship-a-branch`), and every thread is answered and then resolved. `main` is
-  protected with *require conversation resolution*, so an open thread blocks
-  the merge button.
-- **`/code-review` is run by the human — the agent cannot invoke it.** Ask and
-  wait; never tick that box or excuse it, and never confuse it with the GitHub
-  bot, which is an advisor and may be skipped when unavailable.
-- **Rule of three.** Touching the same code a third time for the same class of
-  defect means the design is the problem, not the instances — stop patching and
-  redesign. A fix that introduces the next defect in the same place counts double.
-
-Run the `ship-a-branch` Skill for the procedure: updating, cleaning history,
-writing and maintaining the PR body, review rounds, and merging.
-
-### Tier 3 — Suggested
-- Commit as you go, not in one blob at the end. A feature that reaches completion
-  entirely uncommitted forces a choice between one unreviewable commit and
-  inventing a history that never existed.
-- Keep unrelated housekeeping (IDE files, ignore rules, asset corrections) in
-  their own commits so a feature's history stays readable.
-
----
-
 ## Tech Stack
 
-### Tier 1 — Immutable
 - Kotlin (latest stable) — project language.
 - Jetpack Compose — all UI, no XML, no ViewBinding.
 - MVI + Clean Architecture — governs every structural rule in this document.
@@ -266,12 +107,11 @@ writing and maintaining the PR body, review rounds, and merging.
   and not be. That mistake shipped a two-releases-old Robolectric past a review
   of this very rule.
 
-### Tier 2 — Configurable within a defined range
 - Room — local persistence. Swappable in theory (e.g. a future SQLDelight
   migration for KMP), but touches the Data layer contract broadly — ask first.
 - Hilt — dependency injection. Same reasoning as Room: high blast radius, ask first.
 
-### Tier 3 — Suggested, can be challenged with justification
+### Prefer
 - Coil — image loading. If there's a concrete reason (deprecation, critical bug,
   better Compose support elsewhere), propose an alternative and explain why.
 
@@ -279,7 +119,6 @@ writing and maintaining the PR body, review rounds, and merging.
 
 ## Testing Stack
 
-### Tier 1 — Immutable
 - Turbine, MockK, TestDispatcher — baked into the `write-tests` skill's patterns.
   Changing any of these breaks consistency across every test in the project.
 - Use the project's `MainDispatcherRule` (`core/testing/`) for ViewModel tests
@@ -330,7 +169,6 @@ See the `write-tests` skill for full conventions (setup per layer, naming, Happy
 MVI with Clean Architecture. Three logical layers (UI, Domain, Data) as packages
 within a single app module.
 
-### Tier 1 — Immutable
 - UI never accesses the Repository directly — always via UseCase through the ViewModel.
 - Repositories contain no business logic — they only coordinate data sources.
 - **Never build a `Result` with `runCatching` around a suspend call.** It catches
@@ -377,7 +215,7 @@ within a single app module.
   Registering `Detail` once at top level instead is what previously let it leak
   across tabs — it would reappear under an unrelated tab with no tab selected.
 
-### MVI Contract conventions (Tier 1)
+### MVI Contract conventions
 Every screen defines exactly three contract types, and they are the only way
 UI and ViewModel communicate:
 
@@ -411,7 +249,7 @@ All three live together in `feature/{name}/presentation/{ScreenName}Contract.kt`
 — this is the one-class-per-file exception (1) below. The ViewModel exposes a
 single public entry point, `fun handleEvent(event: UiEvent)`.
 
-### Tier 2 — Configurable within a defined range
+### Packages and lists
 - Feature-based package structure — the *principle* of feature-based
   organization is fixed, but exact folder names can evolve. Ask first: every
   Skill's "Location" section references these paths. The full set:
@@ -433,7 +271,6 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
 
 ## Data Sources
 
-### Tier 1 — Immutable
 - **IGDB API:** read-only. Requires OAuth via Twitch — see AuthRepository.
   `AuthRepository` uses Twitch's Client Credentials flow (app-level auth,
   no user login involved) — a POST to `id.twitch.tv/oauth2/token` with
@@ -460,7 +297,6 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
 - Personal ratings and lists are never synced with IGDB's own community rating —
   they are independent, local-only data.
 
-### Tier 2 — Configurable within a defined range
 - **Room (local):** a single `UserGameEntity` per game the user interacted with —
   `gameId` (PK), `listStatus` (nullable: PLAYING_NOW/WANT_TO_PLAY/COMPLETED),
   `rating` (nullable: `GameRating.LIKED`/`DISLIKED`), `updatedAt` (any change —
@@ -491,7 +327,6 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
 
 ## Code Conventions
 
-### Tier 1 — Immutable
 - PascalCase for classes, camelCase for functions — Kotlin ecosystem-wide convention.
 - Mappers must live in the data layer. The rule they enforce is directional:
   **a DTO or Entity type must never appear in a signature outside the data layer.**
@@ -514,7 +349,6 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
   (`UiText.StringResource` for translatable strings, `UiText.DynamicString`
   only for truly dynamic values from an API or database).
 
-### Tier 2 — Configurable within a defined range
 - One class per file, EXCEPT:
   (1) MVI contract classes (`UiState`, `UiEvent`, `UiEffect`) for the same
   screen live together in `{ScreenName}Contract.kt` — they only make sense as a
@@ -547,7 +381,7 @@ single public entry point, `fun handleEvent(event: UiEvent)`.
   lines in a file** is only a smoke alarm, meaningless below ~50 lines. Models
   narrate design decisions into comments, so the questions apply to every line.
 
-### Tier 3 — Suggested, can be challenged with justification
+### Prefer
 - Mapper file naming pattern (`{Name}Mapper.kt`) — consistency preference,
   not a structural requirement.
 - Avoid chaining more than 2 functional operators (`map`/`also`/`let`/etc.)
