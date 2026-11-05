@@ -167,12 +167,9 @@ branch that was already final.
 stopping rule earns, fold each round's fixes into the commits that should have
 been right (step 2), and only then open a PR.
 
-Opening one early costs three things at once: review threads anchor to SHAs that
-later get rewritten, the force-push window closes so the branch can no longer be
-cleaned, and the PR body starts going stale from the moment it is written. It
-also makes step 2 impossible — no PR means the window stays open, and an open window
-is what lets a branch be folded into its final shape. The two rules hold each
-other up.
+Opening one early costs two things at once: review threads anchor to SHAs that
+later get rewritten, and the PR body starts going stale from the moment it is
+written.
 
 The GitHub bot is the exception, since it needs a PR to run at all (its bullet
 below says when it runs).
