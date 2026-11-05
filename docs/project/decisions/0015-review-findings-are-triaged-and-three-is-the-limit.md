@@ -1,7 +1,6 @@
 # ADR 0015 — Review findings are triaged, and the rule of three stops the patching
 
-Status: Accepted
-Status: Superseded by ADR-0025 — every finding fixed or dismissed with a written reason; a round producing a real defect earns another round
+Status: Superseded by ADR-0049
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Nothing recorded how review findings get triaged")
 Enforced by: branch protection — `required_conversation_resolution=true` (every review thread resolved before the merge; "answered" is prose; for everyone, administrators included, while `enforce_admins=true`)

@@ -171,12 +171,13 @@ other up.
 The GitHub bot is the exception, since it needs a PR to run at all (its bullet
 below says when it runs).
 
-- **Run `/code-review` on every branch but two: a comments-only diff, and a
-  docs-only diff outside the governing-document shape** (next subsection). Those
-  are step 3's only exemptions. The criterion is what the change can break, not
-  what file extension it touches: a workflow, a hook or a build file can break the
-  gate, and a governing document is what the agent executes, so it can break
-  every later change.
+- **Run `/code-review` on every branch but three:** a comments-only diff, a
+  docs-only diff outside the governing-document shape (§ A governance diff earns
+  the checklist), and a branch the human exempts under *A branch working
+  `review-debt`*. Those are step 3's only exemptions. The criterion is what the
+  change can break, not what file extension it touches: a workflow, a hook or a
+  build file can break the gate, and a governing document is what the agent
+  executes, so it can break every later change.
 - **`/code-review` is run by the human — the agent cannot invoke it.** So ask and
   wait. Never tick that box, never excuse it, and never confuse it with the
   GitHub bot: they are different reviewers and the bot's quota says nothing about
@@ -256,17 +257,19 @@ twenty ADRs clean while reading seventeen.
     Defer on one of its grounds.
 - **Defer** — valid, and not fixed on this branch, because it is outside the
   branch's unit of work (CLAUDE.md → Git workflow), a document already defers it
-  (the PRD, the accessibility default below, an open issue), or its fix needs a
-  plan. A non-defect fix too large to be cheap is one that needs a plan. A
-  valid finding that meets none of the three is fixed here, and a real defect
+  (the PRD, the accessibility default below, an open issue), its fix needs a
+  plan, or it is a cheap fix no round will read that fails *A fix no round will
+  read*. A non-defect fix too large to be cheap is one that needs a plan. A
+  valid finding that meets none of the four is fixed here, and a real defect
   is deferred only by the human. When the ground is an open issue, link that
   issue, labelled `review-debt` if it was not, instead of opening another.
   Otherwise open an issue labelled
   `review-debt`, link it in the thread when there is one, merge. Every time, not
   when remembered: the label is the only register of what a review found and
   nobody fixed (`gh issue list --label review-debt`).
-- **Dismiss** — the finding is wrong. Verify the claim against the repo and
-  `gh api` first; the written reason is what that check showed. A bot finding is
+- **Dismiss** — the finding is wrong, or valid but not a defect on *A branch
+  working `review-debt`*. Verify the claim against the repo and `gh api` first;
+  the written reason is what that check showed. A bot finding is
   answered in its thread, which is its record (§ Closing threads).
 
 A local `/code-review` has no thread and runs before the PR exists, so its
@@ -299,11 +302,24 @@ finding, its bucket, its verified reason, and each `Fix (defect)` row's origin �
 before changing anything. In the chat give one line per finding (number, bucket,
 a reason of twelve words or fewer), then the verdict and the file's path. Touch
 nothing until the human has confirmed the table, every row of it.
+
+**A branch whose whole diff is in the governance shape** narrows the chat to what
+the human decides: those rows, each with its options and a recommendation, then
+the verdict, the other rows' count per bucket, and the file's path. Any other row
+stands as proposed unless the human reopens it, and the human's answer on the
+verdict and the rows shown confirms the table. A row goes to the human when:
+- a possible defect would leave the branch: a defect in Defer, or a `Dismiss`
+  whose reason is not a check anyone can repeat, such as a quote or a command;
+- its call between defect and cheap decides whether a round is earned;
+- its fix has more than one reasonable solution, or writes or changes a rule;
+- it opens an issue or labels an existing one.
+
 The table ends with the round's verdict, `Stopping rule: another round | stop,
 on to §4 | stop, back to the human, because …`, which the human confirms with
 it: after the fixes the natural next step is amend and push, and nothing there
 asks whether a round is owed. Choosing a bucket is plan-level (CLAUDE.md →
-Human-in-the-Loop): a defect filed as debt leaves the branch exactly as a
+Human-in-the-Loop), so a row leaves the human's view only under that narrowing:
+a defect filed as debt leaves the branch exactly as a
 dismissed one does, and a finding moved out on the agent's word alone is a
 finding silently dropped — worse than no review, because it looks like coverage.
 If a finding exposes code/doc drift, its fix carries a `Drift:` trailer (§2
@@ -328,36 +344,73 @@ Then, in this order:
   on to §4.
 - **Origin `from a cheap fix`:** revert that cheap fix, unless the human
   chooses another solution. A revert writes no new text, so it earns no round;
-  with no other `Fix (defect)` row left, stop, on to §4.
-- **Of the rows left, mostly `from a defect fix`:** the rule of three applied to
-  rounds — the fixing has become the source of defects. Stop, back to the
-  human: redesign, revert that part, cut it from the branch, or §4.
-- **Otherwise** the round earns another, with one cap: round three or later is
-  earned only by a defect in a file outside the governance shape (§ A
-  governance diff earns the checklist), because a prose reviewer always finds
-  one more. When the cap denies the round, stop, on to §4, and its fixes follow
-  *A fix no round will read*.
+  with no other `Fix (defect)` row left, stop, on to §4. The finding it answered
+  reopens, and a fix that became a defect is one that needs a plan: Defer it.
+- **Of the rows left, mostly `from a defect fix`, or any of a class an earlier
+  round fixed in the same place:** the rule of three applied to rounds — the
+  fixing is not converging. Stop, back to the human: redesign, revert that part,
+  cut it from the branch, or §4.
+- **Otherwise** the round earns another, up to a cap of two local `/code-review`
+  rounds per branch, governance and product alike (one on *A branch working
+  `review-debt`*), because a reviewer always finds one more: findings hold steady
+  from round to round while real defects fall. When the cap denies the round,
+  stop, on to §4, and its fixes follow *A fix no round will read*.
 
 Stopping ends the rounds, not the triage: that round's findings still go
 through the table above, and a branch stopped back to the human goes no further
-until the human decides. The human may always ask for another round; the saved
-table says so.
+until the human decides.
 
-**One redesign per branch.** It restarts the round count for what it rewrote. If
+**A round past the cap is the human's to authorize.** The human may always ask
+for another round. The agent may propose one, as `stop, back to the human`, only
+for a failure it can state to a `Fix (defect)`'s standard: the concrete scenario,
+quoting the text, in which the product breaks or an agent acts wrongly. The gate
+and the detectors must be unable to check it, and what the rounds did must make
+it likely. Wording, friction and a reviewer that might find more are no reason.
+The saved table records the decision.
+
+**One redesign per branch.** It restarts the round count, under the same cap, for
+what it rewrote only; a fix outside that follows *A fix no round will read*. If
 the rule of three fires again on it, there is no second redesign: that part
 leaves the branch for a plan (CLAUDE.md → Human-in-the-Loop), and the rest goes
 on.
 
-**A fix no round will read** reverts the branch change that caused the defect
-where it can, and is otherwise the smallest change that removes it. Re-run the
-gate and the detectors after it, and list it under the PR body's Verification
-as fixed after the last round, for the human and the GitHub bot, when it runs.
-A fix that cannot be small goes back to the human: defer it, cut that part from
-the branch, or authorize another round.
+**A fix no round will read** is any fix of the round that ends the rounds, and
+any fix after it.
+- A `Fix (defect)` reverts the branch change that caused the defect where it
+  can, and is otherwise the smallest change that removes it. One that cannot be
+  small goes back to the human: defer it, cut that part from the branch, or
+  authorize another round.
+- A `Fix (cheap)` is applied only if it passes one of two tests, named in its
+  row; a row failing both goes to Defer, and all such rows to one `review-debt`
+  issue, except on *A branch working `review-debt`*. **Proven by a mechanism:**
+  a test seen failing on a mutation of what it guards, then passing. It changes
+  no governing text, since a reader is that text's only proof, and settles no
+  question a deferral left open. **Writes no new rule:** a correction of
+  spelling or wrap width, a revert, a deletion no rule depends on, text moved
+  unchanged, or a pointer to something that exists.
+
+Either way, re-run the gate and the detectors after it, and list it under the PR
+body's Verification as fixed after the last round, for the human and the GitHub
+bot, when it runs.
+
+**A branch working `review-debt`** is one whose whole unit of work is findings
+from an issue settling a branch's review leftovers (ADR 0038), none of them
+deferred because its fix needs a plan. Any other issue, labelled or not, takes
+the ordinary path. The branch that deferred those findings already spent its
+rounds, so this one is routed by its weakest fix. If every fix is cheap and
+passes a test above, and the human confirms that, it runs no `/code-review`, only
+the gate and the detectors, and §4's lines record the exemption.
+Otherwise the whole diff gets a cap of one round, and the branch opens no new
+debt: a finding that is not a real defect is fixed if it passes a test above,
+otherwise dismissed with that reason. A real defect the human defers still opens
+its issue.
 
 **Rule of three:** touching the same code a third time for the same class of
 defect means the design is the problem. Stop patching and redesign. A fix that
-introduces the next defect in the same place counts double.
+introduces the next defect in the same place counts double. It counts touches
+to the code, across branches, not rounds, so the cap leaves its number alone;
+the stopping rule applies it sooner inside a branch, since two rounds never see
+a third touch.
 
 ### Closing threads
 Reply in the thread saying what was done, then **Resolve conversation** — the

@@ -234,7 +234,7 @@ code → Automatic review). No file here configures it, nothing here turns it on
 or off, and no detector checks it.
 
 **Why it stays on while §8's review is off.** §8's decision was about a Claude
-reviewer; Codex was a separate bot and was left as it was. ADR 0015 keeps it as
+reviewer; Codex was a separate bot and was left as it was. ADR 0049 keeps it as
 the one automated advisor round per PR, and `ship-a-branch` step 3 says how that
 round is used and when to stop waiting for it.
 
