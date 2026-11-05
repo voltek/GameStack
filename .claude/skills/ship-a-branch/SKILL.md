@@ -302,11 +302,24 @@ finding, its bucket, its verified reason, and each `Fix (defect)` row's origin �
 before changing anything. In the chat give one line per finding (number, bucket,
 a reason of twelve words or fewer), then the verdict and the file's path. Touch
 nothing until the human has confirmed the table, every row of it.
+
+**A branch whose whole diff is in the governance shape** narrows the chat to what
+the human decides: those rows, each with its options and a recommendation, then
+the verdict, the other rows' count per bucket, and the file's path. Any other row
+stands as proposed unless the human reopens it, and the human's answer on the
+verdict and the rows shown confirms the table. A row goes to the human when:
+- a possible defect would leave the branch: a defect in Defer, or a `Dismiss`
+  whose reason is not a check anyone can repeat, such as a quote or a command;
+- its call between defect and cheap decides whether a round is earned;
+- its fix has more than one reasonable solution, or writes or changes a rule;
+- it opens an issue or labels an existing one.
+
 The table ends with the round's verdict, `Stopping rule: another round | stop,
 on to §4 | stop, back to the human, because …`, which the human confirms with
 it: after the fixes the natural next step is amend and push, and nothing there
 asks whether a round is owed. Choosing a bucket is plan-level (CLAUDE.md →
-Human-in-the-Loop): a defect filed as debt leaves the branch exactly as a
+Human-in-the-Loop), so a row leaves the human's view only under that narrowing:
+a defect filed as debt leaves the branch exactly as a
 dismissed one does, and a finding moved out on the agent's word alone is a
 finding silently dropped — worse than no review, because it looks like coverage.
 If a finding exposes code/doc drift, its fix carries a `Drift:` trailer (§2

@@ -10,7 +10,7 @@ Supersedes: ADR-0030
 Enforced by: branch protection — `required_conversation_resolution=true` (every review thread resolved before the merge; "answered" is prose; for everyone, administrators included, while `enforce_admins=true`)
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Testing Stack — a regression test that was never seen to fail
 Enforced by: none (prose only — CLAUDE.md § Git workflow Tier 2) — the human confirms the triage, the rule of three, `/code-review` run by the human
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 3. Reviews — all of them, before the PR exists) — the GitHub bot as an advisor, the exemptions, the buckets and their grounds, the stopping rule, the cap, the round past it, a fix no round will read, a branch working `review-debt`, the records
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 3. Reviews — all of them, before the PR exists) — the GitHub bot as an advisor, the exemptions, the buckets and their grounds, the stopping rule, the cap, the round past it, a fix no round will read, a branch working `review-debt`, the rows that go to the human, the records
 Enforced by: none (prose only — .github/pull_request_template.md § Verification) — the `Deferred:` and `Dismissed:` lines
 
 ## Context
@@ -29,7 +29,8 @@ closed such an issue with a rule (PR #49) ran two rounds that found six defects.
 ## Decision
 Triage every review finding in a table the human confirms before anything
 changes: fixed, deferred to an issue, or dismissed, with the reason recorded.
-Answer and resolve every thread.
+On a branch that is wholly governance the human decides the rows that turn on a
+judgment, and the others stand unless reopened. Answer and resolve every thread.
 
 A real defect, never a finding as such, earns another round, and every branch's
 rounds are capped, governance and product alike. Past the cap a round runs only
@@ -72,6 +73,12 @@ branches, and a second touch alone did not show a bad design. The cap did blind
 it inside a branch: all three verdicts on record that named it came after round
 2. So a class round 1 fixed and round 2 found again in the same place went back
 to the human.
+
+The owner reported reading only the rows the agent flagged on governance diffs,
+so "every row" had stopped describing what happened. Narrowing the chat made the
+confirmation honest at a known cost: the agent chose what the human saw, which is
+why the counts always appeared and an unrepeatable dismissal always went to the
+human. Product branches kept every row, unmeasured until one tried this.
 
 Issue #85 stayed open for what did not change rounds: an *accepted* outcome for
 a cheap finding, the expiry of debt, and whether the label should split.
