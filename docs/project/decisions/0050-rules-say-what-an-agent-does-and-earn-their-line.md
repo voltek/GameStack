@@ -1,12 +1,13 @@
 # ADR 0050 — Rules say what an agent does, and each line in CLAUDE.md earns its place
 
 Status: Accepted
+Status: Superseded by ADR-0052 — "The owner is warned before a large batch of runs" and "Ordinary subagent use needs no warning" (Decision)
 Date: 2026-11-05
 Backfilled: no
 Supersedes: ADR-0006 — reading `git status` in full, and the section being tiered (Decision)
 Supersedes: ADR-0039 — "as a Tier 1 rule" (Decision)
 Enforced by: none (prose only — CLAUDE.md § Working here) — asking first, how a rule changes
-Enforced by: none (prose only — .claude/rules/governance.md § What earns a line in CLAUDE.md) — the admission questions, a line with no effect leaving, the warning before a large batch of runs
+Enforced by: none (prose only — .claude/rules/governance.md § What earns a line in CLAUDE.md) — the admission questions, a line with no effect leaving
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § A governance diff earns the checklist) — `.claude/rules/` in the shape
 
 ## Context

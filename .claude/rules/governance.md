@@ -29,8 +29,6 @@ Before adding a line, ask in order:
 4. **Does it survive a clone?** A path on one machine or a device serial belongs in
    agent memory.
 5. **Does removing it change what an agent does?** A line with no effect leaves.
-   A large batch of runs to measure that spends the owner's usage limit, so warn
-   the owner before launching one. Ordinary subagent use needs no warning.
 
 ## Generated Skills
 The `openspec-*` Skills are generated and `openspec update` rewrites them. A `deny`
