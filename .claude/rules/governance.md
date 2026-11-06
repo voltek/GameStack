@@ -32,6 +32,11 @@ Before adding a line, ask in order:
    A large batch of runs to measure that spends the owner's usage limit, so warn
    the owner before launching one. Ordinary subagent use needs no warning.
 
+## Generated Skills
+The `openspec-*` Skills are generated and `openspec update` rewrites them. A `deny`
+covers their folder but misses other spellings, so never edit one by any route:
+project specifics go to the schema and the config (ADR 0041).
+
 ## How to word a rule
 Keep the reason, not the story: the consequence that makes a rule necessary stays
 beside it in the present tense, and who and when go to the commit body. A decision

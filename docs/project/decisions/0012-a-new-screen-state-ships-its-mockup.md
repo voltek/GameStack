@@ -3,7 +3,7 @@
 Status: Accepted
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("The refresh-failure banner shipped")
-Enforced by: none (prose only — CLAUDE.md § Commands)
+Enforced by: none (prose only — .claude/rules/presentation.md § Device verification)
 
 ## Context
 The refresh-failure banner shipped, was verified on device, and was merged with

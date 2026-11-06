@@ -172,8 +172,8 @@ artifacts:
       lines, one verifier each, which together prove its whole THEN:
       - `test: `<TestClass>` › `<test name>`` - a JVM test, Compose screen tests
         included. In a change, it names the test the build will write first.
-      - `device` - only what the JVM suite cannot assert under CLAUDE.md §
-        Testing Stack (an image from the network, a tab switch, gestures, the
+      - `device` - only what the JVM suite cannot assert under
+        `.claude/rules/tests.md` (an image from the network, a tab switch, gestures, the
         keyboard, what TalkBack speaks); the PR's device pass covers it.
       A THEN no verifier proves is not finished: ask how it is proven.
     requires:

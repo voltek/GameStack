@@ -1,6 +1,7 @@
 # ADR 0038 — Pending work is a GitHub issue, opened through one form
 
 Status: Accepted
+Status: Superseded by ADR-0051 — "its rule to CLAUDE.md" (Decision)
 Status: Superseded by ADR-0041 — "its OpenSpec item included" (Decision)
 Status: Superseded by ADR-0043 — "Product scope deferred past the MVP is not this kind of work" (Decision)
 Status: Superseded by ADR-0047 — "once a merge changes `app/src/main`, or three merges have landed since the last triage" (Decision)

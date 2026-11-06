@@ -10,8 +10,7 @@ Turbine, MockK, TestDispatcher
 ## Scope — JVM only
 Everything this skill writes goes under `test/` and runs on the JVM via
 `./gradlew test`: no emulator, no real database, no real network. That boundary
-is what keeps the suite fast enough to gate every change (CLAUDE.md, Testing
-Stack).
+is what keeps the suite fast enough to gate every change (`.claude/rules/tests.md`).
 
 **Robolectric is permitted for Compose screen tests, and only those** — see
 "Screen tests" below. Not for DAOs against real SQLite, and never as a
@@ -37,7 +36,7 @@ will pass every test in this project and fail on device. Don't write a mocked
 Problem below) and would hide the gap rather than flag it.
 
 ## Screen tests (Compose, under Robolectric)
-The one exception to "no Robolectric" (CLAUDE.md → Testing Stack). Still under
+The one exception to "no Robolectric" (`.claude/rules/tests.md`). Still under
 `test/`, still `./gradlew test`.
 
 ```kotlin
@@ -188,8 +187,8 @@ Pattern: `{method or event} should {expected result} when {condition}`
 ## Verifying a regression test actually catches the bug
 A test written after the fix can pass whether or not the fix is present. That
 test is worse than no test: it looks like coverage and proves nothing. Every
-regression test must be *seen* to fail against the code it guards (CLAUDE.md →
-Testing Stack).
+regression test must be *seen* to fail against the code it guards
+(`.claude/rules/tests.md`).
 
 ```bash
 # 1. Test and fix are both written and green.

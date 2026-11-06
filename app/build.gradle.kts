@@ -104,7 +104,7 @@ dependencies {
     testImplementation(libs.cashapp.turbine)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
-    // Screen tests only — see CLAUDE.md, Testing Stack.
+    // Screen tests only — see .claude/rules/tests.md.
     testImplementation(composeBom)
     testImplementation(libs.androidx.compose.ui.test.junit4)
     testImplementation(libs.robolectric)

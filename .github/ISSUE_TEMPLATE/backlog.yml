@@ -57,7 +57,7 @@ body:
     id: lands
     attributes:
       label: Where it lands when shipped
-      description: Its rule to CLAUDE.md, procedure to a Skill, decision to an ADR, a TOOLING.md entry, and the Enforced by line of every ADR it now polices.
+      description: Its rule to CLAUDE.md or `.claude/rules/`, procedure to a Skill, decision to an ADR, a TOOLING.md entry, and the Enforced by line of every ADR it now polices.
   - type: dropdown
     id: bucket
     attributes:

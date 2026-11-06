@@ -4,7 +4,7 @@ Status: Accepted
 Status: Superseded by ADR-0046 — "The emulator is *asked for*, never launched unprompted" (Decision)
 Date: 2026-08-22
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-22 ("CLAUDE.md defined")
-Enforced by: none (prose only — CLAUDE.md § Commands)
+Enforced by: none (prose only — .claude/rules/presentation.md § Device verification)
 
 ## Context
 CLAUDE.md defined "done" as `build`, `test` and `lint` green, so a UI feature

@@ -3,7 +3,7 @@
 What the app is, for whom, what it does, what has to be true before it ships,
 and what it will not do. A living document: it changes only on the triggers in
 *How this document changes*, through a branch, and git is its version history.
-Technical rules live in `CLAUDE.md`; each capability's behaviour lives in its
+Technical rules live in `CLAUDE.md` and `.claude/rules/`; each capability's behaviour lives in its
 spec under `openspec/specs/` (ADR 0041). Until ADR 0043 it was the Spec,
 `GameStack-Spec-v1.md`, the name frozen ADRs and history still use.
 
@@ -119,8 +119,8 @@ them; no usage metrics are collected. Each points at its `product` issue
 
 - The four screens (Home, Search, Library, Detail) built, and every capability
   they show with its spec — #106, #107, #108.
-- Accessibility pass: TalkBack, large font, contrast, touch targets (CLAUDE.md
-  § Accessibility) — #109.
+- Accessibility pass: TalkBack, large font, contrast, touch targets
+  (`.claude/rules/presentation.md` § Accessibility) — #109.
 - Open Source Licenses screen listing every third-party library and its
   license — #110.
 - A basic security audit: no secret inside the APK, R8 on and `debuggable` off,
@@ -186,7 +186,7 @@ of scope, an open question is answered, or a release criterion changes. The
 deferral that no release criterion needs is a harness issue, never a line here.
 
 ## Related documents
-- `CLAUDE.md` — technical and architectural rules; it wins over any spec or change
+- `CLAUDE.md` and `.claude/rules/` — technical and architectural rules; they win over any spec or change
 - `openspec/` — a spec per capability and the changes that alter them, one per
   feature branch (ADR 0041)
 - `docs/project/DESIGN.md` — the visual design system (colours, typography, spacing)

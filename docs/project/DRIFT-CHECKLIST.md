@@ -1,6 +1,6 @@
 # DRIFT-CHECKLIST — GameStack
 
-> Manual audit checklist derived from CLAUDE.md's rules. It
+> Manual audit checklist derived from the rules in CLAUDE.md and `.claude/rules/`. It
 > detects drift between the code and the Project Constitution, and it runs on
 > either of two events. A pull request touches `CLAUDE.md`, any `.md` under
 > `docs/project/` or `.github/`, any Skill under `.claude/skills/`, any file under
@@ -47,7 +47,7 @@
 
 ## Adding or changing a detector
 **A detector that was never seen to fire proves nothing**, the same rule
-CLAUDE.md sets for regression tests. When one is added or changed, plant one
+`.claude/rules/tests.md` sets for regression tests. When one is added or changed, plant one
 defect per thing it claims to catch, each on its own line, in a copy of the
 repository, and confirm each one is reported. A detector that also reads
 something outside the repository, such as `gh api`, gets its defect planted on
@@ -80,7 +80,7 @@ and items it read, so a silent skip shows.
       Verified by: human
 - [ ] Has any test under `test/` started requiring an emulator, a real database,
       or a real network call? Or Robolectric anywhere other than a Compose screen
-      test? (JVM-only is the gate — see CLAUDE.md.)
+      test? (JVM-only is the gate — see `.claude/rules/tests.md`.)
       Verified by: human
 - [ ] Does `app/src/test/resources/robolectric.properties`'s `sdk=` disagree with
       `targetSdk`? Nothing enforces the match, and the failure is silent: screen
@@ -234,10 +234,9 @@ A rename touches both its paths, so list the diff with `git fetch` and then
       Verified by: human
 
 ### When the diff touches what it reads
-- [ ] Does CLAUDE.md's "Available Skills" list differ from the actual contents
-      of `.claude/skills/`? (A Skill archived under
-      `docs/project/retired-skills/` appearing as invocable is the same drift.)
-      Runs when: `.claude/skills/`, `CLAUDE.md` or `docs/project/retired-skills/`
+- [ ] Does a Skill archived under `docs/project/retired-skills/` still have its
+      folder under `.claude/skills/`? The harness would keep offering it.
+      Runs when: `.claude/skills/` or `docs/project/retired-skills/`
       Verified by: human
 - [ ] Does PRODUCT.md's *Capabilities* table name a spec folder that does not
       exist under `openspec/specs/`, or leave out one that does (ADR 0043)?

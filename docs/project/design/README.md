@@ -80,15 +80,15 @@ $bmp.Save($out, [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose(); $src.Dispose()
 ```
 
-For emulator verification specifically, see CLAUDE.md → Commands → Device
-verification: `Grep` over a `uiautomator dump` answers pre-stated questions for
+For emulator verification specifically, see the `verify-on-device`
+Skill: `Grep` over a `uiautomator dump` answers pre-stated questions for
 a fraction of a screenshot's cost, but never anything involving the keyboard.
 
 ## Coverage gap
 
 No Skill owns "produce or refresh a design reference". Rendering currently
 happens ad hoc against this file. If it recurs, that is a Skill worth adding
-rather than improvising each time — see CLAUDE.md → Available Skills.
+rather than improvising each time.
 
 ## A new state needs its own mockup
 
