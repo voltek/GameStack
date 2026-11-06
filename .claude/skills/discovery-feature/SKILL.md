@@ -22,8 +22,8 @@ compatibility: Requires the target project to have a CLAUDE.md (or equivalent Co
   Code's AskUserQuestion), prefer it for closed/multiple-choice questions.
   Otherwise, ask directly in the conversation — this is a preference, not a
   hard requirement, so the skill works on any tool.
-- Cross-check answers against the project's CLAUDE.md — if something conflicts
-  with an existing rule, surface that conflict explicitly before proceeding.
+- Cross-check answers against the project's CLAUDE.md and `.claude/rules/` — if
+  something conflicts with an existing rule, surface that conflict explicitly before proceeding.
 
 ## Beyond the list
 The questions above are the required minimum — never skip them. But they are

@@ -188,8 +188,8 @@ it. Different jobs and growth laws (the log no longer grows) keep them apart.
 - *Putting everything in CLAUDE.md.* Every line there is paid for on every
   request, whether or not the task touches it. The test for admission is not
   "is this valuable" but "is this needed on every turn".
-- *A hand-written index of the ADRs.* A second place to update per ADR, and the
-  Skills list in CLAUDE.md already drifted out of sync with `.claude/skills/`
+- *A hand-written index of the ADRs.* A second place to update per ADR, and a
+  Skills list CLAUDE.md once held drifted out of sync with `.claude/skills/`
   exactly that way. `grep -H "^Enforced by:"` reads the set instead.
 - *A drift log that keeps growing.* Each row was a second copy of the resolving
   commit's body, and nothing read the log to spot a pattern (ADR 0033).
@@ -248,7 +248,8 @@ change to branch protection, `gh repo edit`/`rename`/`archive`/`delete`,
 `gh workflow disable`, `gh secret`, and printing the GitHub token. The `ask`
 list covers the common PR actions, deleting a remote branch, `git -C` with
 `push` or `commit`, and mutating `gh api` calls, which include turning
-auto-merge on. Each rule catches the common spellings of a mistake, never all
+auto-merge on. An `Edit` rule denies the file tools on the generated
+`openspec-*` Skills (entry 13). Each rule catches the common spellings of a mistake, never all
 of them. Issue #71 lists the spellings known to get through; where
 `main` is concerned, only §2 stops them. A rule also stays narrow enough not to
 catch reads: a prompt on every `git -C … log` was dropped for that reason.
@@ -398,7 +399,7 @@ and `telemetry.enabled false`, then `openspec update`.
 
 **Pilot.** Detail's spec is the first change run through these Skills. The
 owner then judges its output: assumptions visible rather than buried, every
-scenario with a verifier, no rule in CLAUDE.md breached, and each Skill's steps still
+scenario with a verifier, no rule in CLAUDE.md or `.claude/rules/` breached, and each Skill's steps still
 there after a compaction. Kept, `discovery-feature` retires; dropped, the
 format stays by hand and `discovery-feature` writes the change. The CLI stays
 only if `validate` or the archive merge caught something a hand edit would not.

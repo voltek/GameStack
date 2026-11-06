@@ -1,6 +1,6 @@
 ---
 name: new-feature
-description: Create a complete GameStack feature end-to-end, from Domain models to UI, following Clean Architecture and MVI. Use when asked to build a new feature or screen from scratch.
+description: Start any feature that adds or changes what the user sees, however small, from the OpenSpec change first, then build it from Domain models to UI, following Clean Architecture and MVI. Use before writing code for a new feature, screen or visible behaviour, whichever layer it starts in.
 ---
 
 ## Overview

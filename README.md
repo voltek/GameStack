@@ -9,7 +9,7 @@ Search games, view details, organize personal lists, and rate what you've
 played. Not a store, not a gaming platform — a catalog and personal library app.
 
 Full product scope lives in [`docs/project/PRODUCT.md`](docs/project/PRODUCT.md).
-Architectural/technical rules live in [`CLAUDE.md`](CLAUDE.md).
+Architectural/technical rules live in [`CLAUDE.md`](CLAUDE.md) and [`.claude/rules/`](.claude/rules/).
 The repository tooling — what enforces those rules, and what was ruled out on the
 way to it — is inventoried in [`docs/project/TOOLING.md`](docs/project/TOOLING.md).
 

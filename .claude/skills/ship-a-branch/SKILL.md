@@ -119,7 +119,7 @@ the reasoning the diff cannot show, not a retelling of it. Three tests:
 
 - Would a reader six months from now need this sentence to see why the change is
   right? If not, cut it.
-- Is it already in CLAUDE.md, the PRD or an ADR? Point at it.
+- Is it already in CLAUDE.md, `.claude/rules/`, the PRD or an ADR? Point at it.
 - Is it narrating the process ("first I tried X, then Y", "the reviewer found
   this, I verified that")? Cut it. The review's account belongs in the PR body
   (§4); the commit says *what is now true and why*.
@@ -250,7 +250,7 @@ twenty ADRs clean while reading seventeen.
   - **Fix (defect)** — a real defect, fixed here unless the human, confirming
     the table, defers it. In code it is correctness, data loss or something the
     user can perceive, and its fix carries a regression test verified per
-    CLAUDE.md → Testing Stack. In a governing document it needs a failure
+    `.claude/rules/tests.md`. In a governing document it needs a failure
     scenario in which an agent following the text *acts* wrongly, for example
     two rules prescribing different actions, a broken reference, a missing
     step, or a step that cannot be carried out. No test applies; the
@@ -298,7 +298,7 @@ Stopping rule: <verdict>
 Owner decisions (YYYY-MM-DD): <confirmed as proposed, or each change>
 ```
 
-Accessibility findings are deferred by default (CLAUDE.md → Accessibility),
+Accessibility findings are deferred by default (`.claude/rules/presentation.md`),
 *except* where a change removed an affordance that already worked — that is not
 new accessibility work, it is not regressing, and it is a Fix (defect).
 

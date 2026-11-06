@@ -6,7 +6,11 @@ Backfilled: no
 Supersedes: ADR-0038 — "its OpenSpec item included" (Decision)
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § A branch with a change verifies it before the reviews, archives it before the merge) — which branches open a change, verify before the reviews and archive before the merge, a verifier following its renamed test, no open change left on a merged branch
 Enforced by: none (prose only — openspec/schemas/gamestack/schema.yaml § artifacts) — the `VERIFIED BY` lines on every scenario, the proposal's `## Assumptions` and `## Open Questions`, tasks grouped by layer Skill
-Enforced by: none (prose only — docs/project/TOOLING.md § 13. Spec-driven changes) — the generated Skills never edited, the machine profile, the pilot's verdict after Detail
+Enforced by: claude settings — `deny` on the file tools editing `.claude/skills/openspec-*/` (the agent only, common spellings) — the generated Skills never edited
+Enforced by: none (prose only — .claude/rules/governance.md § Generated Skills) — the generated Skills never edited, for a person and for other spellings
+Enforced by: none (prose only — .claude/skills/new-feature/SKILL.md § Steps) — a feature the user sees starts from a change, for a session that takes the Skill
+Enforced by: none (prose only — .claude/rules/presentation.md § Behaviour) — a `feat` branch changing what the user sees starts from a change, for a session touching the UI
+Enforced by: none (prose only — docs/project/TOOLING.md § 13. Spec-driven changes) — the machine profile, the pilot's verdict after Detail
 
 ## Context
 The Spec held each screen's behaviour as a few bullets, written before the code.

@@ -36,6 +36,7 @@
       "Bash(gh auth status *-t*)",
       "Bash(gh auth status *--show-token*)",
       "Bash(git credential*)",
+      "Edit(/.claude/skills/openspec-*/**)",
       "PowerShell(git commit *--no-verify*)",
       "PowerShell(git push *--no-verify*)",
       "PowerShell(git push *--force *)",

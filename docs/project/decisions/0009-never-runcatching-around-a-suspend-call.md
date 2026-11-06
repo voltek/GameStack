@@ -1,6 +1,7 @@
 # ADR 0009 — Never build a `Result` with `runCatching` around a suspend call
 
 Status: Accepted
+Status: Superseded by ADR-0051 — "a rule that applies to future code lives in CLAUDE.md plus its owning Skill" (Decision)
 Date: 2026-08-22
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-22 ("The same rationale for `try`/`catch`")
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Architecture
