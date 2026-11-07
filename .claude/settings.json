@@ -1,4 +1,8 @@
 {
+  "attribution": {
+    "pr": "",
+    "sessionUrl": false
+  },
   "permissions": {
     "deny": [
       "Bash(git commit *--no-verify*)",
