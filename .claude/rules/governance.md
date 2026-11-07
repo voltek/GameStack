@@ -13,7 +13,7 @@ paths:
 
 ## What earns a line in CLAUDE.md
 CLAUDE.md loads on every request, and adherence falls as it grows. It holds at most
-200 lines and 18,000 characters (ADR 0031).
+60 lines and 3,600 characters, which a test checks (ADR 0055).
 
 Before adding a line here or to a `.claude/rules/` file, ask in order. Moving a line
 is no reason to keep it, and the questions apply to what is already there (ADR 0053):

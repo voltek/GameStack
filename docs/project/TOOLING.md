@@ -178,6 +178,10 @@ of file, loaded by path when one is touched; `PRODUCT.md` holds the product; `DE
 and `decisions/` holds one ADR per decision in force, each naming what enforces
 it. Different jobs and growth laws (the log no longer grows) keep them apart.
 
+**CLAUDE.md's bound.** `ClaudeMdBoundTest` fails the gate past ADR 0055's 60 lines and
+3,600 characters. CLAUDE.md is declared an input of the test tasks, because a test that
+opens a file by path otherwise stays UP-TO-DATE when that file changes.
+
 **Replaces.** Rediscovering, per session, why the code looks the way it does.
 
 **Where.** `CLAUDE.md`, `.claude/rules/`, `docs/project/PRODUCT.md`,

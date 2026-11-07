@@ -165,3 +165,9 @@ val installGitHooks by tasks.registering(InstallGitHooks::class) {
 }
 
 tasks.named("preBuild") { dependsOn(installGitHooks) }
+
+// ClaudeMdBoundTest reads this file, which Gradle would not otherwise see as an input,
+// so the test would stay UP-TO-DATE while the file grew past its bound.
+tasks.withType<Test>().configureEach {
+    inputs.file(rootProject.file("CLAUDE.md")).withPathSensitivity(PathSensitivity.NONE)
+}

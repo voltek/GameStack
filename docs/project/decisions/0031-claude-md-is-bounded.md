@@ -1,9 +1,12 @@
 # ADR 0031 — CLAUDE.md is bounded at 200 lines and 18,000 characters
 
 Status: Accepted
+Status: Superseded by ADR-0055 — "at most 200 lines", "18,000 characters, about 6,000 tokens", "Until the file meets the bound" and "as a Gradle task that `check` depends on" (Decision)
 Date: 2026-10-26
 Backfilled: no
-Enforced by: none (prose only — .claude/rules/governance.md § What earns a line in CLAUDE.md)
+Enforced by: test: ClaudeMdBoundTest#should keep CLAUDE md within its character bound — how characters are counted
+Enforced by: none (prose only — .claude/rules/governance.md § What earns a line in CLAUDE.md) — where text that leaves goes
+Enforced by: none (prose only — CLAUDE.md § Working here) — the gate staying three commands
 
 ## Context
 CLAUDE.md had reached 612 lines and 35,950 characters, about 12,700 tokens,

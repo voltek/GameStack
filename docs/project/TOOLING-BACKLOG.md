@@ -18,5 +18,5 @@ cite its items by number. Nothing is added to it: a new item is a new issue.
 | 7. Check the ADR index against `decisions/` | #69 |
 | 8. Fix the gate's Gradle-cache packaging failure | #70 |
 | 9. A `PreToolUse` hook that judges git and gh commands by parsing them | #71 |
-| 10. Check CLAUDE.md's size bound in the build | #72 |
+| 10. Check CLAUDE.md's size bound in the build | Shipped: TOOLING.md § 7 |
 | 11. Block edits to the frozen drift log | #73 |
