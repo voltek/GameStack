@@ -9,7 +9,7 @@ export LC_ALL
 
 TYPES='feat fix refactor docs chore test'
 FORM="^($(printf '%s' "$TYPES" | tr ' ' '|'))(\([a-z]+\))?: [^ ]"
-KNOWN_TRAILERS='drift bypassed co-authored-by claude-session signed-off-by'
+KNOWN_TRAILERS='drift bypassed co-authored-by signed-off-by'
 
 # The closed scope list (ADR 0034). A new scope joins it in the commit that
 # first uses it.

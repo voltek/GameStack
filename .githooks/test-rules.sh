@@ -70,7 +70,7 @@ message 1 'drift: in lowercase' 'docs(ship): Fix\n\ndrift: doc updated\n'
 message 0 'Bypassed: well-formed' 'docs(ship): Fix\n\nBypassed: enforce_admins — outage\n'
 message 1 'Bypassed: no reason' 'docs(ship): Fix\n\nBypassed: because\n'
 message 1 'an exempt subject keeps its trailers checked' 'Revert "docs(ship): X"\n\nDrift: docs updated\n'
-message 0 'a whitespace-only line is blank' "docs(ship): Fix\n\n$(body 11)  \nCo-Authored-By: A <a@b>\nClaude-Session: x\n"
+message 0 'a whitespace-only line is blank' "docs(ship): Fix\n\n$(body 11)  \nCo-Authored-By: A <a@b>\nSigned-off-by: A <a@b>\n"
 message 0 'a whitespace-only second line is blank' 'docs(ship): Fix\n  \nbody\n'
 
 printf 'docs(ship): Fix\n\nDrift: bogus\nDrift: also bogus\n' >"$tmp/message"

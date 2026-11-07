@@ -266,6 +266,9 @@ auto-merge on. An `Edit` rule denies the file tools on the generated
 of them. Issue #71 lists the spellings known to get through; where
 `main` is concerned, only §2 stops them. A rule also stays narrow enough not to
 catch reads: a prompt on every `git -C … log` was dropped for that reason.
+`attribution` in the same file keeps the agent as a commit co-author only: `pr` is
+empty, `sessionUrl` is off, and `commit` stays unset so the trailer names the real
+model.
 
 **Replaces.** A prompt before every `git push`, and the same rules kept only in a
 local file that one machine's global ignore kept out of git.
