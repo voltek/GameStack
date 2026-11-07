@@ -172,7 +172,7 @@ its answer belongs.
 - **How the Twitch client secret leaves the APK.** `local.properties` keeps it
   out of git, but the build compiles it into `BuildConfig`, readable from any
   published APK, and every user would share one rate limit. Likely a small proxy
-  that holds the secret; deciding it changes CLAUDE.md § Data Sources.
+  that holds the secret; deciding it changes how `AuthInterceptor` gets its token.
   Blocks the first release — #111.
 - **Whether to measure use after the first release**, once real users exist.
 

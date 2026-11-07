@@ -5,7 +5,7 @@ description: Take a finished branch through to a merged PR — updating against 
 
 ## When this applies
 The work is written and the gate is green. Everything below is procedure for
-getting it merged; the *rules* that constrain code on any turn stay in CLAUDE.md.
+getting it merged; the *rules* that constrain code stay in CLAUDE.md and `.claude/rules/`.
 
 CLAUDE.md § Working here and the `deny` and `ask` rules in `.claude/settings.json`
 govern every step below. They are not restated here.

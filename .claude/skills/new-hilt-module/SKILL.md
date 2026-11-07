@@ -20,7 +20,7 @@ skill owns their creation, at the moment a real binding is needed.
 
 ## Choosing the module
 Name modules after **what they represent**, never a catch-all "CommonModule" or
-"AppModule" (CLAUDE.md, Code Conventions). Current modules:
+"AppModule". Current modules:
 
 | Module | Owns |
 |---|---|
@@ -61,7 +61,7 @@ Only expose a value via `@Provides`/`@Binds` if something outside the module
 genuinely injects it directly. Otherwise keep it a private helper function —
 the `Json` converter factory in `NetworkModule` is the reference case: used
 only to build the Retrofit instances in that same file, so it is private rather
-than a binding (CLAUDE.md, Code Conventions).
+than a binding (ADR 0004).
 
 **Exception — anything that must be `@Singleton` stays a binding**, even when
 only consumers inside the same module inject it. Scoping is a property of the

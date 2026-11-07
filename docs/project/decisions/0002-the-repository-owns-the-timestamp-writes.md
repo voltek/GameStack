@@ -1,9 +1,10 @@
 # ADR 0002 — The Repository owns the `updatedAt`/`completedAt` write rules
 
 Status: Accepted
+Status: Superseded by ADR-0054 — "as a documented exception to" (Decision)
 Date: 2026-08-04
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-04 ("A decision with no incident behind it: the `completedAt` transition rule")
-Enforced by: none (prose only — CLAUDE.md § Data Sources)
+Enforced by: none (prose only — .claude/rules/data-layer.md § The data layer)
 
 ## Context
 `completedAt` must be stamped only when a game's `listStatus` *transitions* into

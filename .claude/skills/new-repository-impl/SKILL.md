@@ -39,7 +39,7 @@ override suspend fun searchGames(query: String): Result<List<Game>> =
 
 `runCatching` catches `Throwable`, so it swallows `CancellationException` too and
 reports a merely-cancelled coroutine as a genuine failure — the caller then shows
-an error for work nobody was waiting on any more (CLAUDE.md, Architecture).
+an error for work nobody was waiting on any more (ADR 0009).
 
 ## Write operations — read-modify-write and persistence invariants
 Writes to `UserGameEntity` are never blind upserts. The Repository:
@@ -49,13 +49,10 @@ Writes to `UserGameEntity` are never blind upserts. The Repository:
    COMPLETED and the stored value was not already COMPLETED.
 3. Upserts the result.
 
-These timestamp rules are **persistence invariants and belong here** — an explicitly
-documented exception to "Repositories contain no business logic" (CLAUDE.md, Data
-Sources). They live here because detecting a *transition* requires comparing
+These timestamp rules are **persistence invariants and belong here** (ADR 0054). They live here because detecting a *transition* requires comparing
 against stored state, and Entities never leave the Data layer, so no UseCase can see it.
 Nor is it the DAO's job: the rule spans a read *and* a write, and a DAO method is one
-statement. Those two exclusions are why the exception exists at all — without it the
-invariant would have no legal home in the architecture, not merely an inconvenient one.
+statement.
 
 The boundary that still applies: the Repository decides *when a timestamp column is
 written*, never *what it means to the user*. Formatting "Completed on [date]" or
@@ -63,8 +60,8 @@ ordering "Recently Interacted" is Domain/UI work. If a rule ever needs more than
 comparing old and new persisted state, it is real business logic — stop and ask.
 
 Because rating and list-status writes touch the same row, keep this cycle in one
-private helper rather than duplicating it per write function (CLAUDE.md, Code Conventions:
-avoid duplicating logic that could drift out of sync).
+private helper rather than duplicating it per write function, so the copies cannot
+drift apart.
 
 ## Local Data Conventions (Room)
 - Entities, DAOs, TypeConverters and Database registration are owned by the
@@ -84,7 +81,7 @@ avoid duplicating logic that could drift out of sync).
 Example: `GamesRepositoryImpl`, `UserGameRepositoryImpl`
 
 ## Quality criteria
-- Repositories contain no business logic — they only coordinate data sources.
+- A Repository holds the rules of its own data; product rules live in UseCases (ADR 0054).
 - Every function from the interface is overridden — no partial implementations.
 - Never expose DTO/Entity types outside the Repository — only Domain models leave this class.
 - Read and write paths for the same data (e.g. rating, list status) live in the same

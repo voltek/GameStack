@@ -5,10 +5,10 @@ description: Create a ViewModel following the MVI pattern for a GameStack screen
 
 ## Construction
 - Annotated with `@HiltViewModel`, constructor injected with the required UseCase(s) via `@Inject`.
-- Defines three contracts — full rules in CLAUDE.md, Architecture →
-  "MVI Contract conventions":
+- Defines three contracts, the only way UI and ViewModel communicate:
   - `UiState` — data class exposed as `StateFlow`, private `MutableStateFlow` backing it.
-    Use a sealed class only when states are truly mutually exclusive, otherwise use data classes.
+    Use a sealed class only when states are truly mutually exclusive, otherwise use data classes:
+    loading, content and error often coexist, as when a refresh fails over stale content (ADR 0017).
   - `UiEvent` — sealed class with all actions the UI can send.
   - `UiEffect` — sealed class for one-shot events, exposed via `Channel`/`receiveAsFlow()`.
 
@@ -17,13 +17,13 @@ description: Create a ViewModel following the MVI pattern for a GameStack screen
 - Single public entry point: `fun handleEvent(event: UiEvent)`, using a `when` to route to
   private handler functions.
 - Use `.update { }` on the StateFlow to mutate state immutably.
-- Use `UiText` (never raw strings) for any text exposed in UiState or UiEffect.
+- Use `UiText` (never raw strings) for any text exposed in UiState or UiEffect. It is an
+  Android type, so a UseCase returns no text for the user.
 
 ## Location
 - ViewModel: `feature/{feature-name}/presentation/{ScreenName}ViewModel.kt`
 - Contracts: `feature/{feature-name}/presentation/{ScreenName}Contract.kt`
-  (all three in one file — the one-class-per-file exception in CLAUDE.md,
-  Code Conventions)
+  (all three in one file)
 
 ## Naming convention
 `{ScreenName}ViewModel`, `{ScreenName}UiState`, `{ScreenName}UiEvent`, `{ScreenName}UiEffect`
@@ -56,7 +56,7 @@ it.** With the operator, a new keystroke is held for its own timeout *before*
 `mapLatest` ever sees it, so the previous request keeps running and its response
 can still land — painting settled results, or flashing the error card, for the
 whole debounce window after the query changed. That is the same user-visible
-failure CLAUDE.md's `runCatching` rule exists to prevent, arriving by a different
+failure the `runCatching` rule in `.claude/rules/code.md` exists to prevent, arriving by a different
 route. It was caught in review; the pipeline reads almost identically either way,
 which is exactly why it is worth stating.
 

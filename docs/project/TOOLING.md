@@ -178,11 +178,24 @@ of file, loaded by path when one is touched; `PRODUCT.md` holds the product; `DE
 and `decisions/` holds one ADR per decision in force, each naming what enforces
 it. Different jobs and growth laws (the log no longer grows) keep them apart.
 
+**CLAUDE.md's bound.** `ClaudeMdBoundTest` fails the gate past ADR 0055's 60 lines and
+3,600 characters. CLAUDE.md is declared an input of the test tasks, because a test that
+opens a file by path otherwise stays UP-TO-DATE when that file changes.
+
 **Replaces.** Rediscovering, per session, why the code looks the way it does.
 
 **Where.** `CLAUDE.md`, `.claude/rules/`, `docs/project/PRODUCT.md`,
 `docs/project/DESIGN.md`, `docs/project/DRIFT-CHECKLIST.md`,
 `docs/project/DRIFT-LOG.md`, `docs/project/decisions/`.
+
+**Measuring a line.** `.claude/rules/governance.md` drops a line with no effect, and a
+comparison shows that. Give the same prompt through `claude -p`, in a fresh clone per
+run with a fake origin, once with the line and once without. Read what the agent did
+from `--output-format stream-json`, not what it says. Use the real gate, since agents
+notice a stand-in. Pass `--model` and `--effort` explicitly and name them in the record,
+because a result holds for those. The task must tempt the agent into the behaviour the
+line prevents, or "no effect" means nothing. Two runs per side show only large
+differences.
 
 **Ruled out.**
 - *Putting everything in CLAUDE.md.* Every line there is paid for on every

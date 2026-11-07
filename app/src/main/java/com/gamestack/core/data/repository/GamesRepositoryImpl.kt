@@ -13,7 +13,7 @@ class GamesRepositoryImpl @Inject constructor(
 ) : GamesRepository {
 
     // try/catch, not runCatching — runCatching also swallows CancellationException,
-    // turning a debounce-cancelled search into a false error (see CLAUDE.md).
+    // turning a debounce-cancelled search into a false error (ADR 0009).
     override suspend fun searchGames(query: String): Result<List<Game>> =
         try {
             Result.success(igdbApiService.searchGames(buildSearchGamesQuery(query)).map { it.toDomain() })

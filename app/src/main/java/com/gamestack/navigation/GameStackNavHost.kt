@@ -73,15 +73,14 @@ fun GameStackApp() {
     }
 }
 
-// Called from every tab graph, never once at top level — see CLAUDE.md,
-// Architecture → Navigation structure.
+// Called from every tab graph, never once at top level (ADR 0010).
 private fun NavGraphBuilder.gameDetailDestination() {
     composable<Destination.Detail> { DestinationPlaceholder(R.string.detail_placeholder_title) }
 }
 
 // Shared with GameStackBottomNavBar's item clicks so in-content actions (e.g.
-// Search's "Go To Library") switch tabs identically. Takes a *Graph route only —
-// see CLAUDE.md, Architecture → Navigation structure.
+// Search's "Go To Library") switch tabs identically. Takes a *Graph route only
+// (ADR 0010).
 internal fun NavHostController.navigateToBottomNavDestination(destination: Destination) {
     navigate(destination) {
         popUpTo(graph.findStartDestination().id) { saveState = true }

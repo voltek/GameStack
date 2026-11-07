@@ -3,7 +3,8 @@
 Status: Accepted
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Neither CLAUDE.md nor the Spec ever said whether the MVP targets accessibility")
-Enforced by: none (prose only — .claude/rules/presentation.md § Accessibility) — the MVP does not target accessibility, its two bounds and its expiry
+Enforced by: none (prose only — .claude/rules/presentation.md § Accessibility) — the MVP does not target accessibility, never dropping an affordance
+Enforced by: none (prose only — docs/project/PRODUCT.md § First release) — the deferral expires before the first public release
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Triage every finding into one bucket, and say which) — an accessibility finding is deferred by default
 
 ## Context

@@ -3,7 +3,8 @@
 Status: Accepted
 Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, rows 2026-08-23 ("`SearchScreen` evaluated `errorMessage != null`") and ("Third `/code-review` round on PR #5")
-Enforced by: none (prose only — CLAUDE.md § Architecture)
+Enforced by: none (prose only — .claude/skills/new-viewmodel/SKILL.md § Construction) — `UiState` as a data class
+Enforced by: none (prose only — .claude/rules/presentation.md § One-shot events) — a condition is state, an event an effect
 
 ## Context
 `SearchScreen` evaluated `errorMessage != null` as its first branch, so a failed

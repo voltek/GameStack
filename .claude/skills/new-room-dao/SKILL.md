@@ -19,7 +19,7 @@ conversion (`new-mapper`), or the DI bindings (`new-hilt-module`).
   `UserGameEntity` that's `gameId` — the IGDB id, not a generated one, so a game
   the user interacts with twice updates one row instead of creating a second.
 - Entities are Data-layer types. They never appear in a Domain or UI signature
-  (CLAUDE.md, Code Conventions).
+  (ADR 0003).
 - Store timestamps as `Long` (epoch millis), nullable when the event may not have
   happened. Do not store formatted date strings — formatting is a UI concern and
   a stored string can't be re-formatted for another locale.
@@ -96,7 +96,7 @@ consumed by Home, Library and Detail.
 - No `suspend` on a `Flow`-returning DAO function.
 - The Entity appears in the Database's `entities` array.
 - No business logic in the DAO — queries only. Rules about *when* to write
-  (e.g. stamping `completedAt`) belong to the Repository, per CLAUDE.md.
+  (e.g. stamping `completedAt`) belong to the Repository, per ADR 0002.
 - Testing: DAOs are not unit-tested in this project (they need real SQLite —
   see `write-tests` → Scope). Coverage comes from Repository tests with a mocked
   DAO, the mapper round-trip test, and a **direct test per TypeConverter** —

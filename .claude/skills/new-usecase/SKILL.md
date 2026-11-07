@@ -37,5 +37,5 @@ Example: repository function `getPopularGames()` → `GetPopularGamesUseCase`
   from several Repository calls. What does NOT live here: persistence invariants
   that require reading stored state to decide (e.g. stamping `completedAt` on a
   list-status transition). Those are the Repository's, because Entities never
-  leave the Data layer — see CLAUDE.md, Data Sources.
+  leave the Data layer (ADR 0002).
 - After creating the UseCase, invoke the `write-tests` skill to generate its corresponding unit tests.

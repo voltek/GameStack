@@ -104,7 +104,7 @@ dependencies {
     testImplementation(libs.cashapp.turbine)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
-    // Screen tests only — see .claude/rules/tests.md.
+    // Screen tests only (ADR 0016).
     testImplementation(composeBom)
     testImplementation(libs.androidx.compose.ui.test.junit4)
     testImplementation(libs.robolectric)
@@ -165,3 +165,9 @@ val installGitHooks by tasks.registering(InstallGitHooks::class) {
 }
 
 tasks.named("preBuild") { dependsOn(installGitHooks) }
+
+// ClaudeMdBoundTest reads this file, which Gradle would not otherwise see as an input,
+// so the test would stay UP-TO-DATE while the file grew past its bound.
+tasks.withType<Test>().configureEach {
+    inputs.file(rootProject.file("CLAUDE.md")).withPathSensitivity(PathSensitivity.NONE)
+}

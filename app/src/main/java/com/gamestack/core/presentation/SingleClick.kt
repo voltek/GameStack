@@ -13,7 +13,7 @@ internal const val SingleClickWindowMillis = 700L
 // A duplicate navigation effect is not merely handled twice: the Channel it
 // travels on queues it, so it fires again when the user returns to the screen.
 // Share one wrapper per list, or two different items can still fire back to
-// back. Why the fix lives here and not in the Channel: CLAUDE.md, MVI contract.
+// back. Why the fix lives here and not in the Channel: ADR 0011.
 @Composable
 fun <T> rememberSingleClick(onClick: (T) -> Unit): (T) -> Unit {
     // Null, not 0L: zero is a real uptime, so it would claim a click had happened

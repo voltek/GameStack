@@ -55,19 +55,9 @@ the repository side. A check that runs by script also reports how many files
 and items it read, so a silent skip shows.
 
 ## Tech Stack
-- [ ] Is there any XML layout or ViewBinding usage in a UI screen (instead of Compose)?
-      Verified by: human
-- [ ] Is there any HTTP client other than Retrofit/OkHttp, or a serialization
-      library other than Kotlinx.serialization (e.g. Gson, Moshi)?
-      Verified by: human
-- [ ] Is there any raw string navigation route (instead of Navigation Compose Safe-type)?
-      Verified by: human
 - [ ] Has a Light ColorScheme, a `dynamicColor` parameter, or a
       `dynamicDarkColorScheme()` call appeared anywhere? MVP is dark-only with a
       fixed palette — all three are drift, not progress.
-      Verified by: human
-- [ ] For any library added recently — was a remembered/guessed version used
-      instead of checking the latest stable one?
       Verified by: human
 
 ## Testing Stack
@@ -102,15 +92,11 @@ and items it read, so a silent skip shows.
 - [ ] Does any ViewModel or Composable call a Repository function directly,
       skipping the UseCase?
       Verified by: human
-- [ ] Does any Repository implementation contain business logic beyond
-      "coordinate data sources" — calculating derived values or applying domain
-      rules? (Deliberate exception, not drift: the `updatedAt`/`completedAt`
-      write rules on `UserGameEntity`. Everything else still counts.)
+- [ ] Does any Repository apply a product rule, one needing more than its sources
+      and its old and new stored state (ADR 0054)?
       Verified by: subagent (interpretive)
 - [ ] Does any file under `domain/` import `retrofit2.*`, `androidx.room.*`,
       or any `android.*` package (other than `javax.inject`)?
-      Verified by: human
-- [ ] Is `LiveData` used anywhere in the codebase?
       Verified by: human
 - [ ] Does any Composable contain logic beyond view/rendering logic
       (e.g. business rules, direct data transformation)?
@@ -123,9 +109,6 @@ and items it read, so a silent skip shows.
       call target a tab's screen route instead of its `*Graph` route? Either one
       breaks per-tab back stacks (Detail leaks across tabs, no tab selected).
       Verified by: human
-- [ ] Does any navigation code call `NavController.currentBackStack`? It is
-      `@RestrictTo` library-group API and fails the `lint` gate.
-      Verified by: ./gradlew lint
 - [ ] Does any suspend function build a `Result` with `runCatching`? It swallows
       `CancellationException`, reporting a cancelled coroutine as a real failure.
       Verified by: human
@@ -161,8 +144,6 @@ and items it read, so a silent skip shows.
       Verified by: human
 
 ## Code Conventions
-- [ ] Is any class not PascalCase, or any function not camelCase?
-      Verified by: human
 - [ ] Does any DTO or Entity type appear in a signature reachable from the Domain
       or UI layer? (Both `toDomain()` and `toEntity()` are legitimate — the rule
       is about where the *types* surface, not which direction the mapper runs.)
@@ -182,7 +163,8 @@ and items it read, so a silent skip shows.
 - [ ] Does any comment block run past 4 lines in a hand-written file other than
       documentation, generated or template text excepted (ADR 0037)?
       Verified by: human
-- [ ] Is there any hardcoded UI string in a ViewModel or UseCase instead of `UiText`?
+- [ ] Is there any hardcoded UI string in a ViewModel instead of `UiText`, or a UseCase
+      returning text for the user?
       Verified by: human
 - [ ] Is any Hilt module named for a layer or lifetime rather than a concern
       (`AppModule`, `CommonModule`), or does any `@Provides` exist for a class

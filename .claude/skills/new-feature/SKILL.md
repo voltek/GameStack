@@ -82,7 +82,7 @@ Invoke the `new-screen` skill, implementing the approved prototype's layout.
 ### 8. Navigation wiring
 Register the new screen in `navigation/`: add its type-safe route to
 `Destination`, and place the `composable<>` inside the correct tab's nested
-graph (CLAUDE.md, Architecture → Navigation structure). Then wire up the
+graph (`.claude/rules/navigation.md`). Then wire up the
 navigation call from wherever it's launched (e.g. tapping a game card
 navigates to Detail with the gameId as a typed argument). A screen built
 but never wired into navigation is unreachable — do not skip this step.
@@ -95,7 +95,7 @@ Do not skip or batch this — each skill is responsible for its own test coverag
 - Every step above must be completed before moving to the next.
 - If a step doesn't fit the existing structure (e.g. a model doesn't clearly belong
   to `core` or a `feature`), stop and ask before proceeding.
-- No layer imports from a layer above it — see CLAUDE.md rules.
+- No layer imports from a layer above it — see `.claude/rules/code.md`.
 - Before finalizing, confirm the feature supports both reading and writing data
   if the feature's purpose requires both (e.g. rating a game requires saving AND
   displaying the current rating).

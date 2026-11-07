@@ -36,8 +36,10 @@ will pass every test in this project and fail on device. Don't write a mocked
 Problem below) and would hide the gap rather than flag it.
 
 ## Screen tests (Compose, under Robolectric)
-The one exception to "no Robolectric" (`.claude/rules/tests.md`). Still under
-`test/`, still `./gradlew test`.
+The one exception to "no Robolectric" (ADR 0016). Still under
+`test/`, still `./gradlew test`. Its cost scales with the number of tests, so the
+second screen-test class is the trigger to split the suites into separate Gradle
+tasks (#67).
 
 ```kotlin
 @RunWith(RobolectricTestRunner::class)
@@ -155,7 +157,8 @@ state by coincidence.
   outgoing request.
 - Sad: when the token source fails, `AuthInterceptor` throws `IOException` and the
   request does **not** proceed — assert the throw, and assert `chain.proceed()` was
-  never called. This behavior is decided, not open: see CLAUDE.md, Data Sources.
+  never called. This behavior is decided, not open: an unauthenticated request would
+  fail at the server anyway.
 - No Android framework needed — plain JVM unit test, not instrumented.
 
 ### Mapper (write path)

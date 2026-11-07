@@ -3,7 +3,7 @@
 Status: Accepted
 Date: 2026-08-22
 Backfilled: yes — DRIFT-LOG.md, rows 2026-08-22 ("Code review of PR #3 found six defects") and ("A second Codex review pass found two defects")
-Enforced by: none (prose only — CLAUDE.md § Architecture)
+Enforced by: none (prose only — .claude/rules/presentation.md § One-shot events)
 
 ## Context
 A review of PR #3 found six defects the `build`/`test`/`lint` gate had passed

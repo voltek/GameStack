@@ -95,7 +95,7 @@ scope. An ADR whose clauses differ carries one line per group of clauses, and
 
 ```
 Enforced by: repository settings — `allow_rebase_merge=false` (the Rebase and merge button)
-Enforced by: none (prose only — CLAUDE.md § Working here) — `git merge main` instead of `rebase`
+Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 1. Update the branch against main) — `git merge main` instead of `rebase`
 ```
 
 Some values contain ` — ` themselves, so match a line against the vocabulary as
