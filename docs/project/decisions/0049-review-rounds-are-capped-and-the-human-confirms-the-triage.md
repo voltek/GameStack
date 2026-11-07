@@ -13,7 +13,7 @@ Enforced by: none (prose only — CLAUDE.md § Working here) — the rule of thr
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Triage every finding into one bucket, and say which) — the human confirms the triage
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 3. Reviews — all of them, before the PR exists) — `/code-review` run by the human
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 3. Reviews — all of them, before the PR exists) — the GitHub bot as an advisor, the exemptions, the buckets and their grounds, the stopping rule, the cap, the round past it, a fix no round will read, a branch working `review-debt`, the rows that go to the human, the records
-Enforced by: none (prose only — .github/pull_request_template.md § Verification) — the `Deferred:` and `Dismissed:` lines
+Enforced by: commits.yml — a PR body's review record, present and free of `TODO`
 
 ## Context
 The review policy had been patched clause by clause across ADRs 0015, 0025, 0029

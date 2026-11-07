@@ -103,7 +103,7 @@ rule is `ship` in CLAUDE.md, an ADR or a Skill.
 
 The mechanical half of this section is checked, not trusted:
 `.githooks/commit-msg` on each commit, `.githooks/pre-push` on the branch name,
-and `commits.yml` on every commit of the PR, its title and the title's type
+and `commits.yml` on every commit of the PR, its title, its body and the title's type
 against the branch prefix. Any Gradle build installs the hooks. A failure names
 the rule, what it saw and the fix: rewrite the message, never `--no-verify`.
 
@@ -183,7 +183,7 @@ below says when it runs).
   executes, so it can break every later change.
 - **`/code-review` is the human's call: a round starts only when the human asks,
   whoever launches it** (PENDING — #74 decides whether the agent starts one itself).
-  So ask and wait. Never tick that box, never excuse it, and
+  So ask and wait. Never write its record without a round, never excuse it, and
   never confuse it with the GitHub bot: they are different reviewers and the bot's quota says nothing about
   whether `/code-review` has run.
 - **The GitHub bot is an advisor, not a gatekeeper.** It gets one round per PR,
@@ -230,8 +230,8 @@ against the others, which is where governance drift lives. **If the branch touch
 under `.claude/skills/`, any file under `.claude/rules/` (ADR 0050), or
 `.claude/settings.json` (ADR 0027), run the *Documentation integrity* detectors from
 `docs/project/DRIFT-CHECKLIST.md` before opening the PR, after the last round's
-fixes**, and tick the box for
-it in the PR body so the run leaves a trace. That shape is deliberate: a list of
+fixes**, and write what they found on its line in the PR body so the run leaves
+a trace. That shape is deliberate: a list of
 governing documents would be one more thing to keep in sync, and mockup and
 image assets are excluded because no detector reads them
 (`docs/project/decisions/0022-a-governance-diff-triggers-the-checklist.md`).
@@ -239,7 +239,7 @@ image assets are excluded because no detector reads them
 Run the section as it stands rather than a remembered count of it, scoped as
 its header says
 (`docs/project/decisions/0026-a-detector-runs-when-its-input-changes.md`).
-Say in the PR box which conditional items ran and which were skipped. Confirm
+Confirm
 each detector reached everything it claims to cover. A check that silently
 skips what it cannot parse reports health it never established: one reported
 twenty ADRs clean while reading seventeen.
@@ -431,21 +431,17 @@ and may already be stale.
 Use `.github/pull_request_template.md`. **Aim for a body the human reads in a
 minute.** `What changed` states the one claim in one to three sentences and
 points at an ADR, if any, or the commits for the rest instead of restating
-them; the `Deferred:` and `Dismissed:` lines follow their own shape below.
+them. `commits.yml` checks the form and names the rule when it fails (ADR 0057),
+so a limitation or a scope note goes in `Why`, not under a heading of its own.
 
-Three sections carry it: **what changed**, **why**, **how it was verified**. Add
-another heading when the PR genuinely needs one (a known limitation, a scope
-note, a decision taken deliberately) — but only then, with `Why`'s bound; the
-default is the three.
-
-Replace the `TODO` on the template's `Deferred:` and `Dismissed:` lines with
-the local `/code-review` rounds' issues and dismissals, each dismissal as its
-round and number, what it claimed and its verified reason, in about twenty
-words, so the line still answers a recurring finding once the saved table is
-archived. Write `none` when the review ran and produced none, and
-`not run — exempt: <the step-3 exemption>` only when step 3 exempted the branch.
-A review still to come is not an exemption: the `TODO` stays, visible, until the
-record is written.
+Replace every `TODO` in the record with the local `/code-review` rounds' counts,
+issues and dismissals, each dismissal as its round and number, what it claimed
+and its verified reason, in about twenty words, so the line still answers a
+recurring finding once the saved table is archived. Write `none` when the review
+ran and produced none, and replace the block with
+`Review: not run — exempt: <the step-3 exemption>` only when step 3 exempted the
+branch. A review still to come is not an exemption: the `TODO` stays, and the
+check stays red, until the record is written.
 
 **`Why` defaults to one to three sentences** pointing at the decision, not
 narrating how it was reached. Expand past that only when the decision has real

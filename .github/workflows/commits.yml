@@ -2,7 +2,8 @@ name: Commits
 
 # Separate from gate.yml so that a PR title or body edit reruns these, on
 # purpose (TOOLING.md § 11), and not Gradle. Covers what no local hook sees:
-# the PR title, and commits made in a clone without the hooks or on the web.
+# the PR title and body, and commits made in a clone without the hooks or on
+# the web.
 on:
   pull_request:
     branches: [main]
@@ -64,3 +65,13 @@ jobs:
           sh .githooks/rules.sh title "$TITLE" || status=1
           sh .githooks/rules.sh branch "$BRANCH" "$TITLE" || status=1
           exit $status
+
+      # Through env for the same reason as the title.
+      - name: Check the PR body
+        if: ${{ !cancelled() }}
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          printf '%s\n' "$BODY" > "$RUNNER_TEMP/body"
+          sh .githooks/rules.sh body "$RUNNER_TEMP/body" "$TITLE"
