@@ -23,12 +23,10 @@ is a cost.
   branch? Anything else goes on its own branch.
 - Push your own feature branch without asking. Ask before every PR action GitHub
   shows.
-- Never commit on `main`: branch first.
 - Never use `--no-verify`, never force-push `main` or a branch another person may
   hold, and never use bare `--force`, which overwrites the remote without checking.
   `--force-with-lease` may clean your own feature branch until it merges.
 - Never change branch protection or repository settings.
-- Update a pushed branch with `git merge main`, never `git rebase`.
 - Touching the same code a third time for the same class of defect means the design
   is the problem: stop patching and redesign.
 - Ask first: any decision the documents or an existing code pattern do not settle,
@@ -37,7 +35,6 @@ is a cost.
 - When code and a document disagree, say which is right and why, and put
   `Drift: code fixed`, `Drift: doc updated` or `Drift: both` on the commit that
   resolves it. A rule that is born or changes is a new ADR.
-- A rule changes only with the owner's agreement, through an ADR.
 - Run the `ship-a-branch` Skill to take a finished branch to a merged PR.
 
 ## Code map
@@ -45,5 +42,3 @@ One `app` module: Jetpack Compose, MVI over Clean Architecture. `presentation` r
 data only through `domain`, and `data` implements `domain`'s interfaces. `feature/{name}/`
 holds what one feature owns, `core/` what two or more share. The rules for each area load
 from `.claude/rules/` when a file there is touched.
-
-Write code and comments in English, whatever language the conversation is in.

@@ -7,7 +7,8 @@ Date: 2026-11-05
 Backfilled: no
 Supersedes: ADR-0006 — reading `git status` in full, and the section being tiered (Decision)
 Supersedes: ADR-0039 — "as a Tier 1 rule" (Decision)
-Enforced by: none (prose only — CLAUDE.md § Working here) — asking first, how a rule changes
+Enforced by: none (prose only — CLAUDE.md § Working here) — asking first, a changed rule being a new ADR
+Enforced by: none (prose only — docs/project/decisions/0056-four-lines-without-effect-leave-claude-md.md § Decision) — the owner's agreement to a rule change
 Enforced by: none (prose only — .claude/rules/governance.md § What earns a line in CLAUDE.md) — the admission questions, a line with no effect leaving
 Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § A governance diff earns the checklist) — `.claude/rules/` in the shape
 

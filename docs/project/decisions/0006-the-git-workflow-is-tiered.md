@@ -8,7 +8,8 @@ Backfilled: yes — DRIFT-LOG.md, row 2026-08-22 ("CLAUDE.md's Git workflow was 
 Enforced by: branch protection — `required_status_checks=build / test / lint` (the gate must be green to merge, for everyone, administrators included, while `enforce_admins=true`)
 Enforced by: branch protection — `required_pull_request_reviews` is set and `enforce_admins=true` (a pull request before anything lands on `main`, administrators included)
 Enforced by: claude settings — `deny` on `--no-verify` for `git commit` and `git push`; `ask` on `git -C` (the agent only, common spellings)
-Enforced by: none (prose only — CLAUDE.md § Working here) — never `--no-verify` for a person, never commit directly to `main`
+Enforced by: none (prose only — CLAUDE.md § Working here) — never `--no-verify` for a person
+Enforced by: none (prose only — docs/project/decisions/0056-four-lines-without-effect-leave-claude-md.md § Decision) — never commit directly to `main`
 Enforced by: git hook — .githooks/commit-msg — Conventional Commits
 Enforced by: commits.yml — Conventional Commits on every commit of a PR
 
