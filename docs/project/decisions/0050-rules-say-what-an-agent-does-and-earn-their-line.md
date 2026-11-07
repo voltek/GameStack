@@ -2,6 +2,7 @@
 
 Status: Accepted
 Status: Superseded by ADR-0052 — "The owner is warned before a large batch of runs" and "Ordinary subagent use needs no warning" (Decision)
+Status: Superseded by ADR-0053 — "and a \"Prefer\" heading marks rules that may be challenged with a stated reason" (Decision)
 Date: 2026-11-05
 Backfilled: no
 Supersedes: ADR-0006 — reading `git status` in full, and the section being tiered (Decision)

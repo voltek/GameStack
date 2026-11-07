@@ -20,7 +20,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun getValidAccessToken(): Result<String> = mutex.withLock {
         cachedToken?.takeIf { !it.isExpired() }?.let { return@withLock Result.success(it.accessToken) }
 
-        // try/catch, not runCatching (see CLAUDE.md). Today's only caller bridges
+        // try/catch, not runCatching (ADR 0009). Today's only caller bridges
         // through runBlocking, so no cancellation reaches here yet — this keeps it
         // correct for the first caller that isn't behind runBlocking.
         val response = try {

@@ -51,7 +51,7 @@ approval before proceeding.
 `{ScreenName}Screen` (stateful, wires ViewModel), `{ScreenName}Content` (stateless, previewable)
 
 ## Quality criteria
-- Must include a `@Preview` — Dark theme only (MVP has no Light theme, see CLAUDE.md).
+- Must include a `@Preview` — Dark theme only (MVP has no Light theme, see DESIGN.md).
 - No business logic in the Composable — only rendering and event dispatch.
 - Every `UiEvent` the ViewModel defines must be reachable from some UI interaction.
 - After creating the Screen, invoke the `write-tests` skill if any non-trivial

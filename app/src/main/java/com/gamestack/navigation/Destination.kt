@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 // Safe-type routes for Navigation Compose. Each tab is a nested graph wrapping
 // its screen — still exactly three tabs; the graphs are structure, not extra
-// destinations. See CLAUDE.md, Architecture → Navigation structure.
+// destinations. See ADR 0010.
 sealed interface Destination {
 
     @Serializable

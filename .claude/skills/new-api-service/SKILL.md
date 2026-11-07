@@ -28,8 +28,8 @@ that also uses `search` — it will not behave as expected.
   attaches both automatically to every request on the IGDB OkHttp client. Adding
   `@Header("Client-ID") clientId: String` (or `@Headers(...)`) is wrong here: it
   duplicates the header, forces every caller to thread a credential it shouldn't
-  know about, and contradicts CLAUDE.md's rule that the token is never attached
-  manually. Functions take query parameters only.
+  know about, and bypasses the one place that fetches the token. Functions take
+  query parameters only.
 
 ## Location
 `core/data/remote/api/IgdbApiService.kt` (shared — all features consume the same IGDB API).

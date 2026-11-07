@@ -5,7 +5,7 @@ Date: 2026-10-27
 Backfilled: no
 Supersedes: ADR-0018 — "Bounds, as smoke alarms rather than limits: no comment block longer than 4 lines in production code" (Decision) and "the two numbers are heuristics that will occasionally point at a file that is fine" … "the bounds only say where to look first" (Consequences)
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Code Conventions — the 4-line limit and its scope, placement next to the line, the 15% alarm
-Enforced by: none (prose only — CLAUDE.md § Code Conventions) — where a longer rationale goes
+Enforced by: none (prose only — .claude/rules/comments.md § Comments) — where a longer rationale goes
 
 ## Context
 ADR 0018 bounded a comment block at 4 lines "in production code", as a smoke

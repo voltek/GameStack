@@ -14,7 +14,7 @@ A Mapper converts **across the Data/Domain boundary**, in either direction:
 The write path exists because every write feature (saving a rating, moving a game
 between lists) has to build an Entity from Domain data, and that conversion needs a
 defined home. It does not break the Domain/Data boundary: its input is a Domain
-model and its output never leaves the Data layer (see CLAUDE.md's Mapper rule).
+model and its output never leaves the Data layer (`.claude/rules/code.md`).
 
 ## When this skill does NOT apply
 - **Same-layer conversion** (e.g. Entity → Entity, building an updated copy for
@@ -25,8 +25,8 @@ model and its output never leaves the Data layer (see CLAUDE.md's Mapper rule).
   Remote and local models must not know about each other — convert through the
   Domain model (`dto.toDomain().toEntity()`), so a change to the API shape can't
   silently reshape the database.
-- **Domain → DTO**: not applicable in this project. IGDB is read-only (CLAUDE.md,
-  Data Sources) — nothing is ever serialized back to it. If you think you need one, the
+- **Domain → DTO**: not applicable in this project. IGDB is read-only (PRODUCT.md,
+  Constraints on every capability) — nothing is ever serialized back to it. If you think you need one, the
   requirement is wrong; stop and ask.
 
 ## Location
@@ -79,7 +79,7 @@ fun GameDto.toDomain() = Game(
 A `toEntity()` mapper is a **pure field-for-field conversion**. It must not
 compute values that depend on stored state or on the clock:
 `updatedAt` and `completedAt` on `UserGameEntity` are stamped by the Repository
-during its read-modify-write cycle (CLAUDE.md, Data Sources), because
+during its read-modify-write cycle (ADR 0002), because
 deciding them requires comparing against the row already in the database.
 
 If the Domain model does not carry those values, take them as parameters —

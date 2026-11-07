@@ -4,7 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
-// MVP is dark-only per CLAUDE.md — no LightColorScheme, no dynamic color.
+// MVP is dark-only per DESIGN.md — no LightColorScheme, no dynamic color.
 private val GameStackColorScheme = darkColorScheme(
     primary = Primary,
     onPrimary = OnPrimary,
