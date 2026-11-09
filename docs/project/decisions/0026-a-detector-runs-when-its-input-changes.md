@@ -1,6 +1,7 @@
 # ADR 0026 — A detector runs when its input changes
 
 Status: Accepted
+Status: Superseded by ADR-0057 — "said which conditional items it skipped" (Consequences)
 Date: 2026-10-13
 Backfilled: no
 Supersedes: ADR-0022 — every *Documentation integrity* detector runs on every governance diff
