@@ -1,24 +1,29 @@
 ## What changed
-
-<!-- The one claim in one to three sentences; point at an ADR, if any, or the commits for the rest. If the claim needs an "and", split the PR. -->
+<!-- The one claim in one to three sentences; point at an ADR or the commits. -->
 
 ## Why
+<!-- One to three sentences. Name any shortcoming a reviewer should know. -->
 
-<!-- One to three sentences. Expand only for nuance a reviewer cannot get from the diff. -->
+## Issues
+<!-- Delete if none. Each closed number takes its own keyword; related ones follow Related:. -->
+Closes #n, closes #n
+Related: #n, PR #n
 
 ## Verification
+<!-- Keep only the lines that apply. Evidence: what you saw work beyond the checks and what you could not see, or none. -->
+- [ ] OpenSpec change archived at:
+- [ ] Device pass, scenarios and states:
+- [ ] Integrity detectors, found:
 
-- [ ] `./gradlew build` `./gradlew test` `./gradlew lint` — all green
-- [ ] `/code-review` run and every finding triaged in a table the human confirmed (unless `ship-a-branch` step 3 exempts the branch)
-- [ ] OpenSpec change verified and archived (branches that carry one, `ship-a-branch` step 3) — archived at:
-- [ ] Device pass on the emulator (UI changes only) — scenarios and states checked:
-- [ ] Documentation-integrity detectors run (governing-document, Skill, `.claude/rules/` or `.claude/settings.json` changes only) — conditional items run: / skipped: / found:
+Evidence: none
 
-Deferred: TODO <!-- local /code-review only: each review-debt issue (#n), "none", or "not run — exempt: <the step-3 exemption>". -->
+<!-- A branch exempt from review replaces the block below with: Review: not run — exempt: <reason> -->
+<details><summary>Review: TODO rounds, TODO fixed after the last, TODO deferred, TODO dismissed</summary>
 
-Dismissed: TODO <!-- local /code-review only: each dismissed finding as r<k>-<n>, what it claimed and its verified reason, in about twenty words, "none", or "not run — exempt: <the step-3 exemption>". A bot finding's record lives in its thread. -->
+Deferred: TODO #n
+Dismissed: TODO r<k>-<n>, what it claimed, why it was wrong
+Fixed after the last round: TODO r<k>-<n>, what changed
+
+</details>
 
 ### Screenshots
-
-<!-- UI changes only. DRAG OR PASTE THE IMAGES BELOW THIS COMMENT, into this edit box (on an open PR: Edit, top right of the description); GitHub uploads them and inserts the markdown. Never commit emulator captures: only design references under docs/project/design/ are versioned, and they can be linked by URL instead of uploaded. -->
-

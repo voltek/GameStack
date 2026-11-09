@@ -1,8 +1,8 @@
 #!/bin/sh
-# The mechanical half of ADR 0034's message and branch rules, and ADR 0033's
-# trailer forms; the judgement half stays in ship-a-branch § 2. Reports every
-# failure, not only the first, then exits 1. Usage: the case at the end of this
-# file; cases: test-rules.sh.
+# The mechanical half of ADR 0034's message and branch rules, ADR 0033's trailer
+# forms and ADR 0057's PR body; the judgement half stays in ship-a-branch § 2.
+# Reports every failure, not only the first, then exits 1. Usage: the case at
+# the end of this file; cases: test-rules.sh.
 
 LC_ALL=C
 export LC_ALL
@@ -35,6 +35,7 @@ readme      README.md'
 
 LIMIT=72
 BODY_LIMIT=12
+SECTION_LIMIT=600
 HOOK=0
 MERGE=0
 status=0
@@ -226,11 +227,123 @@ check_branch() {
     fi
 }
 
+# Comments and code go first, so neither a template comment nor a quoted heading
+# or marker reads as structure. GitHub stores a body edited on the web with CRLF.
+clean_body() {
+    tr -d '\r' <"$1" | awk '
+        comment {
+            i = index($0, "-->")
+            if (!i) next
+            $0 = substr($0, i + 3)
+            comment = 0
+        }
+        fence {
+            if ($0 ~ "^ ? ? ?" fence "+[ \t]*$") fence = ""
+            next
+        }
+        match($0, /^ ? ? ?(```+|~~~+)/) && $0 !~ /^ ? ? ?```+[^`]+`/ {
+            fence = substr($0, 1, RLENGTH)
+            gsub(/ /, "", fence)
+            next
+        }
+        {
+            gsub(/`[^`]*`/, "``")
+            kept = ""
+            while (i = index($0, "<!--")) {
+                kept = kept substr($0, 1, i - 1)
+                $0 = substr($0, i + 4)
+                i = index($0, "-->")
+                if (!i) { comment = 1; $0 = ""; break }
+                $0 = substr($0, i + 3)
+            }
+            print kept $0
+        }' | sed -E -e 's/[[:space:]]+$//' -e 's/^ {1,3}#/#/'
+}
+
+section() {
+    printf '%s\n' "$body" | awk -v heading="$1" '
+        /^#+( |$)/ { inside = ($0 == heading); next }
+        inside'
+}
+
+check_body_sections() {
+    for name in 'What changed' Why Verification; do
+        text=$(section "## $name")
+        # The record is collapsed, so the bound on the first screen leaves it out.
+        [ "$name" = Verification ] && text=$(printf '%s\n' "$text" | sed '/^<details>/,/<\/details>/d')
+        text=$(printf '%s\n' "$text" | sed '/./,$!d')
+        if [ -z "$text" ] && [ "$name" != Verification ]; then
+            fail "*$name* is empty (ADR 0057)." "only the template's comment" \
+                "Write the section: a comment is not part of it."
+        fi
+        length=$(code_points "$text")
+        if [ "$length" -gt "$SECTION_LIMIT" ]; then
+            fail "*$name* is $length characters, the limit is $SECTION_LIMIT, comments and the collapsed record excluded (ADR 0057)." \
+                "$(printf '%s\n' "$text" | sed -n 1p)" \
+                "Point at the ADR or the commits instead of restating them."
+        fi
+    done
+}
+
+check_body_record() {
+    verification=$(section '## Verification')
+    record=$(printf '%s\n' "$verification" | sed -n '/^Evidence:/,$p')
+    review='^<details><summary>Review:|^Review: not run — exempt: .'
+    if [ "$(printf '%s\n' "$verification" | grep -Ec "$review")" != 1 ] ||
+        [ "$(printf '%s\n' "$record" | grep -Ec "$review")" != 1 ]; then
+        fail "*Verification* holds an Evidence: line, then one review record, collapsed (ADR 0057)." \
+            "$(printf '%s\n' "$verification" | grep -E '^Evidence:|<summary>|^Review:' | paste -sd '|' -)" \
+            "Keep the template's Evidence: and <details><summary>Review: lines, or write Review: not run — exempt: <reason> without <details>."
+    fi
+    report_each "$(printf '%s\n' "$verification" | grep -E '(<summary>Review:.*[^[:alnum:]_]|^([-*+] +)?(Deferred|Dismissed|Fixed after the last round): *)TODO([^[:alnum:]_]|$)')" \
+        "The review record still holds a TODO, so it is not written (ADR 0057)." \
+        "Write what the rounds left, or none where they left nothing."
+    report_each "$(printf '%s\n' "$verification" | grep -E '(^|[^[:alnum:]_])#n([^[:alnum:]_]|$)|r<k>-<n>')" \
+        "The review record still holds the template's #n or r<k>-<n>, so it is not written (ADR 0057)." \
+        "Write the real numbers, or none."
+    report_each "$(printf '%s\n' "$verification" | grep -E '^([-*] \[[ xX]\] [^:]*|Evidence):$')" \
+        "*Verification* keeps a template line with no value (ADR 0057)." \
+        "Fill it, or delete the lines that do not apply."
+}
+
+check_body_issues() {
+    issues=$(section '## Issues')
+    if printf '%s\n' "$body" | grep -qx '## Issues' && [ -z "$(printf '%s\n' "$issues" | sed '/./,$!d')" ]; then
+        fail "*Issues* is empty (ADR 0057)." "only the template's comment" \
+            "Delete the section when nothing is closed or related."
+    fi
+    report_each "$(printf '%s\n' "$issues" | grep -E '(^|[^[:alnum:]_])#n([^[:alnum:]_]|$)')" \
+        "*Issues* still holds the template's #n (ADR 0057)." "Write the numbers, or delete the section."
+}
+
+# $2 is the PR title. The Revert button's PR keeps GitHub's own body, so a title
+# alone does not exempt one.
+check_body() {
+    exempt "$2" && grep -Eq '^Reverts [^ ]+#[0-9]+' "$1" && return
+    body=$(clean_body "$1")
+    headings=$(printf '%s\n' "$body" | grep -E '^#+( |$)' | paste -sd '|' -)
+    if ! printf '%s\n' "$headings" |
+        grep -Eq '^## What changed\|## Why(\|## Issues)?\|## Verification(\|### Screenshots)?$'; then
+        fail "A PR body has the template's headings, in its order (ADR 0057)." "${headings:-no headings}" \
+            "Use What changed, Why, Issues if any, Verification, Screenshots if any."
+        return
+    fi
+    lead=$(printf '%s\n' "$body" | sed -E '/^#+( |$)/,$d' | sed '/./!d')
+    if [ -n "$lead" ]; then
+        fail "A PR body opens with ## What changed (ADR 0057)." "$(printf '%s\n' "$lead" | sed -n 1p)" \
+            "Move the text under a heading, or into a comment."
+    fi
+    check_body_sections
+    check_body_record
+    check_body_issues
+}
+
 case $1 in
     commit-msg) HOOK=1; check_message "$2" ;;
     message) [ "$3" = merge ] && MERGE=1; check_message "$2" ;;
     title) check_title "$2" ;;
     branch) shift; check_branch "$@" ;;
-    *) printf 'Usage: rules.sh commit-msg <file> | message <file> [merge] | title <title> | branch <name> [<title>]\n' >&2; exit 2 ;;
+    body) check_body "$2" "$3" ;;
+    *) printf 'Usage: rules.sh commit-msg <file> | message <file> [merge] | title <title> | branch <name> [<title>] | body <file> <title>\n' >&2; exit 2 ;;
 esac
 exit $status

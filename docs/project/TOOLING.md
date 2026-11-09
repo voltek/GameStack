@@ -117,13 +117,24 @@ silently drops conversation resolution.
   that call, so only the owner can use the exit.
 
 ## 3. Pull request template
-**What.** Three sections — what changed, why, how it was verified — with the gate
-and `/code-review` as explicit checkboxes, and an inline note on where to paste
-screenshots so they are never committed to the repo.
+**What.** One shape for a PR body: what changed, why, the issues it closes, and
+how it was verified, with the review record collapsed under a summary of its
+counts, so the first screen holds the claim. `commits.yml` checks it (entry 11).
 
-**Replaces.** Deciding what a PR body should contain, once per PR.
+**Replaces.** Deciding what a PR body should contain, once per PR, and reading
+each one for an unwritten record.
 
 **Where.** `.github/pull_request_template.md`.
+
+**Ruled out.**
+- *Boxes for the gate and `/code-review`.* The gate's was ticked on 55 of 55 PRs:
+  `gate.yml` is a required check, and the written record replaces the other.
+- *Listing which detectors ran.* The diff and each item's `Runs when:` say so;
+  the line says what they found.
+- *Issues inside `<details>` or a comment.* GitHub does not say whether a closing
+  keyword counts there.
+- *Sample values in the record or in Issues.* A sample left in reads as real, and
+  a real number would close; a `TODO` or a `#n` keeps the check red.
 
 ## 4. Gradle version catalog
 **What.** Every dependency and plugin version declared once, in TOML, referenced
@@ -296,7 +307,8 @@ the subject form, the type and scope against closed lists, a capital first
 letter, no trailing period, 72 code points, a blank second line, a body of 12
 non-blank lines with known trailers excluded, `Drift:` and `Bypassed:`
 values, the branch name's shape, and, on a PR, the title's form, an
-"and" in it, and its type against the branch prefix. Every failure names the
+"and" in it, its type against the branch prefix, and the form of its body
+(ADR 0057). Every failure names the
 rule, the value seen and the fix, and prints the scope list when the scope is
 at fault, so the error is the template.
 
@@ -337,6 +349,8 @@ build.
 - *Checking a PR against `main`'s `rules.sh`.* A new scope joins the list in
   the commit that first uses it (ADR 0034), which `main`'s list would fail.
   An edit to the rules is a reviewed diff, as an edit to `gate.yml` is.
+- *Counting the collapsed record in a PR body's bound.* Its dismissals need their
+  words, and it takes no room on the first screen.
 
 ## 12. Issue form
 **What.** One form for every pending item (ADR 0038): the title in the commit
