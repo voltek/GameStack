@@ -3,7 +3,7 @@ name: Commits
 # Separate from gate.yml so that a PR title or body edit reruns these, on
 # purpose (TOOLING.md § 11), and not Gradle. Covers what no local hook sees:
 # the PR title and body, and commits made in a clone without the hooks or on
-# the web.
+# the web. It also runs the harness scripts' tests, which need no Gradle.
 on:
   pull_request:
     branches: [main]
@@ -34,6 +34,11 @@ jobs:
       - name: Test the session-start hook
         if: ${{ !cancelled() }}
         run: sh .claude/hooks/test-session-start.sh
+
+      # Node comes from the runner image; the script needs 20.11 or later (import.meta.dirname).
+      - name: Test the review extractor
+        if: ${{ !cancelled() }}
+        run: node .claude/skills/review-round/scripts/test-save-review.mjs
 
       # The list is captured first: a failing substitution inside `for` does not
       # stop bash -e, and the loop would check nothing and pass.

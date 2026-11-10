@@ -178,6 +178,14 @@ of the four `SKILL.md` files passes 15,000 bytes (ADR 0060): after a compaction
 Claude Code re-attaches only the first 5,000 tokens of an invoked Skill, so a
 longer one loses its last steps mid-task.
 
+**A Skill's scripts.** A step that must come out the same every time is a script
+under the Skill's `scripts/`, with its test beside it, run in `commits.yml`.
+`review-round/scripts/save-review.mjs` saves a `/code-review` round's raw text
+from the subagent's transcript, the only literal copy: the subagent's output file
+is empty, and its notification escapes `<` and `>`. The transcript format is not
+documented, so every unexpected shape exits non-zero with a repair notice, and the
+Skill falls back to the notification, saying so on the record's first line.
+
 **Replaces.** Improvising the same task a slightly different way each time.
 
 **Where.** `.claude/skills/`, and `docs/project/retired-skills/` for those taken
@@ -194,6 +202,12 @@ out of the listing.
   Skill whose description names when it applies.
 - *Supporting files alone, under one `SKILL.md`.* A file read once does not come
   back after a compaction either, and the description still named one task.
+- *The extractor in shell.* Git Bash has no `jq`, and `sed` cannot decode a JSON
+  string's escapes, which a review about markup is full of. Node parses JSON and
+  ships on the CI runner.
+- *Copying the raw text by hand.* It cost about 2,000 output tokens a round and
+  saved the escaped form, which on a branch about HTML comments and `<details>`
+  no longer matched what the reviewer wrote.
 
 ## 7. The governing documents
 **What.** Five files and two folders, with disjoint jobs: `CLAUDE.md` holds rules
@@ -350,7 +364,9 @@ the hook pass is a real commit, so make it in a scratch clone, never with
 `.githooks/test-rules.sh` its cases. `.githooks/commit-msg` and
 `.githooks/pre-push` call it locally; `.github/workflows/commits.yml` runs the
 cases, then the checks, when a pull request is opened, reopened or pushed to,
-and on any edit of its title or body, or of its base onto `main`.
+and on any edit of its title or body, or of its base onto `main`. The same job
+runs the other harness scripts' tests (entries 6 and 14), so a red
+`messages / title / branch` names the failing step.
 `installGitHooks` in `app/build.gradle.kts`, run by `preBuild`, sets
 `core.hooksPath=.githooks`, warning when that stops other hooks running (another
 value, or a hook in `.git/hooks`) or when `git` cannot run; it never fails the

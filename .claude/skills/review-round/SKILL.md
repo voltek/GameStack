@@ -69,11 +69,12 @@ again. Note the commit the round reads, for the table. The GitHub bot is a
 different reviewer: its round says nothing about whether `/code-review` ran.
 
 ## The sequence
-1. Save the raw output verbatim, before any digest of it. The `/code-review`
-   subagent's output file is always empty, and its notification escapes `<` and
-   `>`. The literal text is the last assistant message of
-   `subagents/agent-<task-id>.jsonl` in the session's transcript folder: copy it
-   from there, or else from the notification, saying so on the record's first line.
+1. Save the raw output verbatim, before any digest of it:
+   `node .claude/skills/review-round/scripts/save-review.mjs <task-id> <raw file>`,
+   the task id from the round's notification. It prints the table's `Reviewer:`
+   line. The subagent's output file is always empty and its notification escapes
+   `<` and `>`, so neither is the record. If the script fails, read
+   `references/extractor-failed.md`.
 2. Verify every finding (§ Verifying) and check each `Fix (defect)`'s origin with git.
 3. Write the table to its file, marked proposed, with the verdict.
 4. Send the message (§ The message) and wait.
@@ -149,6 +150,7 @@ English, because the PR record copies it.
 ```markdown
 # <branch> — round <k> triage (proposed | confirmed by the owner YYYY-MM-DD)
 Raw: <raw file> · Commit reviewed: <sha> (+ uncommitted changes, if the tree was dirty)
+Reviewer: <model id>, <level>
 
 | Id | Claim (file:line) | Bucket | Origin | Evidence |
 |---|---|---|---|---|
@@ -162,6 +164,8 @@ Owner decisions (YYYY-MM-DD): <confirmed as proposed, or each change>
 - A row lets the human judge it without opening the raw file: what the reviewer
   claims, where, its bucket, and the check that decides it. Origin is filled for
   `Fix (defect)` only. Labels are written out in full.
+- `Reviewer:` is the line `save-review.mjs` printed: which model at which level
+  found what, readable when a round is weighed later.
 
 ## The message
 The chat never shows the table; it goes in the human's language. One form for
