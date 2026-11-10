@@ -4,11 +4,7 @@ description: Take a finished branch through to a merged PR — updating against 
 ---
 
 ## When this applies
-The work is written and the gate is green. Everything below is procedure for
-getting it merged; the *rules* that constrain code stay in CLAUDE.md and `.claude/rules/`.
-
-CLAUDE.md § Working here and the `deny` and `ask` rules in `.claude/settings.json`
-govern every step below. They are not restated here.
+The work is written and the gate is green.
 
 ## 1. Update the branch against main
 **Use `git merge main`. Do not rebase a branch that has been pushed.**
@@ -25,19 +21,8 @@ ahead, those commits skipped a PR: move them to a branch and reset `main` to
 `origin/main` before merging, and never push `main`.
 
 Rebase rebuilds each commit on a new base, so the commits that get replayed are
-not the ones that passed the gate — only the final tip is ever compiled. A
-`git bisect` can then land on an intermediate commit that does not build. Merge
-keeps every tested commit intact and adds exactly one new state, which you do
-compile.
-
-Rebase is not wrong in general — "rebase to update, squash to merge" is a common
-and coherent industry standard that optimises for a `main` that reads as a list
-of features. This project optimises for something else: its history is study
-material (PRD → *Why this project exists, and what it optimises for*). That is
-the whole reason for the difference; it is not a claim that rebase is inferior.
-
-`git rebase main` is acceptable on a branch that has **never been pushed**, where
-no SHA is shared and nothing can be orphaned. It is cosmetic there, and optional.
+not the ones that passed the gate: a `git bisect` can land on one that does not
+build (ADR 0008).
 
 ## 2. Check the branch is one claim
 - **Does the branch name still describe what it now contains?** A branch drifts
@@ -52,8 +37,6 @@ no SHA is shared and nothing can be orphaned. It is cosmetic there, and optional
   one pointing at it, so say so when proposing it. Do this before step 3's
   reviews, not after — a PR opened under a stale name drags the mismatch into
   its title too.
-- Does every commit exist *because of* this branch's unit of work? If not, park
-  it (`git stash`) or `git cherry-pick` it onto a fresh branch off `main`.
 - **400 changed lines or 15 files is a smoke alarm**, not a limit. Past roughly
   that size review quality drops sharply. If the PR title needs an "and", split it.
 - A branch is clean when every commit message names a change worth finding later
@@ -72,19 +55,12 @@ through to get there.
 - **Fold in every correction of your own not-yet-landed work.** Review rounds are
   the common case: five rounds do not mean five commits. Fix, re-run the gate,
   and amend or `reset --soft` into the commit that should have been right.
-- **Do not group by `type:` prefix mechanically.** Two `docs:` commits on one
-  branch usually mean one claim split in two — fold them. But `feat(search)` and
-  `feat(home)` are two claims and stay two, and a branch with genuinely separate
-  doc claims keeps them separate. Type is a useful smell, not the rule.
 - **Keep a commit that records a change of design.** Patch, patch, then redesign
   is history worth having; "I wrote a weak test, then strengthened it" is not.
   The test: does this commit represent a different state of the system, or a
   different state of my understanding? Only the first earns a commit.
 - Every commit still has to pass the gate on its own, which usually decides the
   order: a production fix lands before the test that depends on it.
-
-Typical end state for a feature branch: the production change, its tests, and the
-documentation — three commits, however many rounds it took to get there.
 
 ### Commit messages
 Subject: `type(scope): Imperative summary`, no trailing period, **72 characters at
@@ -101,11 +77,8 @@ subject fails. A repo-wide change may omit it. A new scope joins the list in the
 rule takes the scope of what it governs, not of where it is written: a commit
 rule is `ship` in CLAUDE.md, an ADR or a Skill.
 
-The mechanical half of this section is checked, not trusted:
-`.githooks/commit-msg` on each commit, `.githooks/pre-push` on the branch name,
-and `commits.yml` on every commit of the PR, its title, its body and the title's type
-against the branch prefix. Any Gradle build installs the hooks. A failure names
-the rule, what it saw and the fix: rewrite the message, never `--no-verify`.
+A failure of `rules.sh` names the rule, what it saw and the fix: rewrite the
+message, never `--no-verify`.
 
 The PR title takes the same form and states the branch's one claim; on a
 one-commit branch it is that commit's subject. GitHub writes it as the first
@@ -141,26 +114,8 @@ Trailers go after the body, before `Co-Authored-By:` (ADR 0033):
 right up to the merge — never bare `--force`, never `main`, and never a branch
 another person may hold.
 
-The window used to close at the first review, to protect bot threads from being
-orphaned. That trade was backwards: branch history is permanent and drives
-`blame` and `bisect`, while a review thread is read once and effectively never
-revisited after merge. Freezing the permanent thing to protect the ephemeral one
-also meant a single clumsy commit cost a whole branch's granularity.
-
-Measured on PR #12 rather than assumed. A thread whose commented line was
-rewritten keeps its text and `path`, keeps `originalLine` as a reference, loses
-`line` (the live anchor becomes null) and is flagged `isOutdated`. It still
-**accepts replies** and still **resolves** — and resolving it moved the PR from
-`BLOCKED` to `CLEAN`, so this does not deadlock against *require conversation
-resolution*.
-
-The only loss is the diff anchor: GitHub can no longer show the comment beside
-the code that prompted it. **Reply in the thread before rewriting** — the reply
-is the history, the anchor is only the presentation.
-
-In practice this should rarely come up, because step 3 keeps the reviews ahead of
-the PR. It exists for the residual case: the bot finding something real on a
-branch that was already final.
+**Reply in the thread before rewriting** the line a review thread anchors to: the
+thread survives as outdated and still resolves, but loses its place in the diff.
 
 ## 3. Reviews — all of them, before the PR exists
 `/code-review` runs against the local branch and needs no PR. Run every round the
@@ -236,13 +191,8 @@ governing documents would be one more thing to keep in sync, and mockup and
 image assets are excluded because no detector reads them
 (`docs/project/decisions/0022-a-governance-diff-triggers-the-checklist.md`).
 
-Run the section as it stands rather than a remembered count of it, scoped as
-its header says
+Run the section as it stands, scoped as its header says
 (`docs/project/decisions/0026-a-detector-runs-when-its-input-changes.md`).
-Confirm
-each detector reached everything it claims to cover. A check that silently
-skips what it cannot parse reports health it never established: one reported
-twenty ADRs clean while reading seventeen.
 
 ### Triage every finding into one bucket, and say which
 - **Fix** — anything fixed on this branch, in one of two kinds. The table says
@@ -411,12 +361,8 @@ debt: a finding that is not a real defect is fixed if it passes a test above,
 otherwise dismissed with that reason. A real defect the human defers still opens
 its issue.
 
-**Rule of three:** touching the same code a third time for the same class of
-defect means the design is the problem. Stop patching and redesign. A fix that
-introduces the next defect in the same place counts double. It counts touches
-to the code, across branches, not rounds, so the cap leaves its number alone;
-the stopping rule applies it sooner inside a branch, since two rounds never see
-a third touch.
+The rule of three (CLAUDE.md) counts touches to the code across branches, not
+rounds, so the cap leaves its count alone; the stopping rule applies it sooner.
 
 ### Closing threads
 Reply in the thread saying what was done, then **Resolve conversation** — the
