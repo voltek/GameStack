@@ -4,7 +4,13 @@ Status: Accepted
 Date: 2026-10-29
 Backfilled: no
 Supersedes: ADR-0038 — "its OpenSpec item included" (Decision)
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § A branch with a change verifies it before the reviews, archives it before the merge) — which branches open a change, verify before the reviews and archive before the merge, a verifier following its renamed test, no open change left on a merged branch
+Enforced by: none (prose only — .claude/rules/presentation.md § Changing what the user sees) — a `feat` branch opens a change
+Enforced by: none (prose only — decisions/0041-product-behaviour-is-specified-spec-anchored.md § Decision) — which `fix` branches open one
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Which branches get a round) — a missing change stops the branch, verify before the reviews
+Enforced by: none (prose only — .claude/skills/merge-pr/references/openspec-archive.md § Archive the OpenSpec change before the merge) — archive before the merge, no open change left on a merged branch
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § The sequence) — a behaviour-changing fix updating the delta until the archive
+Enforced by: none (prose only — .claude/rules/openspec.md § The merged specs) — never into `openspec/specs/` before the archive
+Enforced by: none (prose only — .claude/rules/tests.md § A renamed test keeps its verifiers) — a verifier following its renamed test
 Enforced by: none (prose only — openspec/schemas/gamestack/schema.yaml § artifacts) — the `VERIFIED BY` lines on every scenario, the proposal's `## Assumptions` and `## Open Questions`, tasks grouped by layer Skill
 Enforced by: claude settings — `deny` on the file tools editing `.claude/skills/openspec-*/` (the agent only, common spellings) — the generated Skills never edited
 Enforced by: none (prose only — .claude/rules/governance.md § Generated Skills) — the generated Skills never edited, for a person and for other spellings

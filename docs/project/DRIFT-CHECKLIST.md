@@ -6,7 +6,7 @@
 > `docs/project/` or `.github/`, any Skill under `.claude/skills/`, any file under
 > `.claude/rules/`, or `.claude/settings.json` — a diff
 > shows you that outright — and what runs then is the *Documentation
-> integrity* set, fired by `ship-a-branch`
+> integrity* set, fired by `open-pr`
 > ([ADR 0022](decisions/0022-a-governance-diff-triggers-the-checklist.md)) and
 > scoped by what the diff touches, as that section's own header says.
 > Or a batch of agent-generated features lands, which no diff marks, so that

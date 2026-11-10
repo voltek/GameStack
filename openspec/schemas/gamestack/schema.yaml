@@ -290,7 +290,7 @@ artifacts:
       written before its code. A screen's prototype gets its own task that
       stops for the owner's approval (new-feature step 5). Workflow follow-up:
       `openspec-verify-change` before the reviews, archive after the last of
-      them, before the merge (`.claude/skills/ship-a-branch/SKILL.md` § 3).
+      them, before the merge (the `review-round` and `merge-pr` Skills).
     requires:
       - specs
 

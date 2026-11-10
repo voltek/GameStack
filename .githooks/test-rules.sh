@@ -57,8 +57,9 @@ printf "Merge branch 'main' into x\n" >"$tmp/message"
 expect 0 'message: Merge subject on a merge commit' sh "$rules" message "$tmp/message" merge
 printf 'wip\n' >"$tmp/message"
 expect 1 'message: hand-written subject on a merge commit' sh "$rules" message "$tmp/message" merge
-message 1 'fixup! is not exempt' 'fixup! docs(ship): Fix a thing\n'
-message 1 'squash! is not exempt' 'squash! docs(ship): Fix a thing\n'
+message 1 'fixup! fails outside the local hook' 'fixup! docs(ship): Fix a thing\n'
+message 1 'squash! fails outside the local hook' 'squash! docs(ship): Fix a thing\n'
+message 1 'amend! fails outside the local hook' 'amend! docs(ship): Fix a thing\n\ndocs(ship): Fix the thing\n'
 message 0 '12 body lines and trailers' "docs(ship): Fix\n\n$(body 12)\nDrift: doc updated\nCo-Authored-By: A <a@b>\n"
 message 1 '13 body lines' "docs(ship): Fix\n\n$(body 13)"
 message 1 'a # line is body in a stored message' "docs(ship): Fix\n\n$(body 12)#55 introduced this\n"
@@ -98,6 +99,11 @@ hook 0 'scissors cut' "docs(ship): Fix\n\n# ------------------------ >8 --------
 hook 1 'a # line inside the body counts under -F' "docs(ship): Fix\n\n$(body 6)#55 introduced this\n$(body 6)" :
 hook 1 'a trailing # line counts under -F' "docs(ship): Fix\n\n$(body 12)#55 caused it\n" :
 hook 1 'Merge subject outside a merge' "Merge branch 'b'\n" :
+hook 0 'fixup! passes the local hook' 'fixup! docs(ship): Fix a thing\n' :
+hook 0 'squash! passes the local hook' 'squash! docs(ship): Fix a thing\n' :
+hook 0 'amend! passes the local hook' 'amend! docs(ship): Fix a thing\n\ndocs(ship): Fix the thing\n' :
+hook 1 'an amend! checks its replacement message' 'amend! docs(ship): Fix a thing\n\nwip fix stuff.\n' :
+hook 1 'a fold marker needs its space' 'fixup!docs(ship): Fix a thing\n' :
 git -C "$repo" rev-parse HEAD >"$repo/.git/MERGE_HEAD"
 hook 0 'Merge subject during a merge' "Merge branch 'b'\n" :
 rm "$repo/.git/MERGE_HEAD"
@@ -120,8 +126,7 @@ title() {
     expect "$1" "title: $2" sh "$rules" title "$3"
 }
 title 0 'one claim' 'chore(repo): Check commit messages mechanically'
-title 1 'an "and"' 'chore(repo): Check messages and branches'
-title 0 'Android is not "and"' 'feat(search): Support Android filters'
+title 0 'an "and" is a judgement, not a check' 'chore(repo): Check messages and branches'
 
 branch() {
     label=$1 want=$2
@@ -220,6 +225,7 @@ pr_body 1 'a record outside details' -e 's/^<details><summary>/<summary>/'
 pr_body 1 'an open record' -e 's/^<details>/<details open>/'
 pr_body 1 'a TODO in the summary' -e 's/2 rounds/TODO rounds/'
 pr_body 1 'a TODO in the record' -e 's/^Deferred: .*/Deferred: TODO/'
+pr_body 1 'a TODO in the accepted line' -e 's/^Dismissed: none/Accepted: TODO/'
 pr_body 0 'a TODO quoted in a written record' -e 's/^Dismissed: none/Dismissed: r1-2, a TODO slips the check/'
 pr_body 0 'a word holding TODO' -e 's/^Dismissed: none/Dismissed: r1-1, TODOS is a word/'
 pr_body 1 'a TODO in a listed record line' -e 's/^Deferred: .*/- Deferred: TODO/'
@@ -239,7 +245,7 @@ template=$(dirname "$rules")/../.github/pull_request_template.md
 expect 1 'body: the template as it ships' sh "$rules" body "$template" 'chore(ship): Check a thing'
 sed -E -e 's/TODO/2/g' -e '/^## What changed/a The claim.' -e '/^## Why/a The reason.' \
     -e 's/#n, closes #n/#1, closes #2/' -e 's/^Related: .*/Related: #3/' -e 's/^(- \[ \] .*:)$/\1 x/' \
-    -e 's/^Deferred: .*/Deferred: #4/' -e 's/^(Dismissed|Fixed after the last round): .*/\1: none/' "$template" >"$tmp/body"
+    -e 's/^Deferred: .*/Deferred: #4/' -e 's/^(Accepted|Dismissed|Fixed after the last round): .*/\1: none/' "$template" >"$tmp/body"
 expect 0 'body: the template once filled' sh "$rules" body "$tmp/body" 'chore(ship): Check a thing'
 
 if [ "$failures" -gt 0 ]; then

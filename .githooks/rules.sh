@@ -1,6 +1,6 @@
 #!/bin/sh
 # The mechanical half of ADR 0034's message and branch rules, ADR 0033's trailer
-# forms and ADR 0057's PR body; the judgement half stays in ship-a-branch § 2.
+# forms and ADR 0057's PR body; the judgement half stays in clean-branch and open-pr.
 # Reports every failure, not only the first, then exits 1. Usage: the case at
 # the end of this file; cases: test-rules.sh.
 
@@ -70,10 +70,13 @@ has_form() {
     printf '%s\n' "$1" | grep -Eq "$FORM"
 }
 
+# The closed list of subjects exempt from the form (ADR 0059). A fold marker passes
+# the local hook only, so CI rejects one left unfolded.
 exempt() {
     case $1 in
         'Revert "'* | 'Reapply "'* | 'Squashed commit of the following:') return 0 ;;
         'Merge '*) is_merge "$1" ;;
+        'fixup! '* | 'squash! '* | 'amend! '*) [ "$HOOK" = 1 ] ;;
         *) return 1 ;;
     esac
 }
@@ -140,7 +143,13 @@ check_message() {
         message=$(sed -e 's/[[:space:]]*$//' -e '/./,$!d' "$1")
     fi
     [ -z "$message" ] && return
-    exempt "$(printf '%s\n' "$message" | sed -n 1p)" || check_form "$message"
+    first=$(printf '%s\n' "$message" | sed -n 1p)
+    if ! exempt "$first"; then
+        check_form "$message"
+    # Autosquash writes an amend!'s replacement message without this hook (ADR 0059).
+    elif [ "${first#amend! }" != "$first" ]; then
+        check_form "$(printf '%s\n' "$message" | sed '1,/^$/d')"
+    fi
     check_trailers "$message"
 }
 
@@ -176,7 +185,7 @@ check_form() {
             print count + 0
         }')
     if [ "$body_lines" -gt "$BODY_LIMIT" ]; then
-        fail "Body is $body_lines lines, the limit is $BODY_LIMIT, trailers and blank lines excluded (ship-a-branch § Commit messages)." \
+        fail "Body is $body_lines lines, the limit is $BODY_LIMIT, trailers and blank lines excluded (clean-branch § 4. Messages)." \
             "$body_lines non-blank lines" \
             "Keep the diagnosis the diff cannot show; point at a document instead of restating it."
     fi
@@ -198,10 +207,6 @@ check_trailers() {
 check_title() {
     exempt "$1" && return
     check_subject "$1"
-    if printf '%s\n' "$1" | grep -Eiq '(^|[^[:alnum:]_])and([^[:alnum:]_]|$)'; then
-        fail "A PR title states one claim, so it has no \"and\" (ADR 0034)." "$1" \
-            "Split the PR, or rephrase if the \"and\" belongs to one name: gh pr edit --title."
-    fi
 }
 
 check_branch() {
@@ -295,7 +300,7 @@ check_body_record() {
             "$(printf '%s\n' "$verification" | grep -E '^Evidence:|<summary>|^Review:' | paste -sd '|' -)" \
             "Keep the template's Evidence: and <details><summary>Review: lines, or write Review: not run — exempt: <reason> without <details>."
     fi
-    report_each "$(printf '%s\n' "$verification" | grep -E '(<summary>Review:.*[^[:alnum:]_]|^([-*+] +)?(Deferred|Dismissed|Fixed after the last round): *)TODO([^[:alnum:]_]|$)')" \
+    report_each "$(printf '%s\n' "$verification" | grep -E '(<summary>Review:.*[^[:alnum:]_]|^([-*+] +)?(Deferred|Accepted|Dismissed|Fixed after the last round): *)TODO([^[:alnum:]_]|$)')" \
         "The review record still holds a TODO, so it is not written (ADR 0057)." \
         "Write what the rounds left, or none where they left nothing."
     report_each "$(printf '%s\n' "$verification" | grep -E '(^|[^[:alnum:]_])#n([^[:alnum:]_]|$)|r<k>-<n>')" \

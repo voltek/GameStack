@@ -49,7 +49,7 @@ Date: 2026-08-23
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-23 ("Two workflow rules were producing the mess")
 Supersedes: ADR-0007
 Enforced by: branch protection — `allow_force_pushes=false` (no force-push to `main`)
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § The force-push window) — the `--force-with-lease` window, bare `--force`
+Enforced by: none (prose only — .claude/skills/clean-branch/SKILL.md § 5. Push) — the `--force-with-lease` window
 
 ## Context
 What situation existed and what forced it. 3-6 sentences, in the past tense.
@@ -95,7 +95,7 @@ scope. An ADR whose clauses differ carries one line per group of clauses, and
 
 ```
 Enforced by: repository settings — `allow_rebase_merge=false` (the Rebase and merge button)
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 1. Update the branch against main) — `git merge main` instead of `rebase`
+Enforced by: none (prose only — .claude/skills/clean-branch/SKILL.md § 1. Update against main) — `git merge origin/main` instead of `rebase`
 ```
 
 Some values contain ` — ` themselves, so match a line against the vocabulary as

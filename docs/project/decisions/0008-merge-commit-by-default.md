@@ -5,10 +5,10 @@ Date: 2026-08-22
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-22 ("The Git workflow said nothing about merge strategy")
 Enforced by: repository settings — `allow_rebase_merge=false` (the Rebase and merge button)
 Enforced by: branch protection — `required_conversation_resolution=true` (every review thread resolved before the merge; "answered" is prose; for everyone, administrators included, while `enforce_admins=true`)
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 1. Update the branch against main) — `git merge main` instead of `rebase`
+Enforced by: none (prose only — .claude/skills/clean-branch/SKILL.md § 1. Update against main) — `git merge origin/main` instead of `rebase`
 Enforced by: none (prose only — CLAUDE.md § Working here) — the per-commit checkpoint
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 6. Merge) — merge commit over squash as the default
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 2. Check the branch is one claim) — the 400-line and 15-file alarm
+Enforced by: none (prose only — .claude/skills/merge-pr/SKILL.md § 2. Merge) — merge commit over squash as the default
+Enforced by: none (prose only — .claude/skills/clean-branch/SKILL.md § 3. One claim per commit) — the 400-line and 15-file alarm
 
 ## Context
 The Git workflow said nothing about merge strategy, nothing about PR size, and

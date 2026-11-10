@@ -19,3 +19,7 @@ looks like coverage and proves nothing. So see it fail against the code it guard
 with a message that describes the bug: a compile error or an NPE is red for the wrong
 reason. State in the commit which method was used, because "the tests pass" is not by
 itself evidence of anything. The recipes, for a patch and for a redesign: `write-tests`.
+
+## A renamed test keeps its verifiers
+A test is a reference, not behaviour: the commit that renames or moves a test updates
+every `VERIFIED BY` line naming it, on any branch, or the scenario points at nothing.

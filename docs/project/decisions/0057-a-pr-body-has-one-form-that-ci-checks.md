@@ -5,7 +5,7 @@ Date: 2026-11-07
 Backfilled: no
 Supersedes: ADR-0026 — "said which conditional items it skipped" (Consequences)
 Enforced by: commits.yml — the headings and their order with nothing before them, the bound on each section, `Evidence:`, one review record after it with no `TODO`, no template line or sample left, no `#n` left in *Issues*
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 4. Write the PR body) — that what the body says is true, the shape of each record line
+Enforced by: none (prose only — .claude/skills/open-pr/SKILL.md § 2. The body) — that what the body says is true, the shape of each record line
 Enforced by: none (prose only — decisions/0057-a-pr-body-has-one-form-that-ci-checks.md § Decision) — a keyword per closed number in *Issues*, none before a number elsewhere (#185)
 
 ## Context
