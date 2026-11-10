@@ -198,10 +198,6 @@ check_trailers() {
 check_title() {
     exempt "$1" && return
     check_subject "$1"
-    if printf '%s\n' "$1" | grep -Eiq '(^|[^[:alnum:]_])and([^[:alnum:]_]|$)'; then
-        fail "A PR title states one claim, so it has no \"and\" (ADR 0034)." "$1" \
-            "Split the PR, or rephrase if the \"and\" belongs to one name: gh pr edit --title."
-    fi
 }
 
 check_branch() {

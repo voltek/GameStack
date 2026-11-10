@@ -42,7 +42,7 @@ What the check cannot see:
 The title takes the commit subject's form and states the branch's one claim; on a
 one-commit branch it is that commit's subject, and GitHub writes it into the merge
 commit. A title that needs an "and" carries two claims: split the PR, unless the
-"and" belongs to one name.
+"and" belongs to one name. No check reads the word.
 
 No local hook sees the title or the body, so check both before opening:
 `sh .githooks/rules.sh title "<title>"` and

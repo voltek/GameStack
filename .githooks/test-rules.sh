@@ -120,8 +120,7 @@ title() {
     expect "$1" "title: $2" sh "$rules" title "$3"
 }
 title 0 'one claim' 'chore(repo): Check commit messages mechanically'
-title 1 'an "and"' 'chore(repo): Check messages and branches'
-title 0 'Android is not "and"' 'feat(search): Support Android filters'
+title 0 'an "and" is a judgement, not a check' 'chore(repo): Check messages and branches'
 
 branch() {
     label=$1 want=$2

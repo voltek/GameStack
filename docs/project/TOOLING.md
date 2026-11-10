@@ -333,9 +333,8 @@ over them. PowerShell denies every `gh api` call, so read GitHub from Bash.
 the subject form, the type and scope against closed lists, a capital first
 letter, no trailing period, 72 code points, a blank second line, a body of 12
 non-blank lines with known trailers excluded, `Drift:` and `Bypassed:`
-values, the branch name's shape, and, on a PR, the title's form, an
-"and" in it, its type against the branch prefix, and the form of its body
-(ADR 0057). Every failure names the
+values, the branch name's shape, and, on a PR, the title's form, its type against
+the branch prefix, and the form of its body (ADR 0057). Every failure names the
 rule, the value seen and the fix, and prints the scope list when the scope is
 at fault, so the error is the template.
 
@@ -380,6 +379,9 @@ build.
 - *Checking a PR against `main`'s `rules.sh`.* A new scope joins the list in
   the commit that first uses it (ADR 0034), which `main`'s list would fail.
   An edit to the rules is a reviewed diff, as an edit to `gate.yml` is.
+- *Failing a PR title that holds an "and".* A script sees the word, not whether
+  one claim or two stands behind it, so a title for one claim that named two
+  things failed, and each failure cost a title edit and a rerun.
 - *Counting the collapsed record in a PR body's bound.* Its dismissals need their
   words, and it takes no room on the first screen.
 
