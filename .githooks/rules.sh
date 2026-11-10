@@ -70,10 +70,13 @@ has_form() {
     printf '%s\n' "$1" | grep -Eq "$FORM"
 }
 
+# The closed list of subjects exempt from the form (ADR 0059). A fold marker passes
+# the local hook only, so CI rejects one left unfolded.
 exempt() {
     case $1 in
         'Revert "'* | 'Reapply "'* | 'Squashed commit of the following:') return 0 ;;
         'Merge '*) is_merge "$1" ;;
+        'fixup! '* | 'squash! '* | 'amend! '*) [ "$HOOK" = 1 ] ;;
         *) return 1 ;;
     esac
 }
@@ -140,7 +143,13 @@ check_message() {
         message=$(sed -e 's/[[:space:]]*$//' -e '/./,$!d' "$1")
     fi
     [ -z "$message" ] && return
-    exempt "$(printf '%s\n' "$message" | sed -n 1p)" || check_form "$message"
+    first=$(printf '%s\n' "$message" | sed -n 1p)
+    if ! exempt "$first"; then
+        check_form "$message"
+    # Autosquash writes an amend!'s replacement message without this hook (ADR 0059).
+    elif [ "${first#amend! }" != "$first" ]; then
+        check_form "$(printf '%s\n' "$message" | sed '1,/^$/d')"
+    fi
     check_trailers "$message"
 }
 

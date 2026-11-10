@@ -47,18 +47,20 @@ later strengthened is not. The test: does the commit represent a different state
 of the system, or of your understanding? Only the first earns a commit.
 
 ### Folding
-`git rebase -i` is unavailable here, and auto mode denies `git commit --amend`.
-Fold before step 1's merge where you can: these recipes replay commits, and a
-merge cannot be replayed.
-- The tip, unless it is a merge: `git reset --soft HEAD~1`, then commit again. If
-  the hook rejects the new message, HEAD is already reset: fix the message and
-  commit, never reset a second time.
-- Below the tip: commit each fix as a temporary commit. Start a fresh branch at the
-  branch's last merge commit, or at `git merge-base origin/main HEAD` if it has
-  none. Replay each original commit after that point with
-  `git cherry-pick -n <original> <its temp commits>` and `git commit -C <original>`.
-  Check that `git diff <old> <new>` is empty, move the branch to the new tip, and
-  push with a lease.
+`git rebase -i` needs an editor no agent session can answer, and auto mode denies
+`git commit --amend`, so fold with marker commits, at the tip or below it:
+- A fix: `git commit --fixup=<the commit it corrects>`.
+- A new message: write `amend! <its current subject>`, a blank line and the whole
+  new message to a file, then
+  `GIT_EDITOR="cp <file>" git commit --allow-empty --fixup=reword:<commit>`.
+
+Then `git rebase --autosquash --rebase-merges $(git merge-base origin/main HEAD)`
+(git 2.44 or later). This folds and is not the update step 1 forbids (ADR 0059).
+`--rebase-merges` rebuilds each merge of `main` on the same parents, so a commit
+below one folds too; a merge that had conflicts asks for them again.
+`git diff <tip before> HEAD` stays empty. The local hook accepts the marker
+subjects and CI rejects them, so fold before a PR reads the branch; then run the
+gate and push with a lease.
 
 ## 4. Messages
 `.githooks/rules.sh` checks every commit's form and prints the rule, what it saw

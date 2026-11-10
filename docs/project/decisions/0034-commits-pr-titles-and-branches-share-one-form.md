@@ -1,10 +1,11 @@
 # ADR 0034 — Commit subjects, PR titles and branch names share one form
 
 Status: Accepted
+Status: Superseded by ADR-0059 — "Subjects git or GitHub writes itself, for a merge, a revert or a squash, are exempt" (Decision)
 Date: 2026-10-26
 Backfilled: no
 Supersedes: ADR-0006 — "branch names are `feature/`, `fix/`, `chore/` or `docs/{name}`" and "lowercase" (Decision, Tier 2 paragraph)
-Enforced by: git hook — .githooks/commit-msg — the subject form (a type, a scope from the closed list or none, a capital first letter, no trailing period, 72 code points), the exemption for subjects git or GitHub writes
+Enforced by: git hook — .githooks/commit-msg — the subject form (a type, a scope from the closed list or none, a capital first letter, no trailing period, 72 code points)
 Enforced by: git hook — .githooks/pre-push — the branch name's shape
 Enforced by: commits.yml — the subject form of every commit on a PR, the PR title's form, the branch name's shape, its prefix against the title's type
 Enforced by: none (prose only — decisions/0034-commits-pr-titles-and-branches-share-one-form.md § Decision) — a verb opening the summary, a scope omitted only when the change is repo-wide, a new scope joining the list in the commit that first uses it

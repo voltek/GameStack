@@ -301,8 +301,8 @@ history is built without that push.
 Auto mode's classifier is a separate gate: `permissions.allow` does not stop it,
 and its own `autoMode` rules are read only from user or managed settings or
 `--settings`, never from a project's files (`claude auto-mode config` shows what
-it reads). It denies `git commit --amend`, so `clean-branch` folds with
-`git reset --soft`.
+it reads). It denies `git commit --amend`, so `clean-branch` § Folding uses marker commits
+(ADR 0059).
 
 **Replaces.** A prompt before every `git push`, and the same rules kept only in a
 local file that one machine's global ignore kept out of git.
@@ -333,7 +333,9 @@ over them. PowerShell denies every `gh api` call, so read GitHub from Bash.
 the subject form, the type and scope against closed lists, a capital first
 letter, no trailing period, 72 code points, a blank second line, a body of 12
 non-blank lines with known trailers excluded, `Drift:` and `Bypassed:`
-values, the branch name's shape, and, on a PR, the title's form, its type against
+values, the closed list of exempt subjects with the fold markers `fixup!`,
+`squash!` and `amend!` accepted by the local hook alone (ADR 0059), the
+branch name's shape, and, on a PR, the title's form, its type against
 the branch prefix, and the form of its body (ADR 0057). Every failure names the
 rule, the value seen and the fix, and prints the scope list when the scope is
 at fault, so the error is the template.
@@ -364,6 +366,10 @@ build.
 - *Skipping the run when only the body changed.* A job skipped by its `if`
   reports Success to a required check, so a body edit after a red run would
   turn it green unchecked. The run is a shell script, not Gradle.
+- *Exempting fold markers in CI too.* A marker left unfolded would reach `main`
+  as a commit nobody meant to keep. Folding by replaying commits with
+  `cherry-pick -n` went with it: it broke on a merge of `main`, which
+  `git rebase --autosquash --rebase-merges` rebuilds.
 - *Counting the subject in bytes.* An em dash is three bytes.
 - *Stripping `#` lines in CI.* Under `-F` git stores them, so CI reads the
   stored message as it is; only the local hook strips the editor's comments.

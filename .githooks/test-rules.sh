@@ -57,8 +57,9 @@ printf "Merge branch 'main' into x\n" >"$tmp/message"
 expect 0 'message: Merge subject on a merge commit' sh "$rules" message "$tmp/message" merge
 printf 'wip\n' >"$tmp/message"
 expect 1 'message: hand-written subject on a merge commit' sh "$rules" message "$tmp/message" merge
-message 1 'fixup! is not exempt' 'fixup! docs(ship): Fix a thing\n'
-message 1 'squash! is not exempt' 'squash! docs(ship): Fix a thing\n'
+message 1 'fixup! fails outside the local hook' 'fixup! docs(ship): Fix a thing\n'
+message 1 'squash! fails outside the local hook' 'squash! docs(ship): Fix a thing\n'
+message 1 'amend! fails outside the local hook' 'amend! docs(ship): Fix a thing\n\ndocs(ship): Fix the thing\n'
 message 0 '12 body lines and trailers' "docs(ship): Fix\n\n$(body 12)\nDrift: doc updated\nCo-Authored-By: A <a@b>\n"
 message 1 '13 body lines' "docs(ship): Fix\n\n$(body 13)"
 message 1 'a # line is body in a stored message' "docs(ship): Fix\n\n$(body 12)#55 introduced this\n"
@@ -98,6 +99,11 @@ hook 0 'scissors cut' "docs(ship): Fix\n\n# ------------------------ >8 --------
 hook 1 'a # line inside the body counts under -F' "docs(ship): Fix\n\n$(body 6)#55 introduced this\n$(body 6)" :
 hook 1 'a trailing # line counts under -F' "docs(ship): Fix\n\n$(body 12)#55 caused it\n" :
 hook 1 'Merge subject outside a merge' "Merge branch 'b'\n" :
+hook 0 'fixup! passes the local hook' 'fixup! docs(ship): Fix a thing\n' :
+hook 0 'squash! passes the local hook' 'squash! docs(ship): Fix a thing\n' :
+hook 0 'amend! passes the local hook' 'amend! docs(ship): Fix a thing\n\ndocs(ship): Fix the thing\n' :
+hook 1 'an amend! checks its replacement message' 'amend! docs(ship): Fix a thing\n\nwip fix stuff.\n' :
+hook 1 'a fold marker needs its space' 'fixup!docs(ship): Fix a thing\n' :
 git -C "$repo" rev-parse HEAD >"$repo/.git/MERGE_HEAD"
 hook 0 'Merge subject during a merge' "Merge branch 'b'\n" :
 rm "$repo/.git/MERGE_HEAD"
