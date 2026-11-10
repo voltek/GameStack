@@ -5,7 +5,7 @@ Date: 2026-10-23
 Backfilled: no
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Documentation integrity — the value is in the closed vocabulary, and the rule a `claude settings` line names is in `.claude/settings.json`
 Enforced by: none (prose only — decisions/README.md § `Enforced by:` — closed vocabulary) — only the committed file counts, never a local one
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § A governance diff earns the checklist) — a diff touching `.claude/settings.json` runs the checklist
+Enforced by: none (prose only — .claude/skills/open-pr/SKILL.md § 1. Detectors, on a governance diff) — a diff touching `.claude/settings.json` runs the checklist
 
 ## Context
 The `Enforced by:` vocabulary had a value for every mechanism the repository

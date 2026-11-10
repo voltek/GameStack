@@ -166,8 +166,13 @@ val installGitHooks by tasks.registering(InstallGitHooks::class) {
 
 tasks.named("preBuild") { dependsOn(installGitHooks) }
 
-// ClaudeMdBoundTest reads this file, which Gradle would not otherwise see as an input,
-// so the test would stay UP-TO-DATE while the file grew past its bound.
+// ClaudeMdBoundTest and ShippingSkillBoundTest read these files, which Gradle would not
+// otherwise see as inputs, so the tests would stay UP-TO-DATE while a file grew past its bound.
+// The shipping Skills are named once, here, and handed to their test (ADR 0060).
+val shippingSkills = listOf("clean-branch", "review-round", "open-pr", "merge-pr")
 tasks.withType<Test>().configureEach {
     inputs.file(rootProject.file("CLAUDE.md")).withPathSensitivity(PathSensitivity.NONE)
+    inputs.files(shippingSkills.map { rootProject.file(".claude/skills/$it/SKILL.md") })
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    systemProperty("gamestack.shippingSkills", shippingSkills.joinToString(","))
 }

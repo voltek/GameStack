@@ -7,7 +7,8 @@ Supersedes: ADR-0007
 Enforced by: branch protection — `allow_force_pushes=false` (no force-push to `main`, for everyone, administrators included, while `enforce_admins=true`)
 Enforced by: claude settings — `deny` on a push with a bare `--force`, `-f`, `-fu` or a `+` refspec; `ask` on `git -C` (the agent only, common spellings)
 Enforced by: none (prose only — CLAUDE.md § Working here) — the `--force-with-lease` window on your own branch, never bare `--force` for a person, never a branch another person may hold
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 2 and § 3) — one commit per claim, every review round before any PR exists
+Enforced by: none (prose only — .claude/skills/clean-branch/SKILL.md § 3. One claim per commit) — one commit per claim
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Run a review round) — every review round before any PR exists
 
 ## Context
 Two workflow rules were producing the mess they were written to prevent. PRs

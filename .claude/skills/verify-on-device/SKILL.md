@@ -236,7 +236,7 @@ Each confirmed defect becomes an issue in the shape of
 --label bug`, since `gh issue create` applies no form's labels, its Horizon
 proposed under the form's heading, with the capture that shows it,
 saying whether a spec covers the behaviour: if none does, its fix carries a
-scenario (`ship-a-branch`).
+scenario (ADR 0041).
 
 ## Cost
 Screenshot cost is set by **aspect ratio, not AVD resolution** — the long edge is
@@ -246,9 +246,11 @@ clamped before billing. Shrinking the AVD saves nothing. See
 ## Finishing
 - **Close `GameStack_Verify`**: `"$ADB" emu kill`. The next launch wipes it, so
   nothing the pass changed needs restoring.
-- Save the captures outside the repo, named for what they show, and hand the
-  paths over in chat — see `ship-a-branch` → Screenshots. They go into the PR
-  as they are: an attachment is not stored in the repository, so nothing needs
-  compressing.
+- Save the captures outside the repo, named for what they show, never in
+  `%TEMP%` or a scratchpad, which get cleaned, and never commit them. Hand the
+  paths over in chat and say plainly that the PR needs them dragged into its
+  body's edit box on the web before the merge: that is the one part only the
+  human can finish. They go in as they are: an attachment is not stored in the
+  repository, so nothing needs compressing.
 - The PR body lists the scenarios and states checked, not merely that something
   was.

@@ -220,6 +220,7 @@ pr_body 1 'a record outside details' -e 's/^<details><summary>/<summary>/'
 pr_body 1 'an open record' -e 's/^<details>/<details open>/'
 pr_body 1 'a TODO in the summary' -e 's/2 rounds/TODO rounds/'
 pr_body 1 'a TODO in the record' -e 's/^Deferred: .*/Deferred: TODO/'
+pr_body 1 'a TODO in the accepted line' -e 's/^Dismissed: none/Accepted: TODO/'
 pr_body 0 'a TODO quoted in a written record' -e 's/^Dismissed: none/Dismissed: r1-2, a TODO slips the check/'
 pr_body 0 'a word holding TODO' -e 's/^Dismissed: none/Dismissed: r1-1, TODOS is a word/'
 pr_body 1 'a TODO in a listed record line' -e 's/^Deferred: .*/- Deferred: TODO/'
@@ -239,7 +240,7 @@ template=$(dirname "$rules")/../.github/pull_request_template.md
 expect 1 'body: the template as it ships' sh "$rules" body "$template" 'chore(ship): Check a thing'
 sed -E -e 's/TODO/2/g' -e '/^## What changed/a The claim.' -e '/^## Why/a The reason.' \
     -e 's/#n, closes #n/#1, closes #2/' -e 's/^Related: .*/Related: #3/' -e 's/^(- \[ \] .*:)$/\1 x/' \
-    -e 's/^Deferred: .*/Deferred: #4/' -e 's/^(Dismissed|Fixed after the last round): .*/\1: none/' "$template" >"$tmp/body"
+    -e 's/^Deferred: .*/Deferred: #4/' -e 's/^(Accepted|Dismissed|Fixed after the last round): .*/\1: none/' "$template" >"$tmp/body"
 expect 0 'body: the template once filled' sh "$rules" body "$tmp/body" 'chore(ship): Check a thing'
 
 if [ "$failures" -gt 0 ]; then

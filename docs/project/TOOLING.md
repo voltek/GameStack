@@ -20,8 +20,9 @@ answers the one question none of those do: **what is the harness made of,
 today.**
 
 **Admission:** an entry exists only for a piece configured by a file or setting
-it names under **Where.**, and it states the step it replaced, a shape it ruled
-out, or both. A state of the repository with no lesson is not an entry
+it names under **Where.**, or, for a service configured outside the repository,
+the place it is set (entry 9), and it states the step it replaced, a shape it
+ruled out, or both. A state of the repository with no lesson is not an entry
 ([ADR 0040](decisions/0040-the-harness-has-a-base-and-a-tooling-entry-a-lesson.md)).
 
 **Base:** the harness is built for a Gradle project for Android or Kotlin
@@ -165,20 +166,34 @@ guess; a mismatch means Gradle downloads a toolchain on every job.
 
 ## 6. Skills
 **What.** Procedures in `.claude/skills/`, one per repeatable task —
-each layer's scaffolding, tests, device verification, and shipping a branch —
+each layer's scaffolding, tests, device verification, and shipping a branch in
+four moments (`clean-branch`, `review-round`, `open-pr`, `merge-pr`) —
 plus the `openspec-*` Skills OpenSpec generates (entry 13). A
 Skill loads only when invoked, which is why procedures live there instead of in
-CLAUDE.md, which is loaded on every turn.
+CLAUDE.md, which is loaded on every turn. A rare case goes to a file under the
+Skill's `references/`, which its `SKILL.md` says when to read.
+
+**The shipping Skills' bound.** `ShippingSkillBoundTest` fails the gate when one
+of the four `SKILL.md` files passes 15,000 bytes (ADR 0060): after a compaction
+Claude Code re-attaches only the first 5,000 tokens of an invoked Skill, so a
+longer one loses its last steps mid-task.
 
 **Replaces.** Improvising the same task a slightly different way each time.
 
 **Where.** `.claude/skills/`, and `docs/project/retired-skills/` for those taken
 out of the listing.
 
-**Ruled out.** *Keeping a once-per-project skill invocable.* `project-scaffold`
-bootstrapped this repo and was retired afterwards — it offered an agent something
-it should never pick. It is archived rather than deleted, because how the project
-was bootstrapped is worth keeping.
+**Ruled out.**
+- *Keeping a once-per-project skill invocable.* `project-scaffold`
+  bootstrapped this repo and was retired afterwards — it offered an agent something
+  it should never pick. It is archived rather than deleted, because how the project
+  was bootstrapped is worth keeping.
+- *One Skill for shipping a branch.* Its description promised one task while it
+  ran four, it grew past 500 lines, and after a compaction only its opening
+  steps came back, so a review round was skipped twice. Each moment now has a
+  Skill whose description names when it applies.
+- *Supporting files alone, under one `SKILL.md`.* A file read once does not come
+  back after a compaction either, and the description still named one task.
 
 ## 7. The governing documents
 **What.** Five files and two folders, with disjoint jobs: `CLAUDE.md` holds rules
@@ -248,10 +263,13 @@ comment. A trigger phrase that is not a substring of it avoids the collision.
 pull requests. A round starts when a PR is opened for review, when a draft is
 marked ready, or on a comment `@codex review` or `@codex security review`. While
 a round runs it reacts 👀; it then posts findings, or reacts 👍 when it has none.
-Its summary comment on each PR names the trigger, the commit and the status.
+Its summary comment on each PR names the trigger, the commit and the status. When
+its quota is spent it posts a usage-limit comment instead. Automatic review sits
+behind two switches, the repository's and each user's personal preference, so a
+round can fail to start for a reason nobody in the repository can see.
 
-**Replaces.** Requesting the bot by hand when a PR opened, which `ship-a-branch`
-used to call for and which bought a second round on the same commit.
+**Replaces.** Requesting the bot by hand when a PR opened, which the shipping
+Skill used to call for and which bought a second round on the same commit.
 
 **Where.** Outside the repository, at chatgpt.com/settings/code-review (Review
 code → Automatic review). No file here configures it, nothing here turns it on
@@ -259,11 +277,11 @@ or off, and no detector checks it.
 
 **Why it stays on while §8's review is off.** §8's decision was about a Claude
 reviewer; Codex was a separate bot and was left as it was. ADR 0049 keeps it as
-the one automated advisor round per PR, and `ship-a-branch` step 3 says how that
-round is used and when to stop waiting for it.
+the one automated advisor round per PR, and `open-pr` § 5 says how that round is
+used and when to stop waiting for it (ADR 0058).
 
-**Ruled out.** *Restating these triggers and signals in the skill.* A copy there
-came out incomplete twice; the skill keeps the rule and points here.
+**Ruled out.** *Restating these triggers and signals in a Skill.* A copy there
+came out incomplete twice; the Skill keeps the rule and points here.
 
 ## 10. Agent permissions
 **What.** `deny` and `ask` rules that stop the agent before a command runs. The
@@ -276,10 +294,15 @@ auto-merge on. An `Edit` rule denies the file tools on the generated
 `openspec-*` Skills (entry 13). Each rule catches the common spellings of a mistake, never all
 of them. Issue #71 lists the spellings known to get through; where
 `main` is concerned, only §2 stops them. A rule also stays narrow enough not to
-catch reads: a prompt on every `git -C … log` was dropped for that reason.
-`attribution` in the same file keeps the agent as a commit co-author only: `pr` is
-empty, `sessionUrl` is off, and `commit` stays unset so the trailer names the real
-model.
+catch reads: a prompt on every `git -C … log` was dropped for that reason. The
+`deny` on a push naming `main` fires in a scratch repository too, so scratch
+history is built without that push.
+
+Auto mode's classifier is a separate gate: `permissions.allow` does not stop it,
+and its own `autoMode` rules are read only from user or managed settings or
+`--settings`, never from a project's files (`claude auto-mode config` shows what
+it reads). It denies `git commit --amend`, so `clean-branch` folds with
+`git reset --soft`.
 
 **Replaces.** A prompt before every `git push`, and the same rules kept only in a
 local file that one machine's global ignore kept out of git.
@@ -296,6 +319,10 @@ over them. PowerShell denies every `gh api` call, so read GitHub from Bash.
   literally, and the rule never fires. A startup warning reports it.
 - *Trusting the patterns alone.* A pattern matches one spelling of a command.
   The guard that holds for any spelling is §2's `enforce_admins`.
+- *`autoMode` rules in `.claude/settings.json` or `settings.local.json`.* The
+  classifier ignores them. The "Teach auto mode about your environment?" prompt
+  writes into user settings, so its lines reach every project: answer it "Don't
+  show again".
 - *Chasing every spelling.* Each review round widened the patterns and found
   the next gap, and a rule matched anywhere in the command
   (`core.hooksPath`, `-n`) denied reads and commit messages. The rule of three
@@ -312,7 +339,11 @@ values, the branch name's shape, and, on a PR, the title's form, an
 rule, the value seen and the fix, and prints the scope list when the scope is
 at fault, so the error is the template.
 
-**Replaces.** Reading each subject against `ship-a-branch` § 2 by hand.
+**Replaces.** Reading each subject against the written form by hand.
+
+**Testing the hooks.** `test-rules.sh` covers `rules.sh`. A commit made to see
+the hook pass is a real commit, so make it in a scratch clone, never with
+`--no-verify`.
 
 **Where.** `.githooks/rules.sh` holds every check and both lists, and
 `.githooks/test-rules.sh` its cases. `.githooks/commit-msg` and
@@ -481,6 +512,26 @@ insertions, its issues are the items, and closing it archives it. Not built
 while one owner works on one machine: every status change would be a GitHub
 write, and every session a `gh` read, with no other reader. The candidates
 weighed are in the `gated` issue #159.
+
+## 15. Agent attribution
+**What.** The agent appears as a commit co-author only. `pr` is empty, so no
+"Generated with Claude Code" line enters a PR body; `sessionUrl` is off, so a
+cloud or Remote Control session adds no `Claude-Session` trailer or link, the
+only sessions it acts on; and `commit` stays unset, so the `Co-Authored-By:`
+trailer names the model in use when the commit is made. A personal
+`.claude/settings.local.json` that sets `attribution` takes precedence for its
+owner, unlike a `deny` rule; whether the object merges key by key is
+undocumented.
+
+**Replaces.** Attribution lines repeated in every PR body and a session link no
+reader outside the session could open.
+
+**Where.** `attribution` in `.claude/settings.json`.
+
+**Ruled out.**
+- *Setting it in user settings only.* A clone would get Claude Code's defaults.
+- *A fixed `commit` string.* It would name one model forever, whichever model
+  made the commit.
 
 ---
 

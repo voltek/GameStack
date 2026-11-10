@@ -16,7 +16,8 @@ is a cost.
 
 ## Working here
 - Before committing, run `./gradlew build`, `./gradlew test` and `./gradlew lint`;
-  all three must be green. A lint Error fails the gate, a warning does not.
+  all three must be green, read from the exit code, which a pipe through `tail`
+  hides. A lint Error fails the gate, a warning does not.
 - Put code and its documentation in the same commit.
 - Before pushing, `git fetch` and reconcile with `origin/main`.
 - One branch per unit of work, checked per commit: does this exist because of this
@@ -35,7 +36,8 @@ is a cost.
 - When code and a document disagree, say which is right and why, and put
   `Drift: code fixed`, `Drift: doc updated` or `Drift: both` on the commit that
   resolves it. A rule that is born or changes is a new ADR.
-- Run the `ship-a-branch` Skill to take a finished branch to a merged PR.
+- Ship a branch by moment: `clean-branch` when its work is done, `review-round`
+  before any review, `open-pr` before the PR, `merge-pr` before the merge.
 
 ## Code map
 One `app` module: Jetpack Compose, MVI over Clean Architecture. `presentation` reaches

@@ -18,9 +18,10 @@ Related: #n, PR #n
 Evidence: none
 
 <!-- A branch exempt from review replaces the block below with: Review: not run — exempt: <reason> -->
-<details><summary>Review: TODO rounds, TODO fixed after the last, TODO deferred, TODO dismissed</summary>
+<details><summary>Review: TODO rounds, TODO fixed after the last, TODO deferred, TODO accepted, TODO dismissed</summary>
 
 Deferred: TODO #n
+Accepted: TODO r<k>-<n>, what it claimed, why it is not worth fixing
 Dismissed: TODO r<k>-<n>, what it claimed, why it was wrong
 Fixed after the last round: TODO r<k>-<n>, what changed
 

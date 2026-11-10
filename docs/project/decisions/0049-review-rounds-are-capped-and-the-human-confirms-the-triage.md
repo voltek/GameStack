@@ -1,6 +1,7 @@
 # ADR 0049 — Review rounds are capped and the human confirms the triage
 
 Status: Accepted
+Status: Superseded by ADR-0058 — "fixed, deferred to an issue, or dismissed", "before anything changes", and "On a branch that is wholly governance the human decides the rows that turn on a judgment, and the others stand unless reopened" (Decision)
 Date: 2026-11-04
 Backfilled: no
 Supersedes: ADR-0015
@@ -10,9 +11,16 @@ Supersedes: ADR-0030
 Enforced by: branch protection — `required_conversation_resolution=true` (every review thread resolved before the merge; "answered" is prose; for everyone, administrators included, while `enforce_admins=true`)
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Testing Stack — a regression test that was never seen to fail
 Enforced by: none (prose only — CLAUDE.md § Working here) — the rule of three
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Triage every finding into one bucket, and say which) — the human confirms the triage
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 3. Reviews — all of them, before the PR exists) — `/code-review` run by the human
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 3. Reviews — all of them, before the PR exists) — the GitHub bot as an advisor, the exemptions, the buckets and their grounds, the stopping rule, the cap, the round past it, a fix no round will read, a branch working `review-debt`, the rows that go to the human, the records
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § The sequence) — the human confirms the triage
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Before each round, ask) — `/code-review` run by the human
+Enforced by: none (prose only — .claude/skills/open-pr/SKILL.md § 5. The GitHub bot's round) — the GitHub bot as an advisor
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Stopping rule) — the stopping rule, the cap
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Which branches get a round) — the exemptions
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Buckets) — the buckets and their grounds
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § A fix no round will read) — a fix no round will read
+Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § The table) — the records
+Enforced by: none (prose only — .claude/skills/review-round/references/past-the-cap.md § A round past the cap) — the round past the cap
+Enforced by: none (prose only — .claude/skills/review-round/references/review-debt-branch.md § A branch working `review-debt`) — a branch working `review-debt`
 Enforced by: commits.yml — a PR body's review record, present and free of `TODO`
 
 ## Context

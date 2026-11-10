@@ -7,8 +7,9 @@ Supersedes: ADR-0006 — "branch names are `feature/`, `fix/`, `chore/` or `docs
 Enforced by: git hook — .githooks/commit-msg — the subject form (a type, a scope from the closed list or none, a capital first letter, no trailing period, 72 code points), the exemption for subjects git or GitHub writes
 Enforced by: git hook — .githooks/pre-push — the branch name's shape
 Enforced by: commits.yml — the subject form of every commit on a PR, the PR title's form and its "and", the branch name's shape, its prefix against the title's type
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § Commit messages) — a verb opening the summary, a scope omitted only when the change is repo-wide
-Enforced by: none (prose only — .claude/skills/ship-a-branch/SKILL.md § 2) — a scope naming the area rather than the file, a new scope joining the list in the commit that first uses it, the PR title being the branch's one claim
+Enforced by: none (prose only — decisions/0034-commits-pr-titles-and-branches-share-one-form.md § Decision) — a verb opening the summary, a scope omitted only when the change is repo-wide, a new scope joining the list in the commit that first uses it
+Enforced by: none (prose only — .claude/skills/clean-branch/SKILL.md § 4. Messages) — a scope naming the area rather than the file
+Enforced by: none (prose only — .claude/skills/open-pr/SKILL.md § 3. The title) — the PR title being the branch's one claim
 
 ## Context
 ADR 0006 adopted Conventional Commits on 2026-08-22 with a subject that was

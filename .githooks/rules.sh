@@ -1,6 +1,6 @@
 #!/bin/sh
 # The mechanical half of ADR 0034's message and branch rules, ADR 0033's trailer
-# forms and ADR 0057's PR body; the judgement half stays in ship-a-branch § 2.
+# forms and ADR 0057's PR body; the judgement half stays in clean-branch and open-pr.
 # Reports every failure, not only the first, then exits 1. Usage: the case at
 # the end of this file; cases: test-rules.sh.
 
@@ -176,7 +176,7 @@ check_form() {
             print count + 0
         }')
     if [ "$body_lines" -gt "$BODY_LIMIT" ]; then
-        fail "Body is $body_lines lines, the limit is $BODY_LIMIT, trailers and blank lines excluded (ship-a-branch § Commit messages)." \
+        fail "Body is $body_lines lines, the limit is $BODY_LIMIT, trailers and blank lines excluded (clean-branch § 4. Messages)." \
             "$body_lines non-blank lines" \
             "Keep the diagnosis the diff cannot show; point at a document instead of restating it."
     fi
@@ -295,7 +295,7 @@ check_body_record() {
             "$(printf '%s\n' "$verification" | grep -E '^Evidence:|<summary>|^Review:' | paste -sd '|' -)" \
             "Keep the template's Evidence: and <details><summary>Review: lines, or write Review: not run — exempt: <reason> without <details>."
     fi
-    report_each "$(printf '%s\n' "$verification" | grep -E '(<summary>Review:.*[^[:alnum:]_]|^([-*+] +)?(Deferred|Dismissed|Fixed after the last round): *)TODO([^[:alnum:]_]|$)')" \
+    report_each "$(printf '%s\n' "$verification" | grep -E '(<summary>Review:.*[^[:alnum:]_]|^([-*+] +)?(Deferred|Accepted|Dismissed|Fixed after the last round): *)TODO([^[:alnum:]_]|$)')" \
         "The review record still holds a TODO, so it is not written (ADR 0057)." \
         "Write what the rounds left, or none where they left nothing."
     report_each "$(printf '%s\n' "$verification" | grep -E '(^|[^[:alnum:]_])#n([^[:alnum:]_]|$)|r<k>-<n>')" \
