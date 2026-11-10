@@ -33,6 +33,7 @@ is a cost.
 - Ask first: any decision the documents or an existing code pattern do not settle,
   such as a visual or UX choice, product scope, the name of a user-facing concept, or a trade-off with no
   single answer. Propose it and wait for approval, even when the request looks small.
+  `review-round`'s round 1 has its own list (ADR 0061).
 - When code and a document disagree, say which is right and why, and put
   `Drift: code fixed`, `Drift: doc updated` or `Drift: both` on the commit that
   resolves it. A rule that is born or changes is a new ADR.

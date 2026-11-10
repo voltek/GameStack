@@ -2,6 +2,7 @@
 
 Status: Accepted
 Status: Superseded by ADR-0058 — "fixed, deferred to an issue, or dismissed", "before anything changes", and "On a branch that is wholly governance the human decides the rows that turn on a judgment, and the others stand unless reopened" (Decision)
+Status: Superseded by ADR-0061 — "`/code-review` is run by the human" (Decision)
 Date: 2026-11-04
 Backfilled: no
 Supersedes: ADR-0015
@@ -12,7 +13,6 @@ Enforced by: branch protection — `required_conversation_resolution=true` (ever
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Testing Stack — a regression test that was never seen to fail
 Enforced by: none (prose only — CLAUDE.md § Working here) — the rule of three
 Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § The sequence) — the human confirms the triage
-Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Before each round, ask) — `/code-review` run by the human
 Enforced by: none (prose only — .claude/skills/open-pr/SKILL.md § 5. The GitHub bot's round) — the GitHub bot as an advisor
 Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Stopping rule) — the stopping rule, the cap
 Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Which branches get a round) — the exemptions

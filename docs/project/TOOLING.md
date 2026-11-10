@@ -259,14 +259,30 @@ off, since Actions bills executed minutes and not files present.
 repository state, read with `gh workflow list --all`.
 
 **Why the file is still there.** Code review on this project is internal:
-`/code-review`, run by the human, before the PR exists. Its trigger fired on PR
-open, while local rounds could still be landing; rather than retrigger it, the
-project decided it wants no automated Claude reviewer on GitHub at all
+`/code-review`, launched by the agent on the human's yes (`review-round`), before
+the PR exists. Its trigger fired on PR open, while local rounds could still be
+landing; rather than retrigger it, the project decided it wants no automated
+Claude reviewer on GitHub at all
 (`DRIFT-LOG.md`, row 2026-08-24, "Installing the Claude GitHub App"). Deleting
 the file would lose the configuration; disabling it keeps the
 decision reversible. **This entry exists because a present-but-disabled workflow
 does not explain itself** — without it, the next reader cannot tell a deliberate
 choice from a bug.
+
+**When a reviewer on the PR fits better.** Local rounds suit one owner with an
+agent session: findings reach that session's chat, and the triage happens there.
+A reviewer on the PR posts inline comments and a check run that everyone with
+access reads, and it runs without anyone's session, so it fits several people
+reviewing, or contributors with no agent. Two forms, per Claude Code's Code Review
+and GitHub Actions documentation:
+- *Managed Code Review*: Team or Enterprise plans, billed to the organization
+  as usage credits outside the plan's usage; read-only, and its check never fails,
+  so it never blocks a merge.
+- *`claude-code-action`*: a workflow of the repository's own, on Actions minutes
+  plus API tokens or a subscription's OAuth token; failing the job can gate a merge.
+
+Either runs after the PR exists, so adopting one as the main reviewer means
+rewriting ADR 0014's rounds before the PR and `review-round`, not only a trigger.
 
 **Ruled out.** *Re-triggering it on a mention.* `claude.yml` already fires on any
 comment containing that substring, so both workflows would run on the same
@@ -575,6 +591,9 @@ the harness, not before. Order matters only where one piece depends on another:
    guess.
 6. **With more than one person or machine, give the cycle its shared home
    before the first cycle**: entry 14's known limit, and #159 for its shape.
+7. **Choose where reviews run before the first one**: local rounds for one person
+   with an agent session, a reviewer on the PR when several people or contributors
+   without one read the findings (entry 8).
 
 If this section ever grows past ordering into actual steps, it has become a
 procedure and belongs in a Skill, not here.

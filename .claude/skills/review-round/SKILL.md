@@ -1,17 +1,14 @@
 ---
 name: review-round
-description: Run a code review round — ask for /code-review, save its raw output, triage every finding in a table the human confirms, apply the stopping rule and the cap. Use when a branch is ready for review, when /code-review or the GitHub bot returns findings, or to decide whether another round is owed.
+description: Run a code review round — launch /code-review on the human's yes, save its raw output, triage every finding in a table, apply alone in round 1 what needs no decision, the rest once the human confirms, apply the stopping rule and the cap. Use when a branch is ready for review, when /code-review or the GitHub bot returns findings, or to decide whether another round is owed.
 ---
 
 # Run a review round
 
-Applies when a branch is clean and its gate green, when `/code-review` or the
-GitHub bot returns findings, and when deciding whether another round is owed.
-Every local round runs before the PR exists (ADR 0014): a PR opened early anchors
-threads to commits the fixes rewrite, and its body goes stale. The bot's findings
-take the same triage, and no local round reads their fixes: they follow § A fix
-no round will read. Next: `clean-branch` to fold the fixes, then another
-round or `open-pr`.
+Starts on a clean branch with a green gate. Every local round runs before the PR
+exists (ADR 0014): a PR opened early anchors threads to commits the fixes rewrite,
+and its body goes stale. The bot's findings take the same triage, and their fixes follow
+§ A fix no round will read. Next: another round or `open-pr`.
 
 ## Stopping rule
 Every `Fix (defect)` row names its origin, checked with git against the commits
@@ -33,9 +30,7 @@ in order:
 
 Before proposing a round past the cap, or a redesign, read
 `references/past-the-cap.md`. Stopping ends the rounds, not the triage, and a
-branch stopped back to the human goes no further until the human decides. The rule
-of three counts touches to the code across branches, not rounds, so the cap leaves
-its count alone; rule 3 applies it sooner.
+branch stopped back to the human goes no further until the human decides.
 
 ## Which branches get a round
 The criterion is what a change can break, not its file extension. Every branch
@@ -51,63 +46,72 @@ gets a round except:
 An exempt branch records `Review: not run — exempt: <which>` in the PR body.
 
 A branch that ADR 0041 says carries an OpenSpec change and has no folder
-`openspec/changes/<branch-kebab-name>/` stops here. One that has it runs `openspec-verify-change`
-before the first round and fixes every CRITICAL. Each test a scenario's
+`openspec/changes/<branch-kebab-name>/` stops here. One that has it runs
+`openspec-verify-change` before the first round and fixes every CRITICAL. Each test a scenario's
 `VERIFIED BY` names exists under that name, and each `device` one joins the device
 pass.
 
 ## Before each round, ask
-A round starts only on the human's explicit yes, whoever launches it. Send *ready
-for round k* with:
+A round starts only on the human's explicit yes. Send *ready for round k* with:
 - what the round reads: the commits, and whether the tree has uncommitted changes;
 - what is still open in the conversation: unanswered questions, requests not done,
   changes not confirmed, or "nothing";
+- the level, `low`, `medium` or `high`, with its reason in one line: `low` gives
+  fewer, surer findings; go higher as the diff grows or reasons across files;
 - the question: launch round k?
 
-An answer that carries a question or a request is not a yes: handle it and ask
-again. Note the commit the round reads, for the table. The GitHub bot is a
-different reviewer: its round says nothing about whether `/code-review` ran.
+On a yes, invoke `/code-review <level> --max-findings default` through the Skill
+tool, on the session's model (#187 holds cheaper ones). Always pass both: a level
+or a cap typed earlier is reused otherwise. An answer that carries a question or a request is not a yes:
+handle it and ask again. Note the commit the round reads, for the table. The
+GitHub bot is a different reviewer: its round says nothing about whether
+`/code-review` ran.
 
 ## The sequence
 1. Save the raw output verbatim, before any digest of it:
    `node .claude/skills/review-round/scripts/save-review.mjs <task-id> <raw file>`,
    the task id from the round's notification. It prints the table's `Reviewer:`
-   line. The subagent's output file is always empty and its notification escapes
-   `<` and `>`, so neither is the record. If the script fails, read
-   `references/extractor-failed.md`.
+   line. The notification escapes `<` and `>`, so it is not the record. If the
+   script fails, read `references/extractor-failed.md`.
 2. Verify every finding (§ Verifying) and check each `Fix (defect)`'s origin with git.
 3. Write the table to its file, marked proposed, with the verdict.
-4. Send the message (§ The message) and wait.
-5. Record the human's answer under `Owner decisions` with the date, and mark the
-   table confirmed.
-6. Apply, in order: the reverts the stopping rule asks for; `Fix (defect)`;
-   `Fix (cheap)`, only those that pass § A fix no round will read if this round
-   ends the rounds; then open or label each Defer's issue. On a branch with an
-   OpenSpec change, a fix that changes behaviour, the bot's included, also updates
-   the change's delta.
-7. Run the gate, and after the last round on a governance diff the detectors too
+4. In `/code-review`'s round 1 only, apply alone every `Fix` row that is not for
+   *To decide* (§ The message), a code defect only with its regression test seen
+   failing, and a cheap one only if it passes § A fix no round will read, unless
+   the verdict is another round however the *To decide* rows go. Hold the rest,
+   opening no issue. Run the gate and commit each row's fix as its own `fixup!`
+   commit, so the human can drop one.
+5. Send the message (§ The message) and wait.
+6. Record the human's answer under `Owner decisions` with the date, and mark the
+   table confirmed. Drop the commit of a row the human reopened, wherever it sits:
+   `git revert --no-commit <its sha>`, then `git commit --fixup=<the commit it
+   corrects>`, so the fold cancels it.
+7. Apply what is left, in order: the reverts the stopping rule asks for;
+   `Fix (defect)`; `Fix (cheap)`, only those that pass § A fix no round will read
+   if this round ends the rounds; then open or label each Defer's issue. On a
+   branch with an OpenSpec change, a fix that changes behaviour, the bot's
+   included, also updates the change's delta.
+8. Run the gate, and after the last round on a governance diff the detectors too
    (`open-pr` § 1).
-8. Fold the fixes into the commits that should have been right (`clean-branch`).
-9. Say the verdict first: another round, back to *ready for round k*; `open-pr`;
-   or wait for the human. A push or a PR is never mentioned before it.
+9. Fold the fixes into the commits that should have been right (`clean-branch`).
+10. Say the verdict first: another round, back to *ready for round k*, unless a
+    bare yes already answered it in round 1's message; `open-pr`; or wait for the
+    human. A push or a PR is never mentioned before it.
 
 No digest comes before the raw file, and no change before its row is confirmed
-(§ A partial answer). No commit, fold, round or PR comes before every row and the
-verdict are confirmed and every open question answered.
-
-A subagent reviewer's claims about the repository or the remote are findings to
-verify, not facts to relay: weigh its reasoning, check its assertions.
+(§ A partial answer), except step 4's. No other commit, and no fold, round or PR,
+comes before every row and the verdict are confirmed and every open question
+answered.
 
 ## Buckets
-Choosing a bucket is an ask-first decision: a finding moved out of the branch on
-the agent's word alone is silently dropped, and looks like coverage.
+Moving a finding out of the branch is the human's call: on the agent's word alone
+it is silently dropped, and looks like coverage.
 - **Fix (defect)**: fixed here unless the human defers it. In code, correctness,
-  data loss or something the user perceives, with a regression test seen to fail
-  (`.claude/rules/tests.md`). In a governing document, a scenario in which an agent
-  following the text acts wrongly: two rules prescribing different actions, a
-  broken reference, a missing step, a step that cannot be carried out. The row
-  quotes both clauses, the reference or the step; a row that cannot is not a
-  defect. Only this bucket can earn a round.
+  data loss or something the user perceives. In a governing document, a scenario
+  in which an agent following the text acts wrongly: two rules prescribing
+  different actions, a broken reference, a missing step, a step that cannot be
+  carried out; a row that cannot quote them is not a defect. Only this bucket can
+  earn a round. § Verifying says what proves each.
 - **Fix (cheap)**: anything else cheap enough to fix here, such as wording,
   duplication, wrap width, or friction with no failure scenario.
 - **Defer**: valid and not fixed here, on one ground: it is outside the branch's
@@ -122,13 +126,11 @@ the agent's word alone is silently dropped, and looks like coverage.
 - **Accept**: valid, not a defect, not worth fixing, and not followed up, so it
   opens no issue. Always the human's call. A row that can cite a failure scenario
   is a defect and is never accepted.
-- **Dismiss**: the finding is wrong. Check the claim against the repository or
-  `gh api`; the reason is what the check showed.
+- **Dismiss**: the finding is wrong; the reason is what the check showed.
 
 A valid finding that fits neither Defer nor Accept is fixed here. A finding that
 recurs, dismissed or accepted, is a gap in the text the reviewer reads, since it
-never reads earlier records: fix that text until it answers the question. Earlier
-PRs' records and threads hold the history.
+never reads earlier records: fix that text until it answers the question.
 
 ## Verifying
 | Bucket | Before the table | Recorded in Evidence |
@@ -164,8 +166,7 @@ Owner decisions (YYYY-MM-DD): <confirmed as proposed, or each change>
 - A row lets the human judge it without opening the raw file: what the reviewer
   claims, where, its bucket, and the check that decides it. Origin is filled for
   `Fix (defect)` only. Labels are written out in full.
-- `Reviewer:` is the line `save-review.mjs` printed: which model at which level
-  found what, readable when a round is weighed later.
+- `Reviewer:` is the line `save-review.mjs` printed.
 
 ## The message
 The chat never shows the table; it goes in the human's language. One form for
@@ -183,24 +184,31 @@ Table: <path>
 ```
 - **To decide:** a defect that would leave the branch; a `Dismiss` whose reason is
   not a quote or a command anyone can repeat; a row whose call between defect and
-  cheap decides whether a round is earned; a fix with more than one reasonable
-  solution, or one that writes or changes a rule.
-- **To know**, a closed list: a fix that changes what the user sees, or what a rule
-  means, beyond what the finding asks; one that undoes something the human asked
-  for or decided; one that touches a file outside the branch's unit of work. These
-  are applied unless the human reopens them.
+  cheap decides whether a round is earned; a fix that writes a rule, or changes
+  what one requires of an agent, that no document or code pattern settles; one
+  that changes what the user sees; one outside the branch's unit of work; after
+  round 1, a fix with more than one reasonable solution.
+- **To know**, a closed list, applied unless the human reopens it: in round 1, a
+  fix chosen among reasonable solutions, as `applied <X> · dropped <Y>`, a few
+  words each, the reason only when asked; one that changes what a rule means beyond what the
+  finding asks, naming the document that settles it; one that undoes something
+  the human asked for or decided.
 - **Leaves the branch:** every `Defer` and `Accept`, and a `Dismiss` only when its
   reason cannot be repeated. A checked `Dismiss` is counted, not listed. Each row
   here needs the human's explicit answer: a Defer opens or labels an issue, and
   only the human accepts.
 - Leave out an empty section. Every other row stands as proposed unless the human
   reopens it, and the human can always ask for the whole table.
+- In round 1 the counts read `<a> applied (<b> Fix (defect), <c> Fix (cheap)),
+  <d> held`. With *To decide* and *Leaves the branch* empty and another round
+  earned, the message ends with *ready for round 2*, reading the branch once these
+  fixups fold; otherwise that follows once the decisions are folded.
 
 ## A partial answer
 Rows the human confirmed may be applied, uncommitted, while another row is still
 open, unless they touch the same file and section as the open row. The verdict
 waits for every row, since the open one may be the defect that earns a round, and
-so do commits, folds, rounds and the PR.
+so do commits, except § The sequence step 4's, folds, rounds and the PR.
 
 ## A fix no round will read
 Any fix of the round that ends the rounds, and any fix after it.
@@ -209,7 +217,8 @@ Any fix of the round that ends the rounds, and any fix after it.
   to the human: defer it, cut that part from the branch, or authorize another round.
 - A `Fix (cheap)` is applied only if its row names one of two tests; otherwise it
   goes to Defer, all such rows into one `review-debt` issue, except on a branch
-  working `review-debt`, which opens no new debt (`references/review-debt-branch.md`). **Proven by a
+  working `review-debt`, which opens no new debt
+  (`references/review-debt-branch.md`). **Proven by a
   mechanism:** a test seen failing on a mutation of what it guards, then passing; it
   changes no governing text, since a reader is that text's only proof, and settles
   no question a deferral left open. **Writes no new rule:** a spelling or wrap fix,
