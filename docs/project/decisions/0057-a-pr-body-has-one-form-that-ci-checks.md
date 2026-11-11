@@ -1,11 +1,12 @@
 # ADR 0057 — A PR body has one form that CI checks
 
 Status: Accepted
+Status: Superseded by ADR-0063 — "then one review record collapsed under a summary of its counts. A branch exempt from review writes its exemption in one line instead. A `TODO` left there fails the check." (Decision)
 Date: 2026-11-07
 Backfilled: no
 Supersedes: ADR-0026 — "said which conditional items it skipped" (Consequences)
-Enforced by: commits.yml — the headings and their order with nothing before them, the bound on each section, `Evidence:`, one review record after it with no `TODO`, no template line or sample left, no `#n` left in *Issues*
-Enforced by: none (prose only — .claude/skills/open-pr/SKILL.md § 2. The body) — that what the body says is true, the shape of each record line
+Enforced by: commits.yml — the headings and their order with nothing before them, the bound on *What changed*, *Why* and *Verification*, one `Evidence:` line, no template line or sample left, no `#n` left in *Issues*
+Enforced by: none (prose only — .claude/skills/open-pr/SKILL.md § 2. The body) — that what the body says is true
 Enforced by: none (prose only — decisions/0057-a-pr-body-has-one-form-that-ci-checks.md § Decision) — a keyword per closed number in *Issues*, none before a number elsewhere (#185)
 
 ## Context
