@@ -2,6 +2,7 @@
 
 Status: Accepted
 Status: Superseded by ADR-0048 — "A harness issue, an app defect among them, opens with one bucket" (Decision)
+Status: Superseded by ADR-0065 — "first after any bound warning" (Decision)
 Date: 2026-11-01
 Backfilled: no
 Supersedes: ADR-0038 — "once a merge changes `app/src/main`, or three merges have landed since the last triage" (Decision)
