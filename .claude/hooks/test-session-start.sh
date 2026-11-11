@@ -22,6 +22,7 @@ cat >"$tmp/bin/gh" <<'EOF'
 #!/bin/sh
 [ -n "$FAKE_GH_FAIL" ] && exit 1
 printf '%s\n' '1|,defect,|fix(search): A defect' '2|,improvement,p2,|docs(x): Prioritised' \
+    '8|,blocks-product,p1,|docs(x): A blocker' \
     '3|,idea,gated,|docs(x): Gated' '4|,product,|feat(detail): A product item' \
     '7|,product,bug,|fix(search): An app defect' \
     '5|,review-debt,|docs(x): Waiting for its bucket' '6|,improvement,|docs(x): Rename p1,p2,p3, a title only'
@@ -81,13 +82,80 @@ lacks 'fork' '# Handoff v2'
 run resume f1
 has 'resume of a fork' '# Handoff v2'
 
-seq 81 >"$dir/HANDOFF.md"
+printf '## Now\n## In flight\n## Owed by the owner\n' >"$dir/HANDOFF.md"
+run startup s4
+lacks 'the allowed sections' 'a section the checkpoint Skill does not allow'
+printf '## Now\r\n## In flight \r\n## Owed by the owner\r\n' >"$dir/HANDOFF.md"
+run startup s4
+lacks 'the allowed sections with CRLF or a trailing space' 'a section the checkpoint Skill does not allow'
+printf '## Now\n## Constraints not written anywhere else\n' >"$dir/HANDOFF.md"
+run startup s4
+has 'a section outside the allowed ones' 'a section the checkpoint Skill does not allow: ## Constraints not written anywhere else. It holds'
+
+lacks 'no plans folder' 'neither CYCLE.md nor HANDOFF.md cites'
+mkdir -p "$dir/plans/probe"
+: >"$dir/plans/cited.md"; : >"$dir/plans/cited"; : >"$dir/plans/stale.md"
+printf 'Points at `plans/cited.md` and plans/probe/run.js.\n' >"$dir/HANDOFF.md"
+run startup s4
+has 'a plan nothing cites' 'WARNING: neither CYCLE.md nor HANDOFF.md cites plans/cited plans/stale.md. Delete'
+cycle 0 0
+echo 'plans/stale.md' >>"$dir/CYCLE.md"
+run startup s4
+has 'a plan the cycle cites' 'cites plans/cited. Delete'
+cycle 0 0
+echo 'Not a plans folder: oldplans/stale.md' >>"$dir/CYCLE.md"
+run startup s4
+has 'a longer folder name is not a citation' 'cites plans/cited plans/stale.md. Delete'
+cycle 0 0
+echo 'A full path: ~/Documents/GameStack/plans/stale.md' >>"$dir/CYCLE.md"
+run startup s4
+has 'a plan cited by a fuller path' 'cites plans/cited. Delete'
+printf '%s\n' 'Its plan is plans/stale.md.' 'Another is plans/cited.' 'And plans/cited.md, plans/probe/run.js' >"$dir/HANDOFF.md"
+run startup s4
+lacks 'a plan cited at the end of a sentence' 'neither CYCLE.md nor HANDOFF.md cites'
+: >"$dir/plans/a"
+printf 'Its plan is plans/stale.md, plans/cited. and plans/cited.md, plans/probe/x and plans/a' >"$dir/HANDOFF.md"
+printf 'bc\n## Insertions\n' >"$dir/CYCLE.md"
+run startup s4
+lacks 'a handoff with no final newline' 'neither CYCLE.md nor HANDOFF.md cites'
+rm "$dir/plans/a"
+printf '%s\n' 'Its plan is plans/stale.md.' 'Another is plans/cited.' 'And plans/cited.md, plans/probe/run.js' >"$dir/HANDOFF.md"
+# Only where the file system takes a backslash in a name, which Windows does not.
+if (: >"$dir/plans/a\\tb.md") 2>/dev/null && [ -f "$dir/plans/a\\tb.md" ]; then
+    printf '%s\n' 'Its plan is plans/a\tb.md' >>"$dir/HANDOFF.md"
+    run startup s4
+    lacks 'a backslash in a plan name' 'neither CYCLE.md nor HANDOFF.md cites'
+fi
+rm -r "$dir/plans" "$dir/CYCLE.md"
+# The cap counts the whole output: a body under it, with the warnings over it.
+awk 'BEGIN { while (n++ < 8050) printf "x"; print "" }' >"$dir/HANDOFF.md"
+mkdir -p "$dir/plans"
+i=0; while [ $i -lt 25 ]; do i=$((i + 1)); : >"$dir/plans/a-plan-with-a-long-name-$i.md"; done
+run startup s4
+has 'warnings counted against the cap' 'WARNING: this hook output is'
+has 'the plan list capped' 'a-plan-with-a-long-name-18.md … and 15 more. Delete'
+[ "$(grep -v '^WARNING:' "$tmp/out" | wc -c)" -lt 9000 ] \
+    || { printf 'FAIL warnings counted against the cap: the body alone is over 9,000 chars\n'; failures=$((failures + 1)); }
+head -1 "$tmp/out" | grep -q '^No cycle is kept' \
+    || { printf 'FAIL the triage line before the warnings: line 1 is "%s"\n' "$(head -1 "$tmp/out")"; failures=$((failures + 1)); }
+rm "$dir/HANDOFF.md"
+run startup s4
+lacks 'plans with neither file to cite them' 'neither CYCLE.md nor HANDOFF.md cites'
+rm -r "$dir/plans"
+
+seq 41 >"$dir/HANDOFF.md"
 run startup s2
-has 'over the line bound' 'WARNING: HANDOFF.md is 81 lines'
+has 'over the line bound' 'WARNING: HANDOFF.md is 41 lines'
+awk 'BEGIN { for (l = 0; l < 39; l++) { s = ""; while (length(s) < 130) s = s "x"; print s } }' >"$dir/HANDOFF.md"
+run startup s2
+has 'over the byte bound' 'WARNING: HANDOFF.md is 39 lines / 5109 bytes'
 
 has 'the product backlog counted apart' 'Product backlog (ADR 0043): 2 open'
 has 'bugs counted in the product backlog' '2 open, 1 of them bugs (ADR 0048)'
-has 'product issues kept out of the harness pool' 'Issue pool: 5 open'
+has 'product issues kept out of the harness pool' 'Issue pool: 6 open'
+has 'what blocks the product listed' '  blocks the product: #8 docs(x): A blocker'
+lacks 'a defect left to the triage' 'A defect'
+lacks 'the status left to gitStatus' 'git status'
 has 'an ungated issue with no priority' 'A bucket and no priority, ungated (ADR 0047): #1 #6.'
 has 'no cycle kept on this machine' 'No cycle is kept on this machine'
 lacks 'no cycle kept on this machine' 'TRIAGE OWED'
@@ -136,6 +204,10 @@ for phrase in "Bound: $(bound max_lines) lines and $(thousands "$(bound max_byte
     printf 'FAIL bounds match the checkpoint Skill: "%s" not in %s\n' "$phrase" "$skill"
     failures=$((failures + 1))
 done
+# The Skill's list of sections is the hook's, in its order and with nothing else.
+phrase="then *$(bound sections | tr -d "'" | sed 's/|/*, */g')*, and no other"
+grep -qF "$phrase" "$skill" \
+    || { printf 'FAIL sections match the checkpoint Skill: "%s" not in %s\n' "$phrase" "$skill"; failures=$((failures + 1)); }
 
 # No CLAUDE_HANDOFF_DIR: a worktree reads ~/Documents/<main checkout's name>.
 mkdir -p "$tmp/home/Documents/repo"

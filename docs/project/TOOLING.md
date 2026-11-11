@@ -303,8 +303,11 @@ comment. A trigger phrase that is not a substring of it avoids the collision.
 pull requests. A round starts when a PR is opened for review, when a draft is
 marked ready, or on a comment `@codex review` or `@codex security review`. While
 a round runs it reacts 👀; it then posts findings, or reacts 👍 when it has none.
-Its summary comment on each PR names the trigger, the commit and the status. When
-its quota is spent it posts a usage-limit comment instead. Automatic review sits
+Its summary comment on each PR names the trigger, the commit and the status, and
+it is posted when the PR opens, with the status "running": a script that waits
+for the round reads `codex-review-state` in that comment, a review or the 👍,
+never a count of comments. When its quota is spent it posts a usage-limit
+comment instead. Automatic review sits
 behind two switches, the repository's and each user's personal preference, so a
 round can fail to start for a reason nobody in the repository can see.
 
@@ -390,7 +393,12 @@ scope is at fault, so the error is the template.
 
 **Testing the hooks.** `test-rules.sh` covers `rules.sh`. A commit made to see
 the hook pass is a real commit, so make it in a scratch clone, never with
-`--no-verify`.
+`--no-verify`; in that clone, point `core.hooksPath` at a copy of the changed
+hooks outside the work tree, since `git reset --hard` restores the tracked
+`rules.sh`. A run of `test-rules.sh` against a planted defect takes about two
+minutes: run it in the background, on a copy of `.githooks` and `.github`. A
+node script that plants one passes the replacement as a function, since in a
+replacement string `$'` inserts the rest of the file.
 
 **Where.** `.githooks/rules.sh` holds every check and both lists, and
 `.githooks/test-rules.sh` its cases. `.githooks/commit-msg` and
@@ -547,9 +555,14 @@ only if `validate` or the archive merge caught something a hand edit would not.
 ## 14. Session handoff
 **What.** A SessionStart hook that injects two small files kept outside the
 repository — `HANDOFF.md` (the session's state) and `CYCLE.md` (the open
-cycle) — and facts it derives live: git state, the next ADR number, the issue
-pool and whether a triage is owed. The `checkpoint` Skill holds the rules both
-files follow and the steps to rewrite them (ADR 0045).
+cycle) — and facts it derives live: the local branches, the next ADR number,
+the issue pool and whether a triage is owed. It warns when the handoff is over
+its bound or holds a section the Skill does not allow, and names the plans
+beside it that neither file cites, ten at most. The `checkpoint` Skill holds the rules both
+files follow, what else is kept beside them, and the steps to rewrite them
+(ADRs 0045 and 0065). A line of its output is paid by every session, so it
+prints only what a session acts on at its start and Claude Code does not
+inject already.
 
 **Replaces.** A 64 KB append-only handoff that every session re-read, mixing
 state with rules, design and history, reached through an agent-memory pointer
@@ -569,6 +582,13 @@ by `commits.yml`; `.claude/skills/checkpoint/`. The files are read from
   issue (ADR 0038).
 - *Stored derived facts.* Branches, hashes and counts went stale between
   sessions; the hook computes them instead.
+- *A handoff section for constraints written nowhere else.* It filled with
+  rules, lessons and decisions that no clone read, around the step that routes
+  each to its home (ADR 0065).
+- *`git status` and `git log` in the hook.* Claude Code's own `gitStatus`
+  already holds both at a session's start.
+- *Listing every open defect at the start.* No session acted on the list; a
+  defect enters the work through the triage, which reads the pool itself.
 - *A triage owed by counting merges* (ADR 0038, until ADR 0047). A one-line
   `.gitignore` merge made it fire mid-cycle, and a product cycle would owe one
   per pull request; skipping merges by path needed a hand-kept list.
@@ -602,6 +622,18 @@ reader outside the session could open.
   made the commit.
 
 ---
+
+## Running on Windows
+Not an entry: nothing in the repository configures it. What a session on
+Windows with Git Bash runs into:
+- A script passed inline through the agent's shell tool can lose its
+  backslashes, a `\n` arriving as a newline: write it with the Write tool and
+  run the file.
+- Git Bash has no `jq`: use `gh --jq`, node, or sed and awk.
+- `python` is the Microsoft Store stub; `py` is the real interpreter.
+- A worktree under a long path fails `git worktree remove` with a filename too
+  long in `build/`: stop its Gradle daemon, `rm -rf` the folder, then
+  `git worktree prune`.
 
 ## Rebuilding this elsewhere
 The copy generalised for export (issue #68) is made when a second project takes

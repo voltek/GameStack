@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # SessionStart hook: prints the hot handoff, the open cycle, and repo facts derived live (checkpoint Skill).
+# A line printed here is paid by every session: it acts on it at its start, and Claude Code does not inject it (ADR 0065).
 # Stdout becomes session context. Claude Code cuts hook output over 10,000 chars to a 2,000-char preview.
 # On resume the transcript already holds the earlier injection, so both files are re-sent only if either changed.
 
@@ -10,8 +11,11 @@ dir="${CLAUDE_HANDOFF_DIR:-$HOME/Documents/$(basename "$(dirname "${common:-$rep
 handoff="$dir/HANDOFF.md"
 cycle="$dir/CYCLE.md"
 state_dir="$dir/.hook-state"
-max_lines=80
-max_bytes=6000
+plans="$dir/plans"
+sections='Now|In flight|Owed by the owner'
+max_plans=10
+max_lines=40
+max_bytes=3000
 max_cycle_lines=30
 max_insertions=3
 max_issues=300
@@ -24,9 +28,9 @@ session=$(field session_id)
 
 facts() {
   echo "== Live repo facts (derived now; never copy them into HANDOFF.md) =="
-  echo "\$ git status -sb";  git -C "$repo" status -sb | head -15
+  # Claude Code's own gitStatus already holds the status and the last commits; it lacks the other branches.
+  # A snapshot from the start is enough: a session about to act on the tree reads git itself (ADR 0065).
   echo "\$ git branch -vv";  git -C "$repo" branch -vv
-  echo "\$ git log --oneline -8"; git -C "$repo" log --oneline -8
   local top
   top=$(for ref in $(git -C "$repo" for-each-ref --format='%(refname:short)' refs/heads refs/remotes); do
           git -C "$repo" ls-tree --name-only "$ref" docs/project/decisions/ 2>/dev/null
@@ -35,7 +39,7 @@ facts() {
   pool
 }
 
-# The issue queue as of the last fetch: counts, defects, and ADR 0047's issues awaiting a priority.
+# The issue queue as of the last fetch: counts, what blocks the product, and ADR 0047's issues awaiting a priority.
 pool() {
   local rows product b n missing buckets='blocks-product defect improvement idea'
   # A label is matched in a row's label field only (num|,labels,|title), never in its title.
@@ -57,8 +61,9 @@ pool() {
   done
   n=$(printf '%s\n' "$rows" | grep . | grep -vcE "$any")
   printf ' no bucket %s; gated %s.\n' "$n" "$(printf '%s\n' "$rows" | grep -cE "${f}gated,")"
-  printf '%s\n' "$rows" | grep -E "$f(blocks-product|defect)," | grep -vE "${f}gated," \
-    | sed 's/^\([0-9]*\)|[^|]*|/  needs attention: #\1 /'
+  # Only what blocks the product changes a session's task; a defect waits for the triage, which lists it.
+  printf '%s\n' "$rows" | grep -E "${f}blocks-product," | grep -vE "${f}gated," \
+    | sed 's/^\([0-9]*\)|[^|]*|/  blocks the product: #\1 /'
   # An issue with no bucket waits for the triage, and is counted above as "no bucket".
   missing=$(printf '%s\n' "$rows" | grep -E "$any" | grep -vE "$f(gated|p[123])," \
             | sed 's/^\([0-9]*\)|.*/#\1/' | tr '\n' ' ')
@@ -121,8 +126,33 @@ if [ -f "$handoff" ]; then
   if [ "$lines" -gt $max_lines ] || [ "$bytes" -gt $max_bytes ]; then
     warn="WARNING: HANDOFF.md is $lines lines / $bytes bytes, over its $max_lines / $max_bytes bound. Trim it at the next checkpoint."$'\n'
   fi
+  extra=$(grep '^## ' "$handoff" | sed 's/[[:space:]]*$//' | grep -vxE "## ($sections)" | tr '\n' ' ')
+  [ -n "$extra" ] && warn+="WARNING: HANDOFF.md has a section the checkpoint Skill does not allow: ${extra% }. It holds only ${sections//|/, }."$'\n'
 fi
-[ ${#body} -gt $((cap - 1000)) ] && warn+="WARNING: this hook output is ${#body} chars; above $cap Claude Code shows only a 2,000-char preview."$'\n'
+# A plan outlives its item when nothing cites it; the deletion stays a checkpoint step, after its decisions are checked.
+# A citation is the path segment plans/<name>, whole: plans/a.md and oldplans/a do not cite plans/a, while
+# ~/x/plans/a, plans/a/b and a sentence's "plans/a." do. Names go through ENVIRON, since -v reads backslash escapes.
+uncited() {
+  PLAN_NAMES="$1" awk -v max=$max_plans 'BEGIN { n = split(ENVIRON["PLAN_NAMES"], name, "\n") }
+    { for (k = 1; k <= n; k++) if (!(k in hit) && cites($0, "plans/" name[k])) hit[k] = 1 }
+    END { for (k = 1; k <= n; k++) if (!(k in hit) && ++m <= max) printf "plans/%s ", name[k]
+          if (m > max) printf "… and %d more ", m - max }
+    function cites(s, t,   at, i, b, c) {
+      while ((i = index(substr(s, at + 1), t)) > 0) {
+        at += i; b = at > 1 ? substr(s, at - 1, 1) : ""; c = substr(s, at + length(t), 2)
+        if (b !~ /[[:alnum:]_.-]/ && c !~ /^([[:alnum:]_-]|\.[[:alnum:]_.-])/) return 1
+      }
+      return 0
+    }'
+}
+if [ -d "$plans" ] && { [ -f "$handoff" ] || [ -f "$cycle" ]; }; then
+  stale=$({ cat "$handoff"; echo; cat "$cycle"; } 2>/dev/null \
+          | uncited "$(for p in "$plans"/*; do [ -e "$p" ] && printf '%s\n' "${p##*/}"; done)")
+  [ -n "$stale" ] && warn+="WARNING: neither CYCLE.md nor HANDOFF.md cites ${stale% }. Delete each once its decisions are in an ADR, an issue or TOOLING.md (checkpoint Skill)."$'\n'
+fi
+owed=$(triage)
+size=$((${#warn} + ${#owed} + ${#body} + 2))
+[ $size -gt $((cap - 1000)) ] && warn+="WARNING: this hook output is $size chars; above $cap Claude Code shows only a 2,000-char preview."$'\n'
 
-# The triage line goes first, beside the warnings: a preview cut at 2,000 chars still shows it.
-printf '%s%s\n%s\n' "$warn" "$(triage)" "$body"
+# The triage line goes first, before the warnings, whose length grows with the plans: a 2,000-char preview still shows it.
+printf '%s\n%s%s\n' "$owed" "$warn" "$body"

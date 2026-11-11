@@ -18,18 +18,22 @@ prints the path it read. They are one person's live state: inside the
 repository every pull request diff would carry it. A clone with neither file
 still gets the derived facts, and a line saying no handoff exists. The cycles
 are kept on one machine, the one with a `CYCLE.md` or an `archive/cycles/`
-beside the handoff; a shared home for a team's cycle is #134's question.
+beside the handoff; a shared home for a team's cycle is #159's question.
 
 ## HANDOFF.md — session state only
 - **Sections:** an `Updated:` line (the date and the event that triggered the
-  checkpoint), then *Now*, *In flight*, *Owed by the owner*, *Constraints not
-  written anywhere else*. *Now* ends with one `**Next action:**` line naming
-  exactly one task, never a "then".
+  checkpoint), then *Now*, *In flight*, *Owed by the owner*, and no other; the
+  hook warns about any other `##` heading. *Now* ends with one
+  `**Next action:**` line naming exactly one task, never a "then".
+- ***In flight* holds only the state of open work:** each line a pointer, an
+  issue or a plan, and where it stands. Never a rule, a lesson, a method or a
+  decision: no clone reads the handoff, so § Steps 5 routes them, and a section
+  for what has no other home was how they got around it (ADR 0065).
 - **Never a *Next* list.** What comes next is `CYCLE.md`; anything not chosen is
   a GitHub issue (ADR 0038).
 - **Rewritten whole at each checkpoint, never appended.** A done item leaves:
   its record is the commit, the ADR or the issue.
-- **Bound: 80 lines and 6,000 bytes.** The hook warns when it is over, and its
+- **Bound: 40 lines and 3,000 bytes.** The hook warns when it is over, and its
   whole output is cut to a 2,000-character preview past 10,000 characters.
 - **Nothing derivable:** branches, hashes, the next ADR number, counts. The hook
   prints those live, and a stored copy goes stale.
@@ -42,6 +46,10 @@ beside the handoff; a shared home for a team's cycle is #134's question.
   then an `## Insertions` heading over an empty table of the same columns.
   Items point at an issue or a plan; they never copy its tasks. A triage writes
   it within the line bound below, or the breaker fires on a new cycle.
+- **A status is a state, not a history:** `todo`, `in progress`, `done
+  <date>, PR #n` (the PRs, if several), `back to the pool`. Where open work
+  stands is the handoff's *In flight*; what was decided is in the issue or the
+  ADR. Every session pays for the file.
 - **Only statuses change.** An insertion is appended to the table under
   `## Insertions` as a row with its number and its clause: the hook counts every
   row of that table, and owes a triage when the heading is missing.
@@ -54,15 +62,16 @@ beside the handoff; a shared home for a team's cycle is #134's question.
   growing past 30 lines. An item that overruns — a third review round, the rule
   of three — goes back to the pool at the next triage.
 - **Closed whole** when the exit condition holds, or **stopped** when a breaker
-  fires: either way, move the file to `archive/cycles/`, and a triage chooses
-  the next cycle from the issue pool. Nothing unchosen carries over. Closing is
-  that move: the hook reads a `CYCLE.md` that is present as an open cycle.
+  fires: either way, move the file to `archive/cycles/YYYY-MM-cycle-N.md`, the
+  month it closed and its number, and a triage chooses the next cycle from the
+  issue pool. Nothing unchosen carries over. Closing is that move: the hook
+  reads a `CYCLE.md` that is present as an open cycle.
 
 ## Triage
 - **Owed** when no cycle is open and when a breaker fires (ADR 0047), never by a
   merge alone, and only where the cycles are kept: elsewhere the hook says no
   cycle is kept there, and nothing blocks a branch. The hook prints `TRIAGE
-  OWED` with its reason, first after any bound warning, and lists the open
+  OWED` with its reason, first, before any warning, and lists the open
   issues that carry a bucket but no priority, neither `gated` nor `product`. An
   owed triage runs before the next branch starts.
 - **What it proposes** to the owner, who decides: what ADR 0038 § Decision lists
@@ -112,11 +121,14 @@ already show those.
 1. Run the hook by hand from the repository root, for the live facts and the
    bound warnings: `bash .claude/hooks/session-start.sh </dev/null`.
 2. Update `CYCLE.md`'s statuses; close the cycle if its exit holds, or stop it
-   if a breaker fired. Either way a triage is now owed (§ Triage).
+   if a breaker fired. Either way a triage is now owed (§ Triage). For an item
+   marked done, and for each plan the hook says nothing cites, check that every
+   decision the plan holds is in an ADR, an issue or TOOLING.md, then delete
+   the plan, never the item's row (§ What is kept).
 3. Read `HANDOFF.md` with the Read tool, then rewrite it whole with Write.
 4. Check the bounds on the handoff at the path the hook's
-   `== HANDOFF.md (<path>) ==` header prints: `wc -l` and `wc -c` within 80
-   and 6,000, and no hash or next ADR number anywhere:
+   `== HANDOFF.md (<path>) ==` header prints: `wc -l` and `wc -c` within 40
+   and 3,000, and no hash or next ADR number anywhere:
    `grep -E '\b[0-9a-f]{7,40}\b|next (free )?ADR' "<path>"`.
 5. Route what the session learned, never into the handoff: a preference to
    agent memory, a rule change proposed to the owner, a decision to an ADR, an
@@ -124,5 +136,17 @@ already show those.
 6. At session end, stop. Report in three lines or fewer: what changed, the next
    action, anything owed by the owner.
 
-Archive conventions (review records, done plans) and a handoff template:
-(PENDING — not yet defined; #87 part B).
+## What is kept
+Beside the two files, in the same folder, only what a later session reads
+(ADR 0065):
+- **Plans** in `plans/`, cited from the cycle or the handoff by their `plans/`
+  path while their item is open. A plan is deleted once every decision it holds
+  is in an ADR, an issue or TOOLING.md (§ Steps 2); there is no plan archive.
+  The hook warns about the plans neither file cites: the first ten by name,
+  and a count of the rest.
+- **Review records** in `reviews/`, while their branch is open; deleted at its
+  merge. `reviews-tally.csv` is frozen: no row is added.
+- **Closed cycles** in `archive/cycles/`, the only record of what each cycle
+  chose and why it ended, and the marker the hook reads for the machine that
+  keeps the cycles. Kept until the cycle has a shared home, #159.
+- **Former handoffs:** none; the handoff is rewritten whole.
