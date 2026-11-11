@@ -51,9 +51,9 @@ of the system, or of your understanding? Only the first earns a commit.
 `git commit --amend` reaches only the tip, and auto mode denies it at times, so
 fold with marker commits, at the tip or below it:
 - A fix: `git commit --fixup=<the commit it corrects>`.
-- A new message: write `amend! <its current subject>`, a blank line and the whole
-  new message to a file, then
-  `GIT_EDITOR="cp <file>" git commit --allow-empty --fixup=reword:<commit>`.
+- A new message: write the whole new message, and nothing else, to a file, then
+  `sh .claude/skills/clean-branch/scripts/reword.sh <commit> <file>`. It makes the
+  `amend!` commit and fails if what it made is not one.
 
 Then `git rebase --autosquash --rebase-merges $(git merge-base origin/main HEAD)`
 (git 2.44 or later). This folds and is not the update step 1 forbids (ADR 0059).

@@ -185,6 +185,11 @@ from the subagent's transcript, the only literal copy: the subagent's output fil
 is empty, and its notification escapes `<` and `>`. The transcript format is not
 documented, so every unexpected shape exits non-zero with a repair notice, and the
 Skill falls back to the notification, saying so on the record's first line.
+`clean-branch/scripts/reword.sh` makes the `amend!` commit that rewords an earlier
+one. git refuses `-F` and `-m` with `--fixup=reword`, so the message has to pass
+through an editor, and an editor that overwrites the file drops git's marker line:
+the result is an ordinary commit that `--autosquash` leaves alone, with no error.
+The script keeps the marker and fails when the commit it made is not an `amend!`.
 
 **Replaces.** Improvising the same task a slightly different way each time.
 
