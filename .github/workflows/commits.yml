@@ -40,6 +40,11 @@ jobs:
         if: ${{ !cancelled() }}
         run: node .claude/skills/review-round/scripts/test-save-review.mjs
 
+      # The cases fold with --autosquash, which needs git 2.44 or later (clean-branch § Folding).
+      - name: Test the reword script
+        if: ${{ !cancelled() }}
+        run: sh .claude/skills/clean-branch/scripts/test-reword.sh
+
       # The list is captured first: a failing substitution inside `for` does not
       # stop bash -e, and the loop would check nothing and pass.
       - name: Check every commit on the branch
@@ -57,6 +62,7 @@ jobs:
             git rev-parse -q --verify "$sha^2" > /dev/null && merge=merge
             sh .githooks/rules.sh message "$RUNNER_TEMP/message" $merge || status=1
           done
+          sh .githooks/rules.sh repeats "$BASE" "$HEAD_SHA" || status=1
           exit $status
 
       # The title arrives through env, never interpolated into the script: a

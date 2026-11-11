@@ -185,6 +185,11 @@ from the subagent's transcript, the only literal copy: the subagent's output fil
 is empty, and its notification escapes `<` and `>`. The transcript format is not
 documented, so every unexpected shape exits non-zero with a repair notice, and the
 Skill falls back to the notification, saying so on the record's first line.
+`clean-branch/scripts/reword.sh` makes the `amend!` commit that rewords an earlier
+one. git refuses `-F` and `-m` with `--fixup=reword`, so the message has to pass
+through an editor, and an editor that overwrites the file drops git's marker line:
+the result is an ordinary commit that `--autosquash` leaves alone, with no error.
+The script keeps the marker and fails when the commit it made is not an `amend!`.
 
 **Replaces.** Improvising the same task a slightly different way each time.
 
@@ -331,8 +336,9 @@ history is built without that push.
 Auto mode's classifier is a separate gate: `permissions.allow` does not stop it,
 and its own `autoMode` rules are read only from user or managed settings or
 `--settings`, never from a project's files (`claude auto-mode config` shows what
-it reads). It denies `git commit --amend`, so `clean-branch` § Folding uses marker commits
-(ADR 0059).
+it reads). It judges each call rather than applying a list: it has denied some
+`git commit --amend` calls as destructive and passed most, so `clean-branch`
+§ Folding does not depend on it and uses marker commits (ADR 0059).
 
 **Replaces.** A prompt before every `git push`, and the same rules kept only in a
 local file that one machine's global ignore kept out of git.
@@ -365,7 +371,8 @@ letter, no trailing period, 72 code points, a blank second line, a body of 12
 non-blank lines with known trailers excluded, `Drift:` and `Bypassed:`
 values, the closed list of exempt subjects with the fold markers `fixup!`,
 `squash!` and `amend!` accepted by the local hook alone (ADR 0059), the
-branch name's shape, and, on a PR, the title's form, its type against
+branch name's shape, a typed subject that two commits on the branch share,
+checked at the push and on a PR (ADR 0062), and, on a PR, the title's form, its type against
 the branch prefix, and the form of its body (ADR 0057). Every failure names the
 rule, the value seen and the fix, and prints the scope list when the scope is
 at fault, so the error is the template.
@@ -403,6 +410,10 @@ build.
   `cherry-pick -n` went with it: it broke on a merge of `main`, which
   `git rebase --autosquash --rebase-merges` rebuilds.
 - *Counting the subject in bytes.* An em dash is three bytes.
+- *The repeated subject in `commit-msg`.* git gives that hook no sign of an
+  `--amend`, not even to `prepare-commit-msg` under `--amend -m`, so an amend
+  that keeps its subject would match the commit it replaces. At the push the
+  amended commit is already gone.
 - *Stripping `#` lines in CI.* Under `-F` git stores them, so CI reads the
   stored message as it is; only the local hook strips the editor's comments.
 - *Guessing from the message's shape which lines git will strip.* Three review

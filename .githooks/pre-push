@@ -1,6 +1,9 @@
 #!/bin/sh
 # Checked before the push, while a rename is free: renaming an open PR's head
-# branch closes the PR.
+# branch closes the PR. Subjects are checked here, not in commit-msg, which cannot
+# tell an --amend from a new commit, against main as last fetched (ADR 0062).
+base=$(git rev-parse -q --verify "refs/remotes/$1/main" || git rev-parse -q --verify refs/heads/main) ||
+    printf 'pre-push: neither %s/main nor main exists, so repeated subjects go unchecked until CI (ADR 0062).\n' "$1" >&2
 status=0
 while read -r local_ref local_sha remote_ref remote_sha; do
     case $local_sha in *[!0]*) ;; *) continue ;; esac
@@ -8,5 +11,6 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     name=${remote_ref#refs/heads/}
     [ "$name" = main ] && continue
     sh "$(dirname "$0")/rules.sh" branch "$name" || status=1
+    [ -n "$base" ] && { sh "$(dirname "$0")/rules.sh" repeats "$base" "$local_sha" || status=1; }
 done
 exit $status

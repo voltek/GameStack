@@ -122,6 +122,57 @@ git -C "$repo" config --unset core.commentChar
 git -C "$repo" config core.commentString ';;'
 hook 0 'core.commentString honoured' "docs(ship): Fix\n\n$(body 13 | sed 's/line/;;/g')"
 
+# A branch off main in its own repository; each case adds commits, then checks
+# main..HEAD in rules.sh and through pre-push against a remote-tracking main.
+push=$tmp/push
+git init -q "$push"
+on_branch() {
+    git -C "$push" -c user.name=t -c user.email=t@t commit -q --allow-empty -m "$1"
+}
+reset_branch() {
+    git -C "$push" switch -q -C x main
+}
+on_branch 'docs(ship): Base' && git -C "$push" branch -M main && git -C "$push" update-ref refs/remotes/origin/main main
+pre_push() {
+    printf 'refs/heads/x %s refs/heads/docs/x 0000000000000000000000000000000000000000\n' "$(git -C "$push" rev-parse x)" >"$tmp/push-input"
+    expect "$1" "pre-push: $2" sh -c 'cd "$1" && sh "$2" origin url <"$3"' \
+        sh "$push" "$(dirname "$rules")/pre-push" "$tmp/push-input"
+}
+repeats() {
+    expect "$1" "repeats: $2" sh -c 'cd "$1" && sh "$2" repeats main x' sh "$push" "$rules"
+    pre_push "$@"
+}
+reset_branch
+repeats 0 'an empty branch'
+on_branch 'docs(ship): One' && on_branch 'docs(ship): Two'
+repeats 0 'every subject its own'
+on_branch 'docs(ship): One'
+repeats 1 'a subject twice'
+reset_branch && on_branch 'docs(ship): Base'
+repeats 0 'a subject only main already holds'
+reset_branch && on_branch 'fixup! docs(ship): One' && on_branch 'fixup! docs(ship): One'
+repeats 0 'two markers, left to the form check'
+reset_branch
+for n in 1 2; do
+    git -C "$push" switch -q main && on_branch "docs(ship): Main $n" && git -C "$push" switch -q x
+    git -C "$push" -c user.name=t -c user.email=t@t merge -q --no-ff --no-edit -m "Merge branch 'main' into x" main
+    on_branch "docs(ship): After $n"
+done
+git -C "$push" update-ref refs/remotes/origin/main main
+repeats 0 'two merges of main with one subject'
+expect 1 'repeats: a base that does not exist' sh -c 'cd "$1" && sh "$2" repeats nope x' sh "$push" "$rules"
+
+# With no origin/main, pre-push measures from the local main, and with neither it warns.
+reset_branch && on_branch 'docs(ship): One' && on_branch 'docs(ship): One'
+git -C "$push" update-ref -d refs/remotes/origin/main
+pre_push 1 'a subject twice, measured from the local main'
+git -C "$push" branch -q -m main trunk
+pre_push 0 'no main at all: the push goes on'
+if ! grep -q 'unchecked until CI' "$tmp/out"; then
+    printf 'FAIL pre-push: no main at all: the warning is missing\n'
+    failures=$((failures + 1))
+fi
+
 title() {
     expect "$1" "title: $2" sh "$rules" title "$3"
 }

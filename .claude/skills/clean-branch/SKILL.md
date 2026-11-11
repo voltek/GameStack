@@ -1,14 +1,15 @@
 ---
 name: clean-branch
-description: Update a branch against main and shape its history into claims — merge origin/main, fold corrections, write the final commit messages, rename a drifted branch. Use when the work on a branch is done and before a review round, or to fold a review's fixes into earlier commits.
+description: Update a branch against main and shape its history into claims — merge origin/main, fold corrections, reword commits, write the final commit messages, rename a drifted branch. Use when the work on a branch is done and before a review round, to fold a review's fixes, and before any fold, reword or rebase of a branch's history, whenever it happens.
 ---
 
 # Clean a branch
 
 Applies when the work on a branch is done and the gate is green, and again after
-a review round, to fold its fixes. A commit in the middle of the work needs none
-of this. Next: `review-round`, or `open-pr` once the rounds are
-done or the branch is exempt.
+a review round, to fold its fixes. A fold, reword or rebase in the middle of the
+work needs § 3 *Folding*, § 4 and § 5; an ordinary commit needs none of this.
+Next: `review-round`, or `open-pr` once the rounds are done or the branch is
+exempt.
 
 ## 1. Update against main
 ```bash
@@ -21,11 +22,8 @@ never passed the gate, so a `git bisect` can land on one that does not build
 
 ## 2. Check the name
 Does the branch name still describe what its commits now contain? The name was a
-guess made before the work. If not, rename it before any review:
-`git branch -m <new-name>`, and once pushed, `git push -u origin <new-name>` then
-delete the old name. Renaming the head branch of an open PR closes the PR (seen
-on PR #39), so with one open the rename means a new PR and a comment on the old
-one: say so when proposing it.
+guess made before the work. If not, propose a rename before any review, and
+read `references/rename.md` first: renaming the head of an open PR closes it.
 
 ## 3. One claim per commit
 The final history holds one commit per claim: a change someone might later want
@@ -47,12 +45,13 @@ later strengthened is not. The test: does the commit represent a different state
 of the system, or of your understanding? Only the first earns a commit.
 
 ### Folding
-`git rebase -i` needs an editor no agent session can answer, and auto mode denies
-`git commit --amend`, so fold with marker commits, at the tip or below it:
+`git rebase -i` needs an editor no agent session can answer, and
+`git commit --amend` reaches only the tip, and auto mode denies it at times, so
+fold with marker commits, at the tip or below it:
 - A fix: `git commit --fixup=<the commit it corrects>`.
-- A new message: write `amend! <its current subject>`, a blank line and the whole
-  new message to a file, then
-  `GIT_EDITOR="cp <file>" git commit --allow-empty --fixup=reword:<commit>`.
+- A new message: write the whole new message, and nothing else, to a file, then
+  `sh .claude/skills/clean-branch/scripts/reword.sh <commit> <file>`. It makes the
+  `amend!` commit and fails if what it made is not one.
 
 Then `git rebase --autosquash --rebase-merges $(git merge-base origin/main HEAD)`
 (git 2.44 or later). This folds and is not the update step 1 forbids (ADR 0059).
@@ -80,6 +79,9 @@ never `--no-verify`. What it cannot check:
   takes no trailer.
 
 ## 5. Push
-Before the push a review or a PR reads, repeat step 1. `git push --force-with-lease`
+Before the push a review or a PR reads, repeat step 1. After a fold or any other
+rewrite, run the rebase and the push as separate commands, and read
+`git log --oneline origin/main..HEAD` between them: no marker is left and each
+claim appears once. `git push --force-with-lease`
 may rewrite your own branch until it merges. On an open PR, answer the bot's
 threads before rewriting the lines they anchor to (`open-pr`).
