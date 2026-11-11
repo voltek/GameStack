@@ -1,6 +1,7 @@
 #!/bin/sh
 # The mechanical half of ADR 0034's message and branch rules, ADR 0033's trailer
-# forms and ADR 0057's PR body; the judgement half stays in clean-branch and open-pr.
+# forms, ADR 0057's PR body and ADR 0062's one subject per commit; the judgement
+# half stays in clean-branch and open-pr.
 # Reports every failure, not only the first, then exits 1. Usage: the case at
 # the end of this file; cases: test-rules.sh.
 
@@ -204,6 +205,19 @@ check_trailers() {
         "Write Bypassed: enforce_admins — <why the emergency exit was needed>."
 }
 
+# $1..$2 is the branch. Merges and subjects off the form are git's own or fail the
+# form check, so only typed subjects count. A copy is most often a reword whose
+# amend! marker was lost, which --autosquash then leaves in place.
+check_repeats() {
+    if ! subjects=$(git log --no-merges --format=%s "$1..$2"); then
+        fail "The branch's commits could not be listed (ADR 0062)." "$1..$2" "Fetch the base, then push again."
+        return
+    fi
+    report_each "$(printf '%s\n' "$subjects" | grep -E "$FORM" | sort | uniq -d)" \
+        "Two commits on the branch share a subject (ADR 0062)." \
+        "Fold the copy (clean-branch § Folding); reword with .claude/skills/clean-branch/scripts/reword.sh, which keeps the amend! marker."
+}
+
 check_title() {
     exempt "$1" && return
     check_subject "$1"
@@ -349,6 +363,7 @@ case $1 in
     title) check_title "$2" ;;
     branch) shift; check_branch "$@" ;;
     body) check_body "$2" "$3" ;;
-    *) printf 'Usage: rules.sh commit-msg <file> | message <file> [merge] | title <title> | branch <name> [<title>] | body <file> <title>\n' >&2; exit 2 ;;
+    repeats) check_repeats "$2" "$3" ;;
+    *) printf 'Usage: rules.sh commit-msg <file> | message <file> [merge] | title <title> | branch <name> [<title>] | body <file> <title> | repeats <base> <tip>\n' >&2; exit 2 ;;
 esac
 exit $status

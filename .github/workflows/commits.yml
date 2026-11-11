@@ -62,6 +62,7 @@ jobs:
             git rev-parse -q --verify "$sha^2" > /dev/null && merge=merge
             sh .githooks/rules.sh message "$RUNNER_TEMP/message" $merge || status=1
           done
+          sh .githooks/rules.sh repeats "$BASE" "$HEAD_SHA" || status=1
           exit $status
 
       # The title arrives through env, never interpolated into the script: a

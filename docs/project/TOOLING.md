@@ -371,7 +371,8 @@ letter, no trailing period, 72 code points, a blank second line, a body of 12
 non-blank lines with known trailers excluded, `Drift:` and `Bypassed:`
 values, the closed list of exempt subjects with the fold markers `fixup!`,
 `squash!` and `amend!` accepted by the local hook alone (ADR 0059), the
-branch name's shape, and, on a PR, the title's form, its type against
+branch name's shape, a typed subject that two commits on the branch share,
+checked at the push and on a PR (ADR 0062), and, on a PR, the title's form, its type against
 the branch prefix, and the form of its body (ADR 0057). Every failure names the
 rule, the value seen and the fix, and prints the scope list when the scope is
 at fault, so the error is the template.
@@ -409,6 +410,10 @@ build.
   `cherry-pick -n` went with it: it broke on a merge of `main`, which
   `git rebase --autosquash --rebase-merges` rebuilds.
 - *Counting the subject in bytes.* An em dash is three bytes.
+- *The repeated subject in `commit-msg`.* git gives that hook no sign of an
+  `--amend`, not even to `prepare-commit-msg` under `--amend -m`, so an amend
+  that keeps its subject would match the commit it replaces. At the push the
+  amended commit is already gone.
 - *Stripping `#` lines in CI.* Under `-F` git stores them, so CI reads the
   stored message as it is; only the local hook strips the editor's comments.
 - *Guessing from the message's shape which lines git will strip.* Three review
