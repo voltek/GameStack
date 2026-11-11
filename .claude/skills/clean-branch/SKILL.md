@@ -47,8 +47,9 @@ later strengthened is not. The test: does the commit represent a different state
 of the system, or of your understanding? Only the first earns a commit.
 
 ### Folding
-`git rebase -i` needs an editor no agent session can answer, and auto mode denies
-`git commit --amend`, so fold with marker commits, at the tip or below it:
+`git rebase -i` needs an editor no agent session can answer, and
+`git commit --amend` reaches only the tip, and auto mode denies it at times, so
+fold with marker commits, at the tip or below it:
 - A fix: `git commit --fixup=<the commit it corrects>`.
 - A new message: write `amend! <its current subject>`, a blank line and the whole
   new message to a file, then

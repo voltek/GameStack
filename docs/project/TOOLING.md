@@ -331,8 +331,9 @@ history is built without that push.
 Auto mode's classifier is a separate gate: `permissions.allow` does not stop it,
 and its own `autoMode` rules are read only from user or managed settings or
 `--settings`, never from a project's files (`claude auto-mode config` shows what
-it reads). It denies `git commit --amend`, so `clean-branch` § Folding uses marker commits
-(ADR 0059).
+it reads). It judges each call rather than applying a list: it has denied some
+`git commit --amend` calls as destructive and passed most, so `clean-branch`
+§ Folding does not depend on it and uses marker commits (ADR 0059).
 
 **Replaces.** A prompt before every `git push`, and the same rules kept only in a
 local file that one machine's global ignore kept out of git.
