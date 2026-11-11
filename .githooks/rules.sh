@@ -1,7 +1,8 @@
 #!/bin/sh
 # The mechanical half of ADR 0034's message and branch rules, ADR 0033's trailer
-# forms, ADR 0057's and ADR 0063's PR body and ADR 0062's one subject per
-# commit; the judgement half stays in clean-branch and open-pr.
+# forms, ADR 0057's and ADR 0063's PR body, ADR 0062's one subject per commit
+# and ADR 0064's references; the judgement half stays in clean-branch, open-pr
+# and CLAUDE.md.
 # Reports every failure, not only the first, then exits 1. Usage: the case at
 # the end of this file; cases: test-rules.sh.
 
@@ -33,6 +34,13 @@ spec        PRODUCT.md, openspec/ and its generated .claude/skills/openspec-*
 design      DESIGN.md and design/ mockups
 tooling     the TOOLING documents
 readme      README.md'
+
+# What no clone can open (ADR 0064): a plan's branch label, a cycle, a plan file,
+# the handoff's Documents folder, a Windows home. One spelling each, both ways: a
+# count after "branch" fails, another spelling passes and CLAUDE.md covers it. Inline
+# code is no exemption, since a path is quoted; /home is left out, as a route.
+UNOPENABLE='(^|[^[:alnum:]_])[Bb]ranch [0-9]+[a-z]?([^[:alnum:]_]|$)|(^|[^[:alnum:]_])[Cc]ycle [0-9]|(^|[^[:alnum:]_./-])plans/|(~|\$HOME|%USERPROFILE%)[/\\]Documents([^[:alnum:]_]|$)|[A-Za-z]:[/\\]Users[/\\]|(^|[^[:alnum:]_.])/[a-z]/Users/'
+TRIAGE_ID='(^|[^[:alnum:]_/.-])r[0-9]+-[0-9]+[a-z]?([^[:alnum:]_]|$)'
 
 LIMIT=72
 BODY_LIMIT=12
@@ -72,7 +80,9 @@ has_form() {
 }
 
 # The closed list of subjects exempt from the form (ADR 0059). A fold marker passes
-# the local hook only, so CI rejects one left unfolded.
+# the local hook only, so CI rejects one left unfolded. What git or GitHub writes,
+# a reverted title among it, is a quote no reference check reads; text a person
+# writes under a Revert or Reapply is read (ADR 0064).
 exempt() {
     case $1 in
         'Revert "'* | 'Reapply "'* | 'Squashed commit of the following:') return 0 ;;
@@ -150,6 +160,10 @@ check_message() {
     # Autosquash writes an amend!'s replacement message without this hook (ADR 0059).
     elif [ "${first#amend! }" != "$first" ]; then
         check_form "$(printf '%s\n' "$message" | sed '1,/^$/d')"
+    # A Revert's subject quotes the commit it undoes; the text written under it is new.
+    elif [ "${first#Revert \"}" != "$first" ] || [ "${first#Reapply \"}" != "$first" ]; then
+        check_references "$(printf '%s\n' "$message" | sed 1d)"
+        check_triage_ids "$(printf '%s\n' "$message" | sed 1d)" 'ADR 0064'
     fi
     check_trailers "$message"
 }
@@ -190,6 +204,21 @@ check_form() {
             "$body_lines non-blank lines" \
             "Keep the diagnosis the diff cannot show; point at a document instead of restating it."
     fi
+    check_references "$message"
+    check_triage_ids "$message" 'ADR 0064'
+}
+
+check_references() {
+    report_each "$(printf '%s\n' "$1" | grep -E "$UNOPENABLE")" \
+        "A reference no clone can open: a plan's label, a cycle or a path on one machine (ADR 0064)." \
+        "Cite a PR, an issue, an ADR or a repository path, or say in words what it meant."
+}
+
+# Inline code is removed first: a token that only looks like an id goes there.
+check_triage_ids() {
+    report_each "$(printf '%s\n' "$1" | sed 's/`[^`]*`/``/g' | grep -E "$TRIAGE_ID")" \
+        "A triage id cites a table that is deleted at the merge ($2)." \
+        "Say what the finding was in plain words; a token that only looks like an id goes in inline code."
 }
 
 check_trailers() {
@@ -221,6 +250,8 @@ check_repeats() {
 check_title() {
     exempt "$1" && return
     check_subject "$1"
+    check_references "$1"
+    check_triage_ids "$1" 'ADR 0064'
 }
 
 check_branch() {
@@ -247,9 +278,11 @@ check_branch() {
 }
 
 # Comments and code go first, so neither a template comment nor a quoted heading
-# or marker reads as structure. GitHub stores a body edited on the web with CRLF.
+# or marker reads as structure; with $2 set, code stays, for the references. One
+# pass per view keeps the awk simpler than one printing both. GitHub stores a body
+# edited on the web with CRLF.
 clean_body() {
-    tr -d '\r' <"$1" | awk '
+    tr -d '\r' <"$1" | awk -v code="$2" '
         comment {
             i = index($0, "-->")
             if (!i) next
@@ -258,22 +291,31 @@ clean_body() {
         }
         fence {
             if ($0 ~ "^ ? ? ?" fence "+[ \t]*$") fence = ""
+            if (code) print
             next
         }
         match($0, /^ ? ? ?(```+|~~~+)/) && $0 !~ /^ ? ? ?```+[^`]+`/ {
             fence = substr($0, 1, RLENGTH)
             gsub(/ /, "", fence)
+            if (code) print
             next
         }
         {
-            gsub(/`[^`]*`/, "``")
+            if (!code) gsub(/`[^`]*`/, "``")
+            # Markers are found with inline code blanked out, so one quoted there opens no comment.
+            text = $0
+            while (code && match(text, /`[^`]*`/)) {
+                span = substr(text, RSTART, RLENGTH)
+                gsub(/./, " ", span)
+                text = substr(text, 1, RSTART - 1) span substr(text, RSTART + RLENGTH)
+            }
             kept = ""
-            while (i = index($0, "<!--")) {
+            while (i = index(text, "<!--")) {
                 kept = kept substr($0, 1, i - 1)
-                $0 = substr($0, i + 4)
-                i = index($0, "-->")
+                $0 = substr($0, i + 4); text = substr(text, i + 4)
+                i = index(text, "-->")
                 if (!i) { comment = 1; $0 = ""; break }
-                $0 = substr($0, i + 3)
+                $0 = substr($0, i + 3); text = substr(text, i + 3)
             }
             print kept $0
         }' | sed -E -e 's/[[:space:]]+$//' -e 's/^ {1,3}#/#/'
@@ -346,7 +388,12 @@ check_body_issues() {
 # $2 is the PR title. The Revert button's PR keeps GitHub's own body, so a title
 # alone does not exempt one.
 check_body() {
-    exempt "$2" && grep -Eq '^Reverts [^ ]+#[0-9]+' "$1" && return
+    if exempt "$2" && grep -Eq '^Reverts [^ ]+#[0-9]+' "$1"; then
+        written=$(clean_body "$1" code | sed -E '/^Reverts [^ ]+#[0-9]+/d')
+        check_references "$written"
+        check_triage_ids "$written" 'ADR 0064'
+        return
+    fi
     body=$(clean_body "$1")
     headings=$(printf '%s\n' "$body" | grep -E '^#+( |$)' | paste -sd '|' -)
     if ! printf '%s\n' "$headings" |
@@ -364,9 +411,8 @@ check_body() {
     check_body_verification
     check_body_review
     check_body_issues
-    report_each "$(printf '%s\n' "$body" | grep -E '(^|[^[:alnum:]_/.-])r[0-9]+-[0-9]+[a-z]?([^[:alnum:]_]|$)')" \
-        "A triage id cites a table that is deleted at the merge (ADR 0063)." \
-        "Say what the finding was in plain words; a token that only looks like an id goes in inline code."
+    check_triage_ids "$body" 'ADR 0063'
+    check_references "$(clean_body "$1" code)"
 }
 
 case $1 in

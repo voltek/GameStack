@@ -379,8 +379,12 @@ values, the closed list of exempt subjects with the fold markers `fixup!`,
 branch name's shape, a typed subject that two commits on the branch share,
 checked at the push and on a PR (ADR 0062), and, on a PR, the title's form, its type against
 the branch prefix, and the form of its body with no triage id (ADRs 0057 and
-0063). Every failure names the rule, the value seen and the fix, and prints the
-scope list when the scope is at fault, so the error is the template.
+0063). In a message, a title and a body it rejects the references no clone can
+open that a pattern recognises: a plan's branch label, a cycle, a `plans/` path,
+the handoff's directory, a Windows home written in full, and a triage id
+(ADR 0064). Every failure
+names the rule, the value seen and the fix, and prints the scope list when the
+scope is at fault, so the error is the template.
 
 **Replaces.** Reading each subject against the written form by hand.
 
@@ -441,6 +445,11 @@ build.
 - *Checking each line of a PR body's review.* Markdown writes a list many ways,
   and two review rounds of line patterns rejected valid lists and let prose
   through; the check reads the first line and the template's samples only.
+- *Checking the repository's files for references.* The `checkpoint` Skill and
+  this file name the handoff's directory on purpose; the CLAUDE.md line covers
+  files (ADR 0064).
+- *A bare `item N` among the references.* A document's own list ("item 3" of a
+  repository file) is a valid reference, so only `cycle N` is matched.
 
 ## 12. Issue form
 **What.** One form for every pending item (ADR 0038): the title in the commit
