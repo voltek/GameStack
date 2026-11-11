@@ -2,6 +2,7 @@
 // Saves a /code-review subagent's final text verbatim, from its transcript (review-round § The sequence).
 // The transcript format is undocumented: every unexpected shape fails loudly with a repair notice,
 // because a record saved wrong in silence is worse than none.
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -101,16 +102,40 @@ function notice(error, script) {
   ].join("\n");
 }
 
-function main([taskId, out]) {
-  if (!taskId || !out) {
-    console.error("Usage: save-review.mjs <task-id> <output file>");
+// The folder is the checked-out branch's, never typed: the SessionStart hook deletes a folder whose
+// name matches no branch (ADR 0067). The handoff folder is resolved as session-start.sh resolves it.
+function recordsDir() {
+  const git = (...args) => execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+  let branch;
+  try {
+    branch = git("branch", "--show-current");
+  } catch {
+    return null;
+  }
+  if (!branch) return null;
+  const main = path.basename(path.dirname(git("rev-parse", "--path-format=absolute", "--git-common-dir")));
+  const home = process.env.HOME || os.homedir();
+  const handoff = process.env.CLAUDE_HANDOFF_DIR || path.join(home, "Documents", main);
+  return path.join(handoff, "reviews", ...branch.split("/"));
+}
+
+function main([taskId, name]) {
+  if (!taskId || !name || /[\\/]/.test(name) || name === "." || name === "..") {
+    console.error("Usage: save-review.mjs <task-id> <file name>, saved in reviews/<branch>/ beside the handoff");
     return 2;
   }
+  const dir = recordsDir();
+  if (!dir) {
+    console.error("save-review: git names no checked-out branch here, so its reviews/<branch>/ folder is unknown. Run it from the branch's checkout.");
+    return 2;
+  }
+  const out = path.join(dir, name);
   const root = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), ".claude");
   try {
     const transcript = findTranscript(root, taskId.replace(/^agent-/, ""));
     const lines = fs.readFileSync(transcript, "utf8").split("\n").filter((l) => l.trim() !== "");
     const { text, model, effort } = extract(lines);
+    fs.mkdirSync(path.dirname(out), { recursive: true });
     fs.writeFileSync(out, text);
     console.log(`Reviewer: ${model}, ${effort}`);
     console.log(`Saved ${[...text].length} characters to ${out}`);

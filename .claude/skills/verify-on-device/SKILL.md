@@ -246,8 +246,10 @@ clamped before billing. Shrinking the AVD saves nothing. See
 ## Finishing
 - **Close `GameStack_Verify`**: `"$ADB" emu kill`. The next launch wipes it, so
   nothing the pass changed needs restoring.
-- Save the captures outside the repo, named for what they show, never in
-  `%TEMP%` or a scratchpad, which get cleaned, and never commit them. Hand the
+- Save the captures in `captures/<branch>/` beside the handoff (the
+  `checkpoint` Skill's § What is kept), named for what they show, never in
+  `%TEMP%` or a scratchpad, which get cleaned, and never commit them; the
+  SessionStart hook deletes the folder once the branch is gone. Hand the
   paths over in chat and say plainly that the PR needs them dragged into its
   body's edit box on the web before the merge: that is the one part only the
   human can finish. They go in as they are: an attachment is not stored in the

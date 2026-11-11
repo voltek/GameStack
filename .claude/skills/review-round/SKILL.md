@@ -69,10 +69,12 @@ GitHub bot is a different reviewer: its round says nothing about whether
 
 ## The sequence
 1. Save the raw output verbatim, before any digest of it:
-   `node .claude/skills/review-round/scripts/save-review.mjs <task-id> <raw file>`,
-   the task id from the round's notification. It prints the table's `Reviewer:`
-   line. The notification escapes `<` and `>`, so it is not the record. If the
-   script fails, read `references/extractor-failed.md`.
+   `node .claude/skills/review-round/scripts/save-review.mjs <task-id> <raw file name>`,
+   the task id from the round's notification. It saves into the checked-out
+   branch's folder (§ The table) and prints the table's `Reviewer:` line and the
+   path; write the table beside it. The notification escapes `<` and `>`, so it
+   is not the record. Exit 2 is a usage error, which its message names; on exit
+   1, read `references/extractor-failed.md`.
 2. Verify every finding (§ Verifying) and check each `Fix (defect)`'s origin with git.
 3. Write the table to its file, marked proposed, with the verdict.
 4. In `/code-review`'s round 1 only, apply alone every `Fix` row that is not for
@@ -144,10 +146,11 @@ never reads earlier records: fix that text until it answers the question.
 | Dismiss | The claim checked against the repository or `gh api` | The quote or the command |
 
 ## The table
-Save the raw output and the table outside the repository as
-`YYYY-MM-DD-<topic>-r<k>.raw.txt` and `.triage.md`, never only in the conversation,
-which a later session cannot read. Where is the human's choice, kept in agent
-memory; if memory names no place, ask before the first round. The table is in
+Save the raw output and the table outside the repository, in `reviews/<branch>/`
+beside the handoff (the `checkpoint` Skill's § What is kept), as
+`YYYY-MM-DD-r<k>.raw.txt` and `.triage.md`, never only in the conversation, which a
+later session cannot read. The SessionStart hook deletes the folder once the branch
+is gone (ADR 0067). The table is in
 English, because the PR body and the issues draw on it.
 
 ```markdown

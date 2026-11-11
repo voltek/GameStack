@@ -97,19 +97,19 @@ mkdir -p "$dir/plans/probe"
 : >"$dir/plans/cited.md"; : >"$dir/plans/cited"; : >"$dir/plans/stale.md"
 printf 'Points at `plans/cited.md` and plans/probe/run.js.\n' >"$dir/HANDOFF.md"
 run startup s4
-has 'a plan nothing cites' 'WARNING: neither CYCLE.md nor HANDOFF.md cites plans/cited plans/stale.md. Delete'
+has 'a plan nothing cites' 'WARNING: neither CYCLE.md nor HANDOFF.md cites plans/cited plans/stale.md. Once its decisions'
 cycle 0 0
 echo 'plans/stale.md' >>"$dir/CYCLE.md"
 run startup s4
-has 'a plan the cycle cites' 'cites plans/cited. Delete'
+has 'a plan the cycle cites' 'cites plans/cited. Once'
 cycle 0 0
 echo 'Not a plans folder: oldplans/stale.md' >>"$dir/CYCLE.md"
 run startup s4
-has 'a longer folder name is not a citation' 'cites plans/cited plans/stale.md. Delete'
+has 'a longer folder name is not a citation' 'cites plans/cited plans/stale.md. Once'
 cycle 0 0
 echo 'A full path: ~/Documents/GameStack/plans/stale.md' >>"$dir/CYCLE.md"
 run startup s4
-has 'a plan cited by a fuller path' 'cites plans/cited. Delete'
+has 'a plan cited by a fuller path' 'cites plans/cited. Once'
 printf '%s\n' 'Its plan is plans/stale.md.' 'Another is plans/cited.' 'And plans/cited.md, plans/probe/run.js' >"$dir/HANDOFF.md"
 run startup s4
 lacks 'a plan cited at the end of a sentence' 'neither CYCLE.md nor HANDOFF.md cites'
@@ -133,7 +133,7 @@ mkdir -p "$dir/plans"
 i=0; while [ $i -lt 25 ]; do i=$((i + 1)); : >"$dir/plans/a-plan-with-a-long-name-$i.md"; done
 run startup s4
 has 'warnings counted against the cap' 'WARNING: this hook output is'
-has 'the plan list capped' 'a-plan-with-a-long-name-18.md … and 15 more. Delete'
+has 'the plan list capped' 'a-plan-with-a-long-name-18.md … and 15 more. Once'
 [ "$(grep -v '^WARNING:' "$tmp/out" | wc -c)" -lt 9000 ] \
     || { printf 'FAIL warnings counted against the cap: the body alone is over 9,000 chars\n'; failures=$((failures + 1)); }
 head -1 "$tmp/out" | grep -q '^No cycle is kept' \
@@ -193,6 +193,35 @@ run startup s3
 unset FAKE_GH_FAIL
 has 'gh unavailable' 'Issue pool: gh unavailable'
 has 'gh unavailable' 'TRIAGE OWED (ADR 0047): no CYCLE.md'
+
+g branch docs/live
+g branch docs/deep/three
+g remote add origin "$tmp/no-such-remote"
+g update-ref refs/remotes/origin/fix/pushed HEAD
+mkdir -p "$dir/reviews/docs/live" "$dir/reviews/docs/merged" "$dir/captures/fix/pushed" "$dir/captures/fix/merged" \
+         "$dir/captures/topic-named" "$dir/reviews/docs/deep/three"
+: >"$dir/reviews/docs/live/r1.raw.txt"; : >"$dir/reviews/docs/merged/r1.raw.txt"; : >"$dir/captures/fix/merged/a.png"
+: >"$dir/captures/topic-named/a.png"; : >"$dir/reviews/2026-01-01-loose-r1.raw.txt"; : >"$dir/captures/fix/desktop.ini"
+# Without a readable repository nothing is deleted: every branch would look gone.
+printf '{"session_id":"n1","source":"startup"}' \
+    | CLAUDE_PROJECT_DIR=$tmp/not-a-repo CLAUDE_HANDOFF_DIR=$dir PATH="$tmp/bin:$PATH" bash "$hook" >"$tmp/out" 2>&1
+lacks 'no repository, nothing deleted' 'Deleted, their branch gone'
+[ -d "$dir/reviews/docs/merged" ] \
+    || { printf 'FAIL no repository, nothing deleted: reviews/docs/merged is gone\n'; failures=$((failures + 1)); }
+run startup s5
+has 'a gone branch loses its records' 'Deleted, their branch gone (checkpoint Skill): reviews/docs/merged captures/fix/merged.'
+# A branch name off ADR 0034's two levels: its folder's first two levels name no branch, yet one lives below.
+for kept in reviews/docs/live captures/fix/pushed captures/topic-named reviews/2026-01-01-loose-r1.raw.txt \
+            reviews/docs/deep/three; do
+    [ -e "$dir/$kept" ] || { printf 'FAIL a live branch keeps its records: %s is gone\n' "$kept"; failures=$((failures + 1)); }
+done
+for gone in reviews/docs/merged captures/fix/merged; do
+    [ -e "$dir/$gone" ] && { printf 'FAIL a gone branch loses its records: %s is kept\n' "$gone"; failures=$((failures + 1)); }
+done
+has 'a record outside a branch folder' 'not under a <type>/<name> branch folder, so never deleted: reviews/2026-01-01-loose-r1.raw.txt captures/fix/desktop.ini captures/topic-named/a.png. Move'
+run startup s5
+lacks 'nothing left to delete' 'Deleted, their branch gone'
+rm -r "$dir/reviews" "$dir/captures"
 
 # The hook's bounds are constants; the checkpoint Skill states them in prose.
 bound() { sed -n "s/^$1=//p" "$hook"; }

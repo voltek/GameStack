@@ -1,6 +1,7 @@
 # ADR 0065 — A session starts with only the state it acts on
 
 Status: Accepted
+Status: Superseded by ADR-0067 — "plans while an open item cites them, deleted once every decision they hold is in an ADR, an issue or TOOLING.md" and "review records until their branch merges" (Decision)
 Date: 2026-11-11
 Backfilled: no
 Supersedes: ADR-0047 — "first after any bound warning" (Decision)

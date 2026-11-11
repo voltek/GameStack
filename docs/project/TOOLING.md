@@ -187,7 +187,9 @@ longer one loses its last steps mid-task.
 under the Skill's `scripts/`, with its test beside it, run in `commits.yml`.
 `review-round/scripts/save-review.mjs` saves a `/code-review` round's raw text
 from the subagent's transcript, the only literal copy: the subagent's output file
-is empty, and its notification escapes `<` and `>`. The transcript format is not
+is empty, and its notification escapes `<` and `>`. It saves into the checked-out
+branch's `reviews/<branch>/`, so the folder cannot be misnamed into one the
+SessionStart hook deletes (ADR 0067). The transcript format is not
 documented, so every unexpected shape exits non-zero with a repair notice, and the
 Skill falls back to the notification, saying so on the record's first line.
 `clean-branch/scripts/reword.sh` makes the `amend!` commit that rewords an earlier
@@ -558,7 +560,10 @@ repository — `HANDOFF.md` (the session's state) and `CYCLE.md` (the open
 cycle) — and facts it derives live: the local branches, the next ADR number,
 the issue pool and whether a triage is owed. It warns when the handoff is over
 its bound or holds a section the Skill does not allow, and names the plans
-beside it that neither file cites, ten at most. The `checkpoint` Skill holds the rules both
+beside it that neither file cites, ten at most. It deletes a branch's folder
+under `reviews/` and `captures/` once the branch is neither local nor on a
+remote, and names what it deleted; it warns about a record outside such a
+folder, which it never deletes (ADR 0067). The `checkpoint` Skill holds the rules both
 files follow, what else is kept beside them, and the steps to rewrite them
 (ADRs 0045 and 0065). A line of its output is paid by every session, so it
 prints only what a session acts on at its start and Claude Code does not
@@ -592,6 +597,12 @@ by `commits.yml`; `.claude/skills/checkpoint/`. The files are read from
 - *A triage owed by counting merges* (ADR 0038, until ADR 0047). A one-line
   `.gitignore` merge made it fire mid-cycle, and a product cycle would owe one
   per pull request; skipping merges by path needed a hand-kept list.
+- *Deleting a branch's records in a `merge-pr` or `checkpoint` step.* Auto mode's
+  classifier refuses an agent's `rm` in that folder (§ 10), and a merge made on
+  GitHub runs no step; the rule written with no step to carry it out left the
+  records in place.
+- *The hook deleting plans.* Whether a plan can go is a judgement on what it
+  still holds, so the owner runs the command the checkpoint gives.
 
 **Known limit.** The cycle is one machine's file, so on a team nobody else sees
 it. With a second person or machine keeping cycles, each cycle is a milestone:
