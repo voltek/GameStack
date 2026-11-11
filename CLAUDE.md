@@ -19,6 +19,9 @@ is a cost.
   all three must be green, read from the exit code, which a pipe through `tail`
   hides. A lint Error fails the gate, a warning does not.
 - Put code and its documentation in the same commit.
+- Text written to the repository, a commit, a PR or an issue cites only what a clone
+  can open: a PR, an issue, an ADR or a repository path. A plan's label, a cycle item
+  or a path on one machine tells its next reader nothing (ADR 0064).
 - Before pushing, `git fetch` and reconcile with `origin/main`.
 - One branch per unit of work, checked per commit: does this exist because of this
   branch? Anything else goes on its own branch.

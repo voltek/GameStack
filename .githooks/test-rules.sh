@@ -73,6 +73,42 @@ message 1 'Bypassed: no reason' 'docs(ship): Fix\n\nBypassed: because\n'
 message 1 'an exempt subject keeps its trailers checked' 'Revert "docs(ship): X"\n\nDrift: docs updated\n'
 message 0 'a whitespace-only line is blank' "docs(ship): Fix\n\n$(body 11)  \nCo-Authored-By: A <a@b>\nSigned-off-by: A <a@b>\n"
 message 0 'a whitespace-only second line is blank' 'docs(ship): Fix\n  \nbody\n'
+message 1 "a plan's branch label" 'docs(ship): Fix\n\nOn branch 3b the rule moved.\n'
+message 1 'a numbered branch label' 'docs(ship): Fix\n\nLands before Branch 4.\n'
+message 0 'a branch named, not numbered' 'docs(ship): Fix\n\nBranch protection holds.\nOne branch per claim, 2 commits.\n'
+message 1 'a cycle in the subject' 'docs(ship): Close cycle 4\n'
+message 1 'a cycle item' 'docs(ship): Fix\n\nCycle 4 item 7 takes it.\n'
+message 0 'a lifecycle is no cycle' 'docs(ship): Fix\n\nThe lifecycle 2 hooks stay.\n'
+message 1 'a plan file' 'docs(ship): Fix\n\nAs plans/harness-audit.md says.\n'
+message 1 'a plan file in inline code' 'docs(ship): Fix\n\nAs `plans/x.md` says.\n'
+message 0 'a plans directory in the repository' 'docs(ship): Fix\n\nSee docs/plans/x.md and the PR plans.\n'
+message 1 'the handoff directory' 'docs(ship): Fix\n\nKept in ~/Documents/GameStack.\n'
+message 1 'the handoff directory through HOME' 'docs(ship): Fix\n\nKept in $HOME/Documents/x.\n'
+message 0 'user settings are on every machine' 'docs(ship): Fix\n\nRead from ~/.claude/settings.json.\n'
+message 1 'the handoff directory with no slash' 'docs(ship): Fix\n\nKept in ~/Documents.\n'
+message 1 'a Windows home in full' 'docs(ship): Fix\n\nKept in C:/Users/x/a.md.\n'
+cat >"$tmp/message" <<'MESSAGE'
+docs(ship): Fix
+
+Kept in C:\Users\x\a.md.
+MESSAGE
+expect 1 'message: a Windows home with backslashes' sh "$rules" message "$tmp/message"
+cat >"$tmp/message" <<'MESSAGE'
+docs(ship): Fix
+
+Kept in %USERPROFILE%\Documents\x.
+MESSAGE
+expect 1 'message: a Windows home through USERPROFILE' sh "$rules" message "$tmp/message"
+message 1 'a Windows home from Git Bash' 'docs(ship): Fix\n\nKept in /c/Users/x/a.md.\n'
+message 0 "a feature's home folder" 'docs(ship): Fix\n\nSee app/feature/home/x.kt and https://e.com/home/x.\n'
+message 0 'a route under /home' 'docs(home): Fix\n\nNavigates to `/home/{id}`.\n'
+message 0 'a deep link under home' 'docs(home): Fix\n\nOpens gamestack://home/detail.\n'
+message 1 'a triage id in a message' 'docs(ship): Fix\n\nAnswers r1-4.\n'
+message 0 'a triage id in inline code in a message' 'docs(ship): Fix\n\nPrints `r1-4`.\n'
+message 0 'an exempt subject quotes what it reverts' 'Revert "docs(ship): Close cycle 4"\n'
+message 1 'the text under a Revert is read' 'Revert "docs(ship): X"\n\nRedone in ~/Documents/GameStack.\n'
+message 1 'a triage id under a Reapply is read' 'Reapply "docs(ship): X"\n\nAnswers r1-4.\n'
+message 1 'an amend! replacement is read' 'amend! docs(ship): Fix\n\ndocs(ship): Fix\n\nOn branch 3b.\n'
 
 printf 'docs(ship): Fix\n\nDrift: bogus\nDrift: also bogus\n' >"$tmp/message"
 reported=$(sh "$rules" message "$tmp/message" 2>&1 | grep -c '^A Drift: trailer')
@@ -178,6 +214,9 @@ title() {
 }
 title 0 'one claim' 'chore(repo): Check commit messages mechanically'
 title 0 'an "and" is a judgement, not a check' 'chore(repo): Check messages and branches'
+title 1 'a cycle in the title' 'docs(ship): Close cycle 4'
+title 1 'a triage id in the title' 'fix(ship): Answer r1-4'
+title 0 'a triage id in inline code in the title' 'fix(ship): Print `r1-4`'
 
 branch() {
     label=$1 want=$2
@@ -291,12 +330,23 @@ pr_body 0 'a range after a word ending in r' -e 's/^The reason\./Pages per2-3./'
 pr_body 0 'an id-like name in a URL' -e '$a ### Screenshots\n![home](https://example.com/home-r1-2.png)\n![detail](https://example.com/r2-3/detail.png)'
 pr_body 1 'a triage id after a comma' -e 's/^The reason\./Fixed,r1-2 too./'
 pr_body 1 'a triage id in parentheses' -e 's/^The reason\./Fixed (r1-2)./'
+pr_body 1 "a plan's branch label" -e 's/^The reason\./On branch 3b./'
+pr_body 1 'a plan file in inline code' -e 's/^The reason\./As `plans\/x.md` says./'
+pr_body 1 'the handoff directory in a fence' -e '/^The reason/a ```\n~/Documents/GameStack/HANDOFF.md\n```'
+pr_body 1 'a cycle in the review list' -e 's/^- a test case added/- cycle 4 wording/'
+pr_body 0 'a cycle in a comment' -e '1i <!-- cycle 4 -->'
+pr_body 1 'a reference after a comment marker in inline code' -e 's/^The reason\./Writes the `<!--` marker.\nOn branch 3b./'
+pr_body 1 'a reference after a comment marker in a fence' -e '/^The reason/a ```html\n<!--\n```\nOn branch 3b.'
+pr_body 1 'a reference in a fenced comment' -e '/^The reason/a ```html\n<!-- cycle 4 -->\n```'
+pr_body 0 'a plans path in a URL' -e '$a ### Screenshots\n![x](https://example.com/plans/x.png)'
 pr_body 1 'a box with no value' -e 's/^- \[x\] .*/- [ ] OpenSpec change archived at:/'
 pr_body 1 'an empty Evidence:' -e 's/^Evidence: none/Evidence:/'
 pr_body 1 'an empty Issues' -e 's/^## Verification/## Issues\n\n&/'
 pr_body 1 'the template number left in Issues' -e 's/^## Verification/## Issues\nRelated: #n\n\n&/'
 pr_text 1 'an empty body' '' 'chore(ship): Check a thing'
 pr_text 0 'the Revert button' 'Reverts voltek/GameStack#1\n' 'Revert "docs(ship): Fix x"'
+pr_text 1 'text under the Revert button line is read' 'Reverts voltek/GameStack#1\n\nRedo on branch 3b.\n' 'Revert "docs(ship): Fix x"'
+pr_text 1 'a triage id under the Revert button line' 'Reverts voltek/GameStack#1\n\nAnswers r1-4.\n' 'Revert "docs(ship): Fix x"'
 pr_text 0 'a reverted revert' 'Reverts voltek/GameStack#2\n' 'Reapply "docs(ship): Fix x"'
 pr_text 1 'a typed Revert title' 'nothing like the template\n' 'Revert "anything at all"'
 
