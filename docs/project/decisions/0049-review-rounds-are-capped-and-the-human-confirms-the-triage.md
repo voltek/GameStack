@@ -21,7 +21,7 @@ Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § A fix 
 Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § The table) — the records
 Enforced by: none (prose only — .claude/skills/review-round/references/past-the-cap.md § A round past the cap) — the round past the cap
 Enforced by: none (prose only — .claude/skills/review-round/references/review-debt-branch.md § A branch working `review-debt`) — a branch working `review-debt`
-Enforced by: commits.yml — a PR body's review record, present and free of `TODO`
+Enforced by: commits.yml — a PR body's *Review*, present and free of the template's `TODO` samples
 
 ## Context
 The review policy had been patched clause by clause across ADRs 0015, 0025, 0029

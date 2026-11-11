@@ -43,7 +43,7 @@ gets a round except:
 - a branch working `review-debt` that the human exempts: read
   `references/review-debt-branch.md`.
 
-An exempt branch records `Review: not run — exempt: <which>` in the PR body.
+An exempt branch writes `Not run — exempt: <which>` under the PR body's *Review*.
 
 A branch that ADR 0041 says carries an OpenSpec change and has no folder
 `openspec/changes/<branch-kebab-name>/` stops here. One that has it runs
@@ -120,9 +120,10 @@ it is silently dropped, and looks like coverage.
   fix no round will read. A change that removed an affordance that already worked
   is a defect, not deferred accessibility work. Link the open issue that covers
   it, labelled `review-debt`, or open one with that label: the label is the only
-  register of what a review found and nobody fixed. Only the human defers a real
-  defect, and its row says what it breaks if shipped: who notices, how often,
-  whether it can be undone.
+  register of what a review found and nobody fixed. The issue describes each
+  finding, never by its id, which resolves to nothing once the tables are
+  deleted (ADR 0063). Only the human defers a real defect, and its row says what
+  it breaks if shipped: who notices, how often, whether it can be undone.
 - **Accept**: valid, not a defect, not worth fixing, and not followed up, so it
   opens no issue. Always the human's call. A row that can cite a failure scenario
   is a defect and is never accepted.
@@ -147,7 +148,7 @@ Save the raw output and the table outside the repository as
 `YYYY-MM-DD-<topic>-r<k>.raw.txt` and `.triage.md`, never only in the conversation,
 which a later session cannot read. Where is the human's choice, kept in agent
 memory; if memory names no place, ask before the first round. The table is in
-English, because the PR record copies it.
+English, because the PR body and the issues draw on it.
 
 ```markdown
 # <branch> — round <k> triage (proposed | confirmed by the owner YYYY-MM-DD)
@@ -161,8 +162,8 @@ Stopping rule: another round | stop, on to open-pr | stop, back to the human, be
 Owner decisions (YYYY-MM-DD): <confirmed as proposed, or each change>
 ```
 - The id is `r<k>-<n>`, `n` in the order the reviewer reports, never renumbered; a
-  finding split across buckets takes a letter, `r1-2a`. The same id appears in the
-  chat, the PR record and any issue.
+  finding split across buckets takes a letter, `r1-2a`. The id lives in the chat
+  and the tables only.
 - A row lets the human judge it without opening the raw file: what the reviewer
   claims, where, its bucket, and the check that decides it. Origin is filled for
   `Fix (defect)` only. Labels are written out in full.
@@ -225,5 +226,5 @@ Any fix of the round that ends the rounds, and any fix after it.
   a revert, a deletion nothing depends on, text moved unchanged, or a pointer to
   something that exists.
 
-Either way, run the gate and the detectors after it, and list it in the PR record
-under `Fixed after the last round`.
+Either way, run the gate and the detectors after it, and list it under the PR
+body's *Review*.

@@ -71,7 +71,8 @@ never `--no-verify`. What it cannot check:
   the change, not how it was reached. Of each sentence ask:
   would a reader in six months need it to see why the change is right? Is it
   already in CLAUDE.md, a rule file, the PRD or an ADR, so a pointer does? Does it
-  narrate the process? Cut what fails; the review's account goes in the PR record.
+  narrate the process? Cut what fails; of the review, only the PR body's *Review*
+  keeps a line.
 - A rule that leaves a governing document carries its history into the body of
   the commit that removes it (ADR 0033).
 - `Drift:` marks a commit that resolves a drift already on `main`, as a claim of

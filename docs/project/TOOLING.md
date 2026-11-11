@@ -119,23 +119,28 @@ silently drops conversation resolution.
 
 ## 3. Pull request template
 **What.** One shape for a PR body: what changed, why, the issues it closes, and
-how it was verified, with the review record collapsed under a summary of its
-counts, so the first screen holds the claim. `commits.yml` checks it (entry 11).
+how it was verified, then the review: the rounds run and each fix made after the
+last round, so the first screen holds the claim and the owner sees what to read
+at the merge. `commits.yml` checks it (entry 11).
 
 **Replaces.** Deciding what a PR body should contain, once per PR, and reading
-each one for an unwritten record.
+each one for an unwritten review.
 
 **Where.** `.github/pull_request_template.md`.
 
 **Ruled out.**
 - *Boxes for the gate and `/code-review`.* The gate's was ticked on 55 of 55 PRs:
-  `gate.yml` is a required check, and the written record replaces the other.
+  `gate.yml` is a required check, and the written review replaces the other.
 - *Listing which detectors ran.* The diff and each item's `Runs when:` say so;
   the line says what they found.
 - *Issues inside `<details>` or a comment.* GitHub does not say whether a closing
   keyword counts there.
-- *Sample values in the record or in Issues.* A sample left in reads as real, and
-  a real number would close; a `TODO` or a `#n` keeps the check red.
+- *Sample values in the review or in Issues.* A sample left in reads as real, and
+  a real number would close; the template's `TODO` or `#n` left in keeps the
+  check red.
+- *A line per accepted and dismissed finding, cited by its triage id.* The id
+  resolved to nothing once the tables were deleted, the reviewer never read the
+  lines, and the owner had confirmed each finding already (ADR 0063).
 
 ## 4. Gradle version catalog
 **What.** Every dependency and plugin version declared once, in TOML, referenced
@@ -373,9 +378,9 @@ values, the closed list of exempt subjects with the fold markers `fixup!`,
 `squash!` and `amend!` accepted by the local hook alone (ADR 0059), the
 branch name's shape, a typed subject that two commits on the branch share,
 checked at the push and on a PR (ADR 0062), and, on a PR, the title's form, its type against
-the branch prefix, and the form of its body (ADR 0057). Every failure names the
-rule, the value seen and the fix, and prints the scope list when the scope is
-at fault, so the error is the template.
+the branch prefix, and the form of its body with no triage id (ADRs 0057 and
+0063). Every failure names the rule, the value seen and the fix, and prints the
+scope list when the scope is at fault, so the error is the template.
 
 **Replaces.** Reading each subject against the written form by hand.
 
@@ -431,8 +436,11 @@ build.
 - *Failing a PR title that holds an "and".* A script sees the word, not whether
   one claim or two stands behind it, so a title for one claim that named two
   things failed, and each failure cost a title edit and a rerun.
-- *Counting the collapsed record in a PR body's bound.* Its dismissals need their
-  words, and it takes no room on the first screen.
+- *Bounding a PR body's review.* It comes after the claim, and a long list of
+  fixes no round read is for the owner to see, not to trim (ADR 0063).
+- *Checking each line of a PR body's review.* Markdown writes a list many ways,
+  and two review rounds of line patterns rejected valid lists and let prose
+  through; the check reads the first line and the template's samples only.
 
 ## 12. Issue form
 **What.** One form for every pending item (ADR 0038): the title in the commit

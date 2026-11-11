@@ -8,7 +8,7 @@ The branch that deferred those findings already spent its rounds, so this one is
 routed by its weakest fix:
 - **Every fix is cheap and passes a test of *A fix no round will read*, and the
   human confirms that:** no `/code-review`, only the gate and the detectors. The PR
-  record says `Review: not run — exempt: review-debt, every fix cheap and tested`.
+  body's *Review* says `Not run — exempt: review-debt, every fix cheap and tested`.
 - **Otherwise:** the whole diff gets a cap of one round, and the branch opens no new
   debt. A finding that is not a real defect is fixed if it passes a test of *A fix
   no round will read*, and otherwise proposed as Accept, which the human

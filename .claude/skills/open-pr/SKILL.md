@@ -1,6 +1,6 @@
 ---
 name: open-pr
-description: Open a pull request and see it through the GitHub bot — documentation-integrity detectors, the PR body and review record, the title check, answering and resolving threads. Use when the review rounds are done or exempt, before any gh pr create, or when the bot has answered on an open PR.
+description: Open a pull request and see it through the GitHub bot — documentation-integrity detectors, the PR body and its review section, the title check, answering and resolving threads. Use when the review rounds are done or exempt, before any gh pr create, or when the bot has answered on an open PR.
 ---
 
 # Open the pull request
@@ -26,11 +26,12 @@ What the check cannot see:
 - The body reads in a minute. Point at an ADR or the commits instead of restating
   them, since the copy in the body is the one nobody updates. A *What changed*
   that needs more than three sentences usually means a second claim.
-- The record copies the saved tables: the counts, each `Deferred:` issue, and each
-  `Accepted:` and `Dismissed:` as its id, what it claimed and the reason, in about
-  twenty words, so the line still answers a recurring finding once the tables are
-  gone. Write `none` where a round left nothing. A round still to come is not an
-  exemption: the `TODO` stays, and the check stays red, until the record is written.
+- *Review* lists every fix made after the last round, from the saved tables. An
+  issue a round deferred goes under `Related:`, and a dismissal proven only by
+  something seen outside the repository goes in `Evidence:`, in one sentence; no
+  other finding takes a line (ADR 0063). A round still to come is not an
+  exemption: the `TODO` stays, and the check stays red, until the section is
+  written.
 - Each issue the branch ships takes its own `Closes #n` under *Issues*, and the
   branch repoints every document that cites that issue to where its content now
   lives (ADR 0038).

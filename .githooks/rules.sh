@@ -1,7 +1,7 @@
 #!/bin/sh
 # The mechanical half of ADR 0034's message and branch rules, ADR 0033's trailer
-# forms, ADR 0057's PR body and ADR 0062's one subject per commit; the judgement
-# half stays in clean-branch and open-pr.
+# forms, ADR 0057's and ADR 0063's PR body and ADR 0062's one subject per
+# commit; the judgement half stays in clean-branch and open-pr.
 # Reports every failure, not only the first, then exits 1. Usage: the case at
 # the end of this file; cases: test-rules.sh.
 
@@ -287,42 +287,50 @@ section() {
 
 check_body_sections() {
     for name in 'What changed' Why Verification; do
-        text=$(section "## $name")
-        # The record is collapsed, so the bound on the first screen leaves it out.
-        [ "$name" = Verification ] && text=$(printf '%s\n' "$text" | sed '/^<details>/,/<\/details>/d')
-        text=$(printf '%s\n' "$text" | sed '/./,$!d')
+        text=$(section "## $name" | sed '/./,$!d')
         if [ -z "$text" ] && [ "$name" != Verification ]; then
             fail "*$name* is empty (ADR 0057)." "only the template's comment" \
                 "Write the section: a comment is not part of it."
         fi
         length=$(code_points "$text")
         if [ "$length" -gt "$SECTION_LIMIT" ]; then
-            fail "*$name* is $length characters, the limit is $SECTION_LIMIT, comments and the collapsed record excluded (ADR 0057)." \
+            fail "*$name* is $length characters, the limit is $SECTION_LIMIT, comments excluded (ADR 0057)." \
                 "$(printf '%s\n' "$text" | sed -n 1p)" \
                 "Point at the ADR or the commits instead of restating them."
         fi
     done
 }
 
-check_body_record() {
+check_body_verification() {
     verification=$(section '## Verification')
-    record=$(printf '%s\n' "$verification" | sed -n '/^Evidence:/,$p')
-    review='^<details><summary>Review:|^Review: not run — exempt: .'
-    if [ "$(printf '%s\n' "$verification" | grep -Ec "$review")" != 1 ] ||
-        [ "$(printf '%s\n' "$record" | grep -Ec "$review")" != 1 ]; then
-        fail "*Verification* holds an Evidence: line, then one review record, collapsed (ADR 0057)." \
-            "$(printf '%s\n' "$verification" | grep -E '^Evidence:|<summary>|^Review:' | paste -sd '|' -)" \
-            "Keep the template's Evidence: and <details><summary>Review: lines, or write Review: not run — exempt: <reason> without <details>."
+    if [ "$(printf '%s\n' "$verification" | grep -c '^Evidence:')" != 1 ]; then
+        fail "*Verification* holds one Evidence: line (ADR 0057)." \
+            "$(printf '%s\n' "$verification" | grep '^Evidence:' | paste -sd '|' -)" \
+            "Keep the template's Evidence: line: what you saw work beyond the checks, or none."
     fi
-    report_each "$(printf '%s\n' "$verification" | grep -E '(<summary>Review:.*[^[:alnum:]_]|^([-*+] +)?(Deferred|Accepted|Dismissed|Fixed after the last round): *)TODO([^[:alnum:]_]|$)')" \
-        "The review record still holds a TODO, so it is not written (ADR 0057)." \
-        "Write what the rounds left, or none where they left nothing."
-    report_each "$(printf '%s\n' "$verification" | grep -E '(^|[^[:alnum:]_])#n([^[:alnum:]_]|$)|r<k>-<n>')" \
-        "The review record still holds the template's #n or r<k>-<n>, so it is not written (ADR 0057)." \
-        "Write the real numbers, or none."
     report_each "$(printf '%s\n' "$verification" | grep -E '^([-*] \[[ xX]\] [^:]*|Evidence):$')" \
         "*Verification* keeps a template line with no value (ADR 0057)." \
         "Fill it, or delete the lines that do not apply."
+}
+
+# Only the first line and the template's own samples are read: the lines after it
+# are Markdown for the owner (ADR 0063).
+check_body_review() {
+    review=$(section '## Review' | sed '/./!d')
+    first=$(printf '%s\n' "$review" | sed -n 1p)
+    rounds='^(1 round|([2-9]|[1-9][0-9]+) rounds)\. Fixed after the last:'
+    if printf '%s\n' "$first" | grep -Eq "$rounds\$"; then
+        if [ -z "$(printf '%s\n' "$review" | sed 1d)" ]; then
+            fail "*Review* lists what was fixed after the last round (ADR 0063)." "$first" \
+                "Add one - item per fix, or end the line with: none."
+        fi
+    elif ! printf '%s\n' "$first" | grep -Eq "$rounds none\$|^Not run — exempt: .*[^ ]\$"; then
+        fail "*Review* opens with the rounds run, or with the branch's exemption (ADR 0063)." "${first:-nothing}" \
+            "Write: <n> rounds. Fixed after the last: (then a list, or none). Exempt: Not run — exempt: <reason>."
+    fi
+    report_each "$(printf '%s\n' "$review" | grep -E 'TODO what changed|^Not run — exempt: TODO([^[:alnum:]_]|$)|<reason>')" \
+        "*Review* still holds a sample from the template (ADR 0063)." \
+        "Write the fix or the exemption in plain words; with nothing fixed, end the first line with none and delete the item."
 }
 
 check_body_issues() {
@@ -342,9 +350,9 @@ check_body() {
     body=$(clean_body "$1")
     headings=$(printf '%s\n' "$body" | grep -E '^#+( |$)' | paste -sd '|' -)
     if ! printf '%s\n' "$headings" |
-        grep -Eq '^## What changed\|## Why(\|## Issues)?\|## Verification(\|### Screenshots)?$'; then
+        grep -Eq '^## What changed\|## Why(\|## Issues)?\|## Verification\|## Review(\|### Screenshots)?$'; then
         fail "A PR body has the template's headings, in its order (ADR 0057)." "${headings:-no headings}" \
-            "Use What changed, Why, Issues if any, Verification, Screenshots if any."
+            "Use What changed, Why, Issues if any, Verification, Review, Screenshots if any."
         return
     fi
     lead=$(printf '%s\n' "$body" | sed -E '/^#+( |$)/,$d' | sed '/./!d')
@@ -353,8 +361,12 @@ check_body() {
             "Move the text under a heading, or into a comment."
     fi
     check_body_sections
-    check_body_record
+    check_body_verification
+    check_body_review
     check_body_issues
+    report_each "$(printf '%s\n' "$body" | grep -E '(^|[^[:alnum:]_/.-])r[0-9]+-[0-9]+[a-z]?([^[:alnum:]_]|$)')" \
+        "A triage id cites a table that is deleted at the merge (ADR 0063)." \
+        "Say what the finding was in plain words; a token that only looks like an id goes in inline code."
 }
 
 case $1 in

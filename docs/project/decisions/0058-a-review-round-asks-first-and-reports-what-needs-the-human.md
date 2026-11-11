@@ -5,7 +5,6 @@ Status: Superseded by ADR-0061 — "nothing is committed, folded, reviewed again
 Date: 2026-11-09
 Backfilled: no
 Supersedes: ADR-0049 — "fixed, deferred to an issue, or dismissed", "before anything changes", and "On a branch that is wholly governance the human decides the rows that turn on a judgment, and the others stand unless reopened" (Decision)
-Enforced by: commits.yml — the review record's `Accepted:` line free of `TODO`
 Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Before each round, ask) — asking before every round, an answer with a question or a request not counting as a yes
 Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § The sequence) — the order from the raw output to the verdict, the verdict before any push or PR
 Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Buckets) — `Accept`, a deferred defect saying what it breaks

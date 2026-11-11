@@ -213,12 +213,9 @@ The reason.
 
 Evidence: none
 
-<details><summary>Review: 2 rounds, 1 deferred</summary>
-
-Deferred: #178
-Dismissed: none
-
-</details>
+## Review
+2 rounds. Fixed after the last:
+- a test case added
 BODY
 }
 
@@ -250,8 +247,11 @@ pr_body 0 'inline triple backticks are no fence' -e 's/^The reason\./```x``` is 
 pr_body 1 'a heading after a closed comment' -e 's/^The reason\./<!-- x -->\n## Extra/'
 pr_body 1 'text before the first heading' -e '1i Text above the claim.\n'
 pr_body 0 'a comment before the first heading' -e '1i <!-- A note. -->\n'
-pr_body 0 'an exempt branch' -e 's/^<details>.*/Review: not run — exempt: comments only/' -e '/^Deferred:/,$d'
-pr_body 1 'an exempt line with no reason' -e 's/^<details>.*/Review: not run — exempt:/' -e '/^Deferred:/,$d'
+pr_body 0 'an exempt branch' -e 's/^2 rounds.*/Not run — exempt: comments only/' -e '/^- a test/d'
+pr_body 1 'an exempt line with no reason' -e 's/^2 rounds.*/Not run — exempt: /' -e '/^- a test/d'
+pr_body 1 'a TODO for the exemption' -e 's/^2 rounds.*/Not run — exempt: TODO/' -e '/^- a test/d'
+pr_body 1 'the comment sample for the exemption' -e 's/^2 rounds.*/Not run — exempt: <reason>/' -e '/^- a test/d'
+pr_body 0 'an exemption naming a TODO' -e 's/^2 rounds.*/Not run — exempt: removes a TODO comment only/' -e '/^- a test/d'
 pr_body 1 'a heading out of order' -e 's/^## Why/## Tmp/' -e 's/^## What changed/## Why/' -e 's/^## Tmp/## What changed/'
 pr_body 1 'a heading of its own' -e 's/^## Why/## Notes\n\n&/'
 pr_body 1 'a missing section' -e 's/^## Why/The/'
@@ -260,29 +260,37 @@ pr_body 1 'Issues after Verification' -e '$a ## Issues'
 pr_body 1 'an empty section' -e '/^The reason/d'
 pr_body 0 '600 characters, em dashes' -e "s/^The reason\./——${long#xx}/"
 pr_body 1 '601 characters' -e "s/^The reason\./x$long/"
-pr_body 0 'details named in prose' -e 's/^The one claim\./Uses a <details> block./'
-pr_body 1 'details named in Verification keeps the bound' -e "s/^- \[x\] .*/- [x] found: x$long <details>/"
-pr_body 1 'details in Why keeps the bound' -e "s/^The reason\./Short.\n\n<details>\nx$long\n<\/details>/"
 pr_body 1 'What changed past the bound' -e "s/^The one claim\./x$long/"
 pr_body 1 'Verification past the bound' -e "s/^- \[x\].*/x$long/"
 pr_body 0 'a comment leaves the count' -e "s/^The reason\./short <!-- x$long -->/"
-pr_body 0 'the collapsed record leaves the count' -e "s/^Dismissed: none/Dismissed: x$long/"
+pr_body 0 'Review has no bound' -e "s/^- a test case added/- x$long/"
 pr_body 1 'no Evidence:' -e '/^Evidence:/d'
-pr_body 1 'the record before Evidence:' -e '/^Evidence:/d' -e '$a Evidence: none'
-pr_body 1 'no record' -e '/^Evidence:/q'
-pr_body 1 'two records' -e '$a Review: not run — exempt: comments only'
-pr_body 1 'a record on each side of Evidence:' -e 's/^Evidence:/Review: not run — exempt: x\n\n&/'
-pr_body 1 'a record outside details' -e 's/^<details><summary>/<summary>/'
-pr_body 1 'an open record' -e 's/^<details>/<details open>/'
-pr_body 1 'a TODO in the summary' -e 's/2 rounds/TODO rounds/'
-pr_body 1 'a TODO in the record' -e 's/^Deferred: .*/Deferred: TODO/'
-pr_body 1 'a TODO in the accepted line' -e 's/^Dismissed: none/Accepted: TODO/'
-pr_body 0 'a TODO quoted in a written record' -e 's/^Dismissed: none/Dismissed: r1-2, a TODO slips the check/'
-pr_body 0 'a word holding TODO' -e 's/^Dismissed: none/Dismissed: r1-1, TODOS is a word/'
-pr_body 1 'a TODO in a listed record line' -e 's/^Deferred: .*/- Deferred: TODO/'
-pr_body 1 'a TODO with no space' -e 's/^Deferred: .*/Deferred:TODO/'
-pr_body 1 'the template number left in the record' -e 's/^Deferred: .*/Deferred: #n/'
-pr_body 1 'the template id left in the record' -e 's/^Dismissed: none/Dismissed: r<k>-<n>, what it claimed, why it was wrong/'
+pr_body 1 'two Evidence: lines' -e 's/^Evidence: none/&\nEvidence: x/'
+pr_body 1 'no Review' -e '/^## Review/,$d'
+pr_body 1 'an empty Review' -e '/^2 rounds/,$d'
+pr_body 0 'one round' -e 's/^2 rounds/1 round/'
+pr_body 0 'twelve rounds' -e 's/^2 rounds/12 rounds/'
+pr_body 1 'one rounds' -e 's/^2 rounds/1 rounds/'
+pr_body 1 'three round, nothing fixed' -e 's/^2 rounds.*/3 round. Fixed after the last: none/' -e '/^- a test/d'
+pr_body 1 'no number of rounds' -e 's/^2 rounds/Two rounds/'
+pr_body 1 'the old summary line' -e 's/^2 rounds\. Fixed after the last:/<details><summary>Review: 2 rounds<\/summary>/'
+pr_body 0 'nothing fixed after the last round' -e 's/last:$/last: none/' -e '/^- a test/d'
+pr_body 1 'no list after the colon' -e '/^- a test/d'
+pr_body 0 'the lines after the first are not read' -e 's/^- a test case added/  see the commits/'
+pr_body 1 'a TODO for the rounds' -e 's/^2 rounds/TODO rounds/'
+pr_body 1 'the template item left' -e 's/^- a test case added/- TODO what changed/'
+pr_body 1 'the template item numbered' -e 's/^- a test case added/1. TODO what changed/'
+pr_body 1 'the template item left after none' -e 's/last:$/last: none/' -e 's/^- a test case added/- TODO what changed/'
+pr_body 1 'the template item left after an exemption' -e 's/^2 rounds.*/Not run — exempt: comments only/' -e 's/^- a test case added/- TODO what changed/'
+pr_body 0 'a TODO named in an item' -e 's/^- a test case added/- removed a stale TODO/'
+pr_body 0 'a fix that starts with TODO' -e 's/^- a test case added/- TODO comments removed from the hook/'
+pr_body 1 'a triage id in the list' -e 's/^- a test case added/- r2-4, a test case added/'
+pr_body 1 'a split triage id in Why' -e 's/^The reason\./Fixes r1-2a./'
+pr_body 0 'a triage id in inline code' -e 's/^The reason\./Prints `r1-2`./'
+pr_body 0 'a range after a word ending in r' -e 's/^The reason\./Pages per2-3./'
+pr_body 0 'an id-like name in a URL' -e '$a ### Screenshots\n![home](https://example.com/home-r1-2.png)\n![detail](https://example.com/r2-3/detail.png)'
+pr_body 1 'a triage id after a comma' -e 's/^The reason\./Fixed,r1-2 too./'
+pr_body 1 'a triage id in parentheses' -e 's/^The reason\./Fixed (r1-2)./'
 pr_body 1 'a box with no value' -e 's/^- \[x\] .*/- [ ] OpenSpec change archived at:/'
 pr_body 1 'an empty Evidence:' -e 's/^Evidence: none/Evidence:/'
 pr_body 1 'an empty Issues' -e 's/^## Verification/## Issues\n\n&/'
@@ -296,7 +304,7 @@ template=$(dirname "$rules")/../.github/pull_request_template.md
 expect 1 'body: the template as it ships' sh "$rules" body "$template" 'chore(ship): Check a thing'
 sed -E -e 's/TODO/2/g' -e '/^## What changed/a The claim.' -e '/^## Why/a The reason.' \
     -e 's/#n, closes #n/#1, closes #2/' -e 's/^Related: .*/Related: #3/' -e 's/^(- \[ \] .*:)$/\1 x/' \
-    -e 's/^Deferred: .*/Deferred: #4/' -e 's/^(Accepted|Dismissed|Fixed after the last round): .*/\1: none/' "$template" >"$tmp/body"
+    "$template" >"$tmp/body"
 expect 0 'body: the template once filled' sh "$rules" body "$tmp/body" 'chore(ship): Check a thing'
 
 if [ "$failures" -gt 0 ]; then
