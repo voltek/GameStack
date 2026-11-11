@@ -220,9 +220,11 @@ Any fix of the round that ends the rounds, and any fix after it.
   goes to Defer, all such rows into one `review-debt` issue, except on a branch
   working `review-debt`, which opens no new debt
   (`references/review-debt-branch.md`). **Proven by a
-  mechanism:** a test seen failing on a mutation of what it guards, then passing; it
-  changes no governing text, since a reader is that text's only proof, and settles
-  no question a deferral left open. **Writes no new rule:** a spelling or wrap fix,
+  mechanism:** a test seen failing on a mutation of what it guards, then passing.
+  Plant the mutation with the Edit tool, print the mutated line and check the
+  file still parses (`bash -n` for a script): one that did not land, or broke
+  the syntax, proves nothing. It changes no governing text, since a reader is that
+  text's only proof, and settles no question a deferral left open. **Writes no new rule:** a spelling or wrap fix,
   a revert, a deletion nothing depends on, text moved unchanged, or a pointer to
   something that exists.
 

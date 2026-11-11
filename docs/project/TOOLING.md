@@ -621,6 +621,33 @@ reader outside the session could open.
 - *A fixed `commit` string.* It would name one model forever, whichever model
   made the commit.
 
+## 16. Agent memory gate
+**What.** A `PreToolUse` hook on Write and Edit that denies the first write to
+each agent memory file in a session, its reason the question ADR 0066 asks:
+would this serve a clone or another person, and then go to the repository; does
+it serve nobody, and then not be written. The same call sent again goes through.
+The index of memories is let through, since it only points at them.
+
+**Replaces.** Lessons that gathered in one machine's memory unasked, found only
+by a walk through every file weeks later (#88).
+
+**Where.** `.claude/hooks/memory-gate.mjs`, registered in
+`.claude/settings.json`, and `test-memory-gate.sh` beside it, run by
+`commits.yml`. It keeps which files it asked about per session in the system's
+temporary folder, or `$CLAUDE_MEMORY_GATE_DIR`, for two days.
+
+**Ruled out.**
+- *Context added without blocking.* It reaches the model beside the tool's
+  result, after the file is written, so a memory that served nobody would need
+  deleting, which auto mode's classifier refuses.
+- *An `ask` decision.* The owner would answer a permission prompt on every
+  memory write, where the agent can answer the question itself.
+- *Parsing the input in shell.* A memory's content can hold a `file_path` of its
+  own, and Git Bash has no `jq`.
+- *Matching shell commands too.* A command names the memory folder in more
+  spellings than a pattern reads (§ 10), so a memory written through the shell
+  is not asked about.
+
 ---
 
 ## Running on Windows

@@ -60,7 +60,9 @@ beside the handoff; a shared home for a team's cycle is #159's question.
   issues (ADR 0047).
 - **Breakers.** A third insertion in one cycle stops it, and so does the file
   growing past 30 lines. An item that overruns — a third review round, the rule
-  of three — goes back to the pool at the next triage.
+  of three — goes back to the pool at the next triage. Before proposing an
+  insertion, say whether it would be the third, and offer the open item's plan
+  instead when the work fits there.
 - **Closed whole** when the exit condition holds, or **stopped** when a breaker
   fires: either way, move the file to `archive/cycles/YYYY-MM-cycle-N.md`, the
   month it closed and its number, and a triage chooses the next cycle from the
@@ -130,9 +132,11 @@ already show those.
    `== HANDOFF.md (<path>) ==` header prints: `wc -l` and `wc -c` within 40
    and 3,000, and no hash or next ADR number anywhere:
    `grep -E '\b[0-9a-f]{7,40}\b|next (free )?ADR' "<path>"`.
-5. Route what the session learned, never into the handoff: a preference to
-   agent memory, a rule change proposed to the owner, a decision to an ADR, an
-   incident to the commit body, pending work to an issue.
+5. Route what the session learned, never into the handoff: what is personal to
+   the owner or about this machine to agent memory, a rule change proposed to
+   the owner, a decision to an ADR, an incident to the commit body, pending work
+   to an issue. What would serve a clone or another person never goes to memory
+   (ADR 0066).
 6. At session end, stop. Report in three lines or fewer: what changed, the next
    action, anything owed by the owner.
 
