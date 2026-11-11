@@ -1,6 +1,7 @@
 # ADR 0058 — A review round asks first and reports what needs the human
 
 Status: Accepted
+Status: Superseded by ADR-0061 — "nothing is committed, folded, reviewed again or opened as a PR before every row and the verdict are confirmed" (Decision), for round 1's fixes that need no decision
 Date: 2026-11-09
 Backfilled: no
 Supersedes: ADR-0049 — "fixed, deferred to an issue, or dismissed", "before anything changes", and "On a branch that is wholly governance the human decides the rows that turn on a judgment, and the others stand unless reopened" (Decision)

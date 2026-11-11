@@ -115,7 +115,7 @@ present, using the name GitHub's API uses, because that is what
 - `test: <TestName>#<caseName>`
 - `gate.yml`
 - `commits.yml` — a check on every commit, the title, the body and the branch
-  name of a pull request. Until branch protection requires it, the line says
+  name of a pull request, or a harness script's test it runs. Until branch protection requires it, the line says
   `(not a required check)` after the value.
 - `git hook — .githooks/<hook>` — binds anyone committing or pushing from a
   clone where a Gradle build has set `core.hooksPath`; `--no-verify` skips it.
