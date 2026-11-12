@@ -19,7 +19,7 @@ what does not exist, and one sentence telling the branch that first runs it to
 correct it and remove the marker before its merge, where #n is the issue of the
 feature that runs it first. The marker holds its instruction itself: a Skill run
 through the Skill tool may not load a path rule, and some sections run after
-`new-feature` step 9, in a review or at the merge.
+`build-feature` step 9, in a review or at the merge.
 
 ## Consequences
 The convention lived in `governance.md`, which loads when a Skill file is read, so a

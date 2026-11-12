@@ -5,7 +5,7 @@ import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-// Apicalypse endpoints get added here via the new-api-service skill. Every call on
+// Apicalypse endpoints get added here via the write-igdb-endpoint skill. Every call on
 // this service is authenticated automatically by AuthInterceptor — never add
 // Client-ID/Authorization headers manually to a function here.
 interface IgdbApiService {

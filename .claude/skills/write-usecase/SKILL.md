@@ -1,5 +1,5 @@
 ---
-name: new-usecase
+name: write-usecase
 description: Create or change a UseCase in the Domain layer, which calls one or more Repository functions and holds the product rules between them. Use when asked to create a UseCase, or when a ViewModel needs data or an action from a Repository.
 ---
 

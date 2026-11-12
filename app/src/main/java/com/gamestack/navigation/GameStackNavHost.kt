@@ -89,7 +89,7 @@ internal fun NavHostController.navigateToBottomNavDestination(destination: Desti
     }
 }
 
-// Placeholders until the corresponding feature screens are built (see new-feature skill).
+// Placeholders until the corresponding feature screens are built (see build-feature skill).
 @Composable
 private fun HomePlaceholder() = DestinationPlaceholder(R.string.nav_home)
 

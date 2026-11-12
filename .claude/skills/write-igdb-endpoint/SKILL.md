@@ -1,5 +1,5 @@
 ---
-name: new-api-service
+name: write-igdb-endpoint
 description: Create or change an IGDB endpoint — the Retrofit function, its Apicalypse query and its DTOs. Use when asked to add an endpoint to the IGDB API service, to request another field from IGDB, or to change a query.
 ---
 

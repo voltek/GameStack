@@ -46,12 +46,12 @@ viewModel.uiEffect.test {
 ## What each class gets
 - **UseCase.** Happy: the Repository succeeds and the UseCase returns the expected
   data. Sad: the Repository fails and the failure comes out unchanged.
-- **Mapper.** What `new-mapper` § Tests lists.
+- **Mapper.** What `write-mapper` § Tests lists.
 - **Repository.** Happy: each source returns data. Sad: a network failure and an
   empty response.
 - **ViewModel.** Every `UiEvent` has a test. Happy: the event produces the expected
   `UiState`. Sad: a UseCase failure reaches `UiState`, or a `UiEffect`.
-- **ViewModel that supersedes work.** A `mapLatest` pipeline (`new-viewmodel`), a
+- **ViewModel that supersedes work.** A `mapLatest` pipeline (`write-viewmodel`), a
   debounce or a throttle also gets an interaction test that the superseded call never
   ran (`coVerify(exactly = 0)`): a cancellation that fails can still leave a
   correct-looking final state. A request superseded after it reached the UseCase has

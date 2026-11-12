@@ -29,7 +29,7 @@ ambiguity or risk this feature raises, saying what prompted it.
 
 ## When to stop
 - Stop once the answers can fill the feature's OpenSpec change (`openspec-propose`,
-  `new-feature` step 0). This Skill decides what the feature is, never how it is
+  `build-feature` step 0). This Skill decides what the feature is, never how it is
   built: the stack and layering are CLAUDE.md's.
 - A capability with a spec in `openspec/specs/` is settled by it; reopen
   nothing it answers. One whose *Spec* column in the PRD says none yet is not

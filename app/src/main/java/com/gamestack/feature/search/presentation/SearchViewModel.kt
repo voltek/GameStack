@@ -49,7 +49,7 @@ class SearchViewModel @Inject constructor(
     // No field records which query was already searched — the operators carry it.
     // distinctUntilChanged after trim: a whitespace-only edit is not a new query,
     // so it neither restarts a search nor disturbs one in flight. See the
-    // debounced-pipeline pattern in the new-viewmodel Skill.
+    // debounced-pipeline pattern in the write-viewmodel Skill.
     @OptIn(ExperimentalCoroutinesApi::class)
     private val searchPipeline = merge(
         typedQuery

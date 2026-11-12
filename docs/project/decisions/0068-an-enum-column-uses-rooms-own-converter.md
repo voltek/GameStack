@@ -5,7 +5,7 @@ Date: 2026-11-11
 Backfilled: no
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Data Sources — an enum column with a hand-written converter, and a constant renamed or removed after the first release without a version bump and a `Migration`
 Enforced by: none (prose only — .claude/skills/write-tests/references/room-tests.md) — a test pinning each stored enum's names
-Enforced by: none (prose only — .claude/skills/new-room-dao/SKILL.md § Enum columns) — a `@TypeConverter` only for a type Room cannot store
+Enforced by: none (prose only — .claude/skills/write-room-storage/SKILL.md § Enum columns) — a `@TypeConverter` only for a type Room cannot store
 
 ## Context
 `new-room-dao`, `new-repository-impl` and `write-tests` said Room could not persist a

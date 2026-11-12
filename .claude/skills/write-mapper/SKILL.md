@@ -1,5 +1,5 @@
 ---
-name: new-mapper
+name: write-mapper
 description: Create or change a Mapper between a DTO or Entity and a domain model — `toDomain()` on the read path, `toEntity()` on the write path. Use when asked for a Mapper, or when a DTO, an Entity or a domain model gains, loses or renames a field.
 ---
 
@@ -22,7 +22,7 @@ Not a Mapper, so not here:
 ## Writing it
 - File `{DataType}Mapper.kt`, named for the DTO or Entity in both directions, in
   `core/data/mapper/`, or that feature's `data/mapper/` only for a type that, per the
-  PRD, no other feature reads, as for its Repository (`new-repository-impl`).
+  PRD, no other feature reads, as for its Repository (`write-repository`).
   An Entity's `toDomain()` and `toEntity()` share one file, so the two stay in step.
 - The reference is `core/data/mapper/GameDtoMapper.kt`.
 - Assign every field of the target by name, including those with a default value: a

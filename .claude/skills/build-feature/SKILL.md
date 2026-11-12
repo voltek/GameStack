@@ -1,5 +1,5 @@
 ---
-name: new-feature
+name: build-feature
 description: Start any feature that adds or changes what the user sees, however small, from the OpenSpec change first, then build it from Domain models to UI and close it, following Clean Architecture and MVI. Use before writing code for a new feature, screen or visible behaviour, whichever layer it starts in.
 ---
 
@@ -33,15 +33,15 @@ its code.
 ### 1. Domain models
 The pure domain model(s) the feature needs, beside the Repository that returns them:
 `core/domain/model/` for a Repository in `core/`, which is the default
-(`new-repository-impl` § The interface), the feature's own `domain/model/` otherwise.
+(`write-repository` § The interface), the feature's own `domain/model/` otherwise.
 
 ### 2. Repository
-Invoke `new-repository-impl`: the interface, then its implementation and its Hilt
-binding in this same step (`new-repository-impl` § The implementation), bringing in
-`new-room-dao`, `new-mapper` and `new-api-service` as it needs them.
+Invoke `write-repository`: the interface, then its implementation and its Hilt
+binding in this same step (`write-repository` § The implementation), bringing in
+`write-room-storage`, `write-mapper` and `write-igdb-endpoint` as it needs them.
 
 ### 3. UseCases
-Invoke `new-usecase` for each thing the screen asks of the domain (`new-usecase`
+Invoke `write-usecase` for each thing the screen asks of the domain (`write-usecase`
 § Location and name).
 
 ### 4. Prototype
@@ -54,11 +54,11 @@ Stop until the owner approves the prototype. A visual or UX choice is an ask-fir
 decision (CLAUDE.md § Working here): the agent proposes, the owner decides.
 
 ### 6. ViewModel
-Invoke `new-viewmodel`, shaping `UiState` from the approved prototype and the spec's
+Invoke `write-viewmodel`, shaping `UiState` from the approved prototype and the spec's
 states, with the UseCases from step 3.
 
 ### 7. Screen
-Invoke `new-screen`, implementing the approved prototype's layout.
+Invoke `write-screen`, implementing the approved prototype's layout.
 
 ### 8. Navigation
 Add the screen's type-safe route to `Destination` and its `composable<>` to the tab

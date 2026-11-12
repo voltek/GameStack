@@ -1,5 +1,5 @@
 ---
-name: new-viewmodel
+name: write-viewmodel
 description: Create a ViewModel following the MVI pattern for a screen, or change one. Use when asked to create a ViewModel, or to add debounced input or a navigation argument to one.
 ---
 

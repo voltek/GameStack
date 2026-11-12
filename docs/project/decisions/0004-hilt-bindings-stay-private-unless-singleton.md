@@ -3,7 +3,7 @@
 Status: Accepted
 Date: 2026-08-05
 Backfilled: yes — DRIFT-LOG.md, row 2026-08-05 ("Hilt visibility rule")
-Enforced by: none (prose only — .claude/skills/new-hilt-module/SKILL.md § Visibility)
+Enforced by: none (prose only — .claude/skills/write-hilt-module/SKILL.md § Visibility)
 
 ## Context
 Two rules collided the first time they were applied together. "Keep a
