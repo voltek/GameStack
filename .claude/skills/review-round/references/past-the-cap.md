@@ -11,6 +11,13 @@ acts wrongly. The gate and the detectors must be unable to check it, and what th
 rounds did must make it likely. Wording, friction and a reviewer that might find
 more are no reason. The saved table records the decision.
 
+## Where a redesign runs
+A redesign runs in the session that holds the failed attempts, since a subagent's
+brief would carry only a summary of them (ADR 0077). When an earlier touch was made
+in another branch, read it from that branch's history, and ask whether this branch
+needs the defect gone. If it does, the redesign is this branch's one redesign; if
+not, open an issue for it, and leave that code as `main` has it.
+
 ## One redesign per branch
 A redesign restarts the round count, under the same cap, for what it rewrote only;
 a fix outside it follows *A fix no round will read*. If the rule of three fires
