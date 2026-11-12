@@ -22,13 +22,12 @@ exercising it needs real SQLite (an instrumented `androidTest/` suite, currently
 backlog). What this skill covers instead:
 - Repository tests with a **mocked DAO** — proving the Repository calls the right
   DAO function with the right arguments, and handles what comes back.
-- Write-path mapper tests with an enum round trip — proving the *mapper's own*
+- Write-path mapper tests with a round trip — proving the *mapper's own*
   field-to-field mapping is consistent (see `new-mapper`). This does NOT exercise
-  Room's registered `@TypeConverter` — `toEntity()`/`toDomain()` never call it.
-- Direct `@TypeConverter` tests — plain JVM calls against the converter object's
-  functions (`GameRatingConverters.fromRating(...)`, `.toRating(...)`, etc.), no
-  Room/SQLite involved. This is what actually proves a converter is correct,
-  registered, and matches the mapper (see "TypeConverter" below).
+  how Room stores a column — `toEntity()`/`toDomain()` never reach Room.
+- Direct `@TypeConverter` tests, for a converter of a type Room cannot store — plain
+  JVM calls, no Room/SQLite involved (see "TypeConverter" below). An enum column has
+  none: Room's own converter stores it (ADR 0068).
 
 Be honest about the residual gap: a wrong `@Query` string or a missing migration
 will pass every test in this project and fail on device. Don't write a mocked
@@ -164,18 +163,22 @@ state by coincidence.
 ### Mapper (write path)
 - Round trip: `domainModel.toEntity().toDomain()` returns the original model,
   including nullable enum fields (rating unset, list status unset). Proves the
-  mapper's internal consistency only — see "TypeConverter" below for what
-  actually exercises Room's converter.
+  mapper's internal consistency only, not how Room stores the columns.
+
+### Stored enum
+Each enum Room stores gets one test asserting `entries.map { it.name }` equals the
+names as stored, with a failure message saying that renaming or removing a stored
+constant needs, before the first release, the app's data cleared, and after it, a
+version bump and a `Migration` (ADR 0068). Room's converter stores the name, and no
+schema check sees a rename, so this test is the only thing that does.
 
 ### TypeConverter
-- Happy: call the `@TypeConverter` function directly (not through Room) —
-  enum → stored string → enum returns the original value. No `@Database`,
-  no SQLite, no instrumentation needed: it's a plain function call.
-- Sad: an unrecognized stored string returns the documented fallback (`null`,
-  per `new-room-dao`) instead of throwing.
-- This is the test that actually catches a converter storing the wrong
-  representation (e.g. ordinal instead of name) — the mapper round trip above
-  cannot, because it never calls this function.
+Only for a type Room cannot store; an enum column has none (ADR 0068).
+- Happy: call the `@TypeConverter` functions directly (not through Room) — value →
+  stored form → value returns the original. A plain function call: no `@Database`,
+  no SQLite.
+- Sad: a stored form the converter cannot read has a documented result, and the test
+  asserts it.
 
 ## Naming convention
 Test function names use backticks with natural language, describing behavior:
@@ -268,8 +271,6 @@ Android setup is awkward and slow — but it is the same question asked at scale
   affected suite after each agent edit — see issue #65.
 - **Real persistence.** No test in this project touches real SQLite; see
   "Scope" above. An instrumented `androidTest/` suite covering DAO queries and
-  Room migrations is backlog (issue #132). `@TypeConverter`s
-  are the exception — they're plain JVM functions and ARE directly unit-tested
-  (see "TypeConverter" above); what remains untested pre-instrumentation is
-  Room actually invoking them at runtime (registration on `@Database`) and the
-  `@Query`/migration surface.
+  Room migrations is backlog (issue #132). Until then a `@Query`, a converter's
+  registration and a migration, including one an enum rename needs (ADR 0068), are
+  untested.
