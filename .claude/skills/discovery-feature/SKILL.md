@@ -1,6 +1,6 @@
 ---
 name: discovery-feature
-description: Asks a series of guided questions to turn a vague feature idea into the answers its OpenSpec change needs, aware of existing project architecture. Use when adding a feature to a project that already has a PRD and a CLAUDE.md — not for defining a brand-new project from zero.
+description: Ask guided questions that turn a vague feature idea into the answers its OpenSpec change needs, checked against the project's rules. Use when a feature's scope is ambiguous and the project already has a PRD and a CLAUDE.md.
 compatibility: Requires the target project to have a CLAUDE.md.
 ---
 
@@ -29,7 +29,7 @@ ambiguity or risk this feature raises, saying what prompted it.
 
 ## When to stop
 - Stop once the answers can fill the feature's OpenSpec change (`openspec-propose`,
-  `new-feature` step 0). This Skill decides what the feature is, never how it is
+  `build-feature` step 0). This Skill decides what the feature is, never how it is
   built: the stack and layering are CLAUDE.md's.
 - A capability with a spec in `openspec/specs/` is settled by it; reopen
   nothing it answers. One whose *Spec* column in the PRD says none yet is not
@@ -51,9 +51,8 @@ OpenSpec change for the feature's branch (ADR 0041) — minimum behavior as
 requirements and scenarios, open questions under the proposal's
 `## Open Questions`.
 
-Not yet exercised with OpenSpec. Which of this Skill and `openspec-explore` clarifies
-Detail (#106), the pilot's first feature, is #206's question; the pilot's verdict then
-decides whether this Skill retires (TOOLING.md § 13, **Pilot.**).
+Not exercised yet (#106): no feature has run it with OpenSpec.
+The first branch to run it corrects it and removes this note.
 
 ## Quality criteria
 - The "touches existing systems" answer is explicit — never left ambiguous,

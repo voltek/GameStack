@@ -25,7 +25,7 @@ theme       ui/theme
 core        core/ packages shared by two or more features
 build       Gradle build files, dependency versions, the wrapper
 governance  CLAUDE.md rules and bounds, .claude/rules, ADRs, drift, the drift checklist
-skills      implementation Skills: new-*, write-tests, verify-on-device, discovery-feature
+skills      implementation Skills: build-feature, write-*, verify-on-device, discovery-feature
 ship        branch to merge: review rounds, PR template, commit messages, PR titles, branch names
 gate        CI workflows
 agent       .claude/ settings and agent hooks

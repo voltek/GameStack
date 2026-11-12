@@ -1,6 +1,6 @@
 ---
 name: open-pr
-description: Open a pull request and see it through the GitHub bot — documentation-integrity detectors, the PR body and its review section, the title check, answering and resolving threads. Use when the review rounds are done or exempt, before any gh pr create, or when the bot has answered on an open PR.
+description: Open a pull request and see it through the GitHub bot's external round — documentation-integrity detectors, the PR body and its review section, the title check, answering and resolving threads. Use when the local review rounds are done or exempt, before any gh pr create, or when the bot has answered on an open PR.
 ---
 
 # Open the pull request

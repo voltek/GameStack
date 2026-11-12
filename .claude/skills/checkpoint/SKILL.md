@@ -1,6 +1,6 @@
 ---
 name: checkpoint
-description: Rewrite the session handoff (HANDOFF.md) and the open cycle (CYCLE.md) — after a merge or an abandoned branch, when a cycle item's status changes, and at session end. Holds the rules both files follow, the cycle's admission and breaker rules, when a triage is owed and what it proposes, and one task per session. Use whenever a cycle status changes, a triage is owed, or the session is ending.
+description: Rewrite the session handoff (HANDOFF.md) and the open cycle (CYCLE.md), and hold the cycle's rules — admission, breakers, when a triage is owed and what it proposes, one task per session. Use after a merge or an abandoned branch, when a cycle item's status changes, before admitting work to the cycle, when a triage is owed, and at session end.
 ---
 
 ## Why this exists

@@ -1,6 +1,6 @@
 ---
 name: clean-branch
-description: Update a branch against main and shape its history into claims — merge origin/main, fold corrections, reword commits, write the final commit messages, rename a drifted branch. Use when the work on a branch is done and before a review round, to fold a review's fixes, and before any fold, reword or rebase of a branch's history, whenever it happens.
+description: Update a branch against main and shape its history into one commit per claim — merge origin/main, fold and reword commits, write the final messages, rename a drifted branch. Use when a branch's work is done, before a review round, to fold a review's fixes, and before any fold, reword or rebase, whenever it happens.
 ---
 
 # Clean a branch

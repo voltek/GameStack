@@ -1,16 +1,16 @@
 ---
-name: new-room-dao
-description: Create a Room Entity, its DAO, any required TypeConverters, and register both on the app Database. Use when a feature needs local persistence, or changes an Entity, its columns or a stored enum, or as part of the new-repository-impl skill.
+name: write-room-storage
+description: Create a Room Entity, its DAO, any required TypeConverters, and register both on the app Database. Use when a feature needs local persistence, or changes an Entity, its columns or a stored enum.
 ---
 
-Not exercised yet: no Room code exists. The first Entity in Detail (#106) validates
-this Skill; correct it in that branch from what the code needed.
+Not exercised yet (#106): no Room code exists.
+The first branch to run it corrects it and removes this note.
 
 ## Scope
 Everything Room-specific below the Repository: the `@Entity`, the `@Dao`, any
 `@TypeConverter`, the `@Database` class and its schema. Not the Repository
-(`new-repository-impl`), the Domain↔Entity conversion (`new-mapper`) or the DI
-bindings (`new-hilt-module`).
+(`write-repository`), the Domain↔Entity conversion (`write-mapper`) or the DI
+bindings (`write-hilt-module`).
 
 ## Entity
 - `@Entity(tableName = "...")`, snake_case.
@@ -69,8 +69,8 @@ feature reads it.
 1. Create or extend the Entity and the DAO.
 2. Register them on the Database, handle a schema change as § Database says, and
    commit the exported schema.
-3. Invoke `new-hilt-module` to provide the Database and the DAO.
-4. Invoke `new-mapper` for `toDomain()` and `toEntity()`.
+3. Invoke `write-hilt-module` to provide the Database and the DAO.
+4. Invoke `write-mapper` for `toDomain()` and `toEntity()`.
 
 ## Tests
 A DAO is not unit-tested: it needs real SQLite, and the instrumented suite for DAOs

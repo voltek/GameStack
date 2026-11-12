@@ -1,14 +1,16 @@
 ---
 name: review-round
-description: Run a code review round — launch /code-review on the human's yes, save its raw output, triage every finding in a table, apply alone in round 1 what needs no decision, the rest once the human confirms, apply the stopping rule and the cap. Use when a branch is ready for review, when /code-review or the GitHub bot returns findings, or to decide whether another round is owed.
+description: Run a local /code-review round on the human's yes, triage its findings, and decide whether another is owed. Use when a branch is ready for review before its PR, when /code-review returns findings, or to triage the GitHub bot's findings.
 ---
 
 # Run a review round
 
-Starts on a clean branch with a green gate. Every local round runs before the PR
-exists (ADR 0014): a PR opened early anchors threads to commits the fixes rewrite,
-and its body goes stale. The bot's findings take the same triage, and their fixes follow
-§ A fix no round will read. Next: another round or `open-pr`.
+Starts on a clean branch with a green gate. A round here is a local `/code-review`
+round, and every one runs before the PR exists (ADR 0014): a PR opened early anchors
+threads to commits the fixes rewrite, and its body goes stale. The GitHub bot's round
+is external: it runs on the PR (`open-pr` § 5), neither counts as a local round nor
+replaces one, and borrows only this triage; its fixes follow § A fix no round will
+read. Next: another round or `open-pr`.
 
 ## Stopping rule
 Every `Fix (defect)` row names its origin, checked with git against the commits
@@ -49,9 +51,8 @@ A branch that ADR 0041 says carries an OpenSpec change and has no folder
 `openspec/changes/<branch-kebab-name>/` stops here. One that has it runs
 `openspec-verify-change` before the first round and fixes every CRITICAL. Each test a scenario's
 `VERIFIED BY` names exists under that name, and each `device` one joins the device
-pass. Not exercised yet, like § The sequence step 7's delta: no branch has taken
-a change through a round. The first, in Detail (#106), validates both; correct
-them in that branch from what it needed.
+pass. Not exercised yet (#106): no branch has taken a change through a round.
+The first branch to run it corrects it and removes this note.
 
 ## Before each round, ask
 A round starts only on the human's explicit yes. Send *ready for round k* with:
@@ -65,9 +66,7 @@ A round starts only on the human's explicit yes. Send *ready for round k* with:
 On a yes, invoke `/code-review <level> --max-findings default` through the Skill
 tool, on the session's model (#187 holds cheaper ones). Always pass both: a level
 or a cap typed earlier is reused otherwise. An answer that carries a question or a request is not a yes:
-handle it and ask again. Note the commit the round reads, for the table. The
-GitHub bot is a different reviewer: its round says nothing about whether
-`/code-review` ran.
+handle it and ask again. Note the commit the round reads, for the table.
 
 ## The sequence
 1. Save the raw output verbatim, before any digest of it:
@@ -94,7 +93,8 @@ GitHub bot is a different reviewer: its round says nothing about whether
    `Fix (defect)`; `Fix (cheap)`, only those that pass § A fix no round will read
    if this round ends the rounds; then open or label each Defer's issue. On a
    branch with an OpenSpec change, a fix that changes behaviour, the bot's
-   included, also updates the change's delta.
+   included, also updates the change's delta. Not exercised yet (#106): no delta has
+   been updated. The first branch to run it corrects it and removes this note.
 8. Run the gate, and after the last round on a governance diff the detectors too
    (`open-pr` § 1).
 9. Fold the fixes into the commits that should have been right (`clean-branch`).

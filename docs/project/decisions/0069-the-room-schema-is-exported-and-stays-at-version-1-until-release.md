@@ -4,7 +4,7 @@ Status: Accepted
 Date: 2026-11-11
 Backfilled: no
 Enforced by: checklist detector — DRIFT-CHECKLIST.md § Data Sources — `fallbackToDestructiveMigration()` anywhere, and a schema changed after the first release without a version bump and a `Migration`
-Enforced by: none (prose only — .claude/skills/new-room-dao/SKILL.md § Database) — the exported schema committed, and app data cleared on a development device after a schema change
+Enforced by: none (prose only — .claude/skills/write-room-storage/SKILL.md § Database) — the exported schema committed, and app data cleared on a development device after a schema change
 
 ## Context
 No Room code existed yet; Detail (#106) was to create the first Database, holding the

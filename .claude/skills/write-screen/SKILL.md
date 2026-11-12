@@ -1,6 +1,6 @@
 ---
-name: new-screen
-description: Create a Composable screen that observes a ViewModel following MVI, or change one. Use when asked to create a screen, UI or Composable for a feature, to add a state, a preview or pull-to-refresh to one, or as part of the new-feature skill.
+name: write-screen
+description: Create a Composable screen that observes a ViewModel following MVI, or change one. Use when asked to create a screen, UI or Composable for a feature, or to add a state, a preview or pull-to-refresh to one.
 ---
 
 ## Design reference

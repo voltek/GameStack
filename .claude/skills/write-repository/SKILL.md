@@ -1,6 +1,6 @@
 ---
-name: new-repository-impl
-description: Create a Repository, its interface in the Domain layer and its implementation in the Data layer. Use when asked to create a Repository or a RepositoryImpl, or as part of the new-feature skill.
+name: write-repository
+description: Create or change a Repository — its interface in the Domain layer, its implementation in the Data layer, and its writes to the user's library. Use when asked to create a Repository or a RepositoryImpl, or to add a read or a write to one.
 ---
 
 ## The interface
@@ -11,7 +11,7 @@ description: Create a Repository, its interface in the Domain layer and its impl
   `GamesRepository`, `UserGameRepository` (PENDING — not yet defined; Detail, #106).
 - A one-shot call is `suspend fun` returning `Result<T>`; data the UI keeps observing
   returns `Flow<Result<T>>`, so a failure reaches the UseCase as a value it passes on
-  (`new-usecase`). Only Domain types in its signatures.
+  (`write-usecase`). Only Domain types in its signatures.
 - Name each function for what it gives the caller (`searchGames`), not how
   (`fetchFromApiOrCache`).
 - The read and the write of the same data, such as a rating, belong to one
@@ -21,12 +21,12 @@ description: Create a Repository, its interface in the Domain layer and its impl
 - `{Name}RepositoryImpl @Inject constructor(...)`, beside its interface's choice:
   `core/data/repository/`, or that feature's `data/repository/`. It takes its API
   services and DAOs as `private val`, and the Database when it writes (§ Writes).
-- Bind it to its interface (`new-hilt-module`): in `RepositoryModule`, or for a
+- Bind it to its interface (`write-hilt-module`): in `RepositoryModule`, or for a
   feature's own Repository in a module under that feature's `data/di/`. Without the
   `@Binds`, Hilt fails the build.
-- A new IGDB endpoint and its DTOs: `new-api-service`. Local storage (Entity, DAO,
-  converters, Database): `new-room-dao`. Every conversion across the Data/Domain
-  boundary: `new-mapper`.
+- A new IGDB endpoint and its DTOs: `write-igdb-endpoint`. Local storage (Entity, DAO,
+  converters, Database): `write-room-storage`. Every conversion across the Data/Domain
+  boundary: `write-mapper`.
 - A suspend function returning `Result` uses `try`/`catch` with `CancellationException`
   rethrown, never `runCatching` (`.claude/rules/code.md`); `GamesRepositoryImpl` is
   the reference. An observed `Flow` maps each value to `Result.success` and ends with
@@ -34,14 +34,14 @@ description: Create a Repository, its interface in the Domain layer and its impl
   stored value it cannot read, reaches the screen as a value instead of crashing it.
 - A Repository combines the sources of its own data only (ADR 0054). A model that
   joins two kinds of data, such as a game from IGDB with the user's rating from Room,
-  is joined by a UseCase from both Repositories (`new-usecase`), so each kind keeps
+  is joined by a UseCase from both Repositories (`write-usecase`), so each kind keeps
   its read and its write in one Repository.
 - An IGDB response is not cached: offline mode is a Repository redesign of its own
   (#130).
 
 ## Writes to `UserGameEntity`
-Not exercised yet: no Room code exists. The first write in Detail (#106) validates
-this section; correct it in that branch from what the code needed.
+Not exercised yet (#106): no Room code exists.
+The first branch to run it corrects it and removes this note.
 
 A write is a read-modify-write, never a blind upsert, because the timestamps depend on
 the stored row (`.claude/rules/data-layer.md`, ADR 0054):

@@ -3,7 +3,7 @@
 Status: Accepted
 Date: 2026-11-11
 Backfilled: no
-Enforced by: none (prose only — .claude/skills/new-screen/SKILL.md § Construction) — pull-to-refresh on a list loaded from the network, none on a list observed from Room
+Enforced by: none (prose only — .claude/skills/write-screen/SKILL.md § Construction) — pull-to-refresh on a list loaded from the network, none on a list observed from Room
 
 ## Context
 The rule had come from CLAUDE.md to `new-screen` (ADR 0053) and gave every list

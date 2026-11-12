@@ -1,6 +1,6 @@
 ---
 name: write-tests
-description: Write GameStack's JVM tests — UseCases, Repositories, Mappers, Interceptors, ViewModels, Room converters and stored enums, and Compose screens under Robolectric — and see a regression test fail. Use when asked to write, add, or complete tests, when a spec scenario names a test, or to prove a regression test catches its bug.
+description: Write JVM tests — UseCases, Repositories, Mappers, Interceptors, ViewModels, Room converters and stored enums, and Compose screens under Robolectric — and see a regression test fail. Use when asked to write, add, or complete tests, when a spec scenario names a test, or to prove a regression test catches its bug.
 ---
 
 ## Stack and scope
@@ -46,12 +46,12 @@ viewModel.uiEffect.test {
 ## What each class gets
 - **UseCase.** Happy: the Repository succeeds and the UseCase returns the expected
   data. Sad: the Repository fails and the failure comes out unchanged.
-- **Mapper.** What `new-mapper` § Tests lists.
+- **Mapper.** What `write-mapper` § Tests lists.
 - **Repository.** Happy: each source returns data. Sad: a network failure and an
   empty response.
 - **ViewModel.** Every `UiEvent` has a test. Happy: the event produces the expected
   `UiState`. Sad: a UseCase failure reaches `UiState`, or a `UiEffect`.
-- **ViewModel that supersedes work.** A `mapLatest` pipeline (`new-viewmodel`), a
+- **ViewModel that supersedes work.** A `mapLatest` pipeline (`write-viewmodel`), a
   debounce or a throttle also gets an interaction test that the superseded call never
   ran (`coVerify(exactly = 0)`): a cancellation that fails can still leave a
   correct-looking final state. A request superseded after it reached the UseCase has

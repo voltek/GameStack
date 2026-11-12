@@ -1,5 +1,5 @@
 ---
-name: new-hilt-module
+name: write-hilt-module
 description: Create or extend a Hilt module to bind an interface to its implementation or provide a constructed dependency. Use when a new Repository, DAO, Database, API service, or interceptor needs to enter the DI graph.
 ---
 

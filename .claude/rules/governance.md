@@ -32,6 +32,14 @@ is no reason to keep it, and the questions apply to what is already there (ADR 0
 6. **Does the source support it?** Read the platform's guidance rather than recalling
    it. A rule that departs from that guidance on purpose says so and why.
 
+## Naming and describing a Skill
+A Skill's name is verb-object, as `write-screen` and `open-pr`, the form the generated
+`openspec-*` Skills take, so the collection keeps one pattern and a name read alone in
+another Skill's body says what that Skill does (ADR 0074). Its description says what
+it does and when to use it, the key use first, in the imperative. It does not name a
+Skill that invokes it by name: the description only decides automatic loading.
+`checkpoint`, `review-round` and `discovery-feature` keep their names (ADR 0074).
+
 ## Generated Skills
 The `openspec-*` Skills are generated and `openspec update` rewrites them. A `deny`
 covers their folder but misses other spellings, so never edit one by any route:
@@ -47,3 +55,13 @@ without making it stronger.
 A reference to a component that does not fully exist is specified in the same edit,
 or marked `(PENDING — not yet defined)`. A vague reference that looks complete hides
 the gap until an agent trips over it mid-task.
+
+## Not exercised yet
+A Skill section that no product code has run yet carries `Not exercised yet (#n):`,
+what does not exist, and "The first branch to run it corrects it and removes this
+note.", #n being the issue of the feature that runs it first. It tells the agent the
+section is unproven, so a step the code contradicts is corrected, not forced. The
+marker carries its own instruction because a Skill run through the Skill tool may
+never load this file, and a section can run after `build-feature` step 9, as a
+review or a merge does. It is not a story about the future: it holds until a branch
+runs the section, which corrects it and removes the note before its merge (ADR 0073).
