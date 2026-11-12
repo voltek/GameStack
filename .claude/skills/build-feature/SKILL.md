@@ -72,8 +72,9 @@ wired into navigation is unreachable.
   also writes it: rating a game saves the rating and shows the current one.
   `openspec-verify-change` checks only what the spec states, so a half the spec left
   out is caught here.
-- `verify-on-device` for every screen the feature adds or alters, then
-  `openspec-verify-change`, both before the reviews.
+- `verify-screen-on-device` for every screen the feature adds or alters, before the
+  reviews; `openspec-verify-change` runs in `review-round` § Which branches get a
+  round, which covers a branch that gets no round too.
 - A step this feature repeated that no Skill holds, or a Skill line the work proved
   wrong, is corrected in that Skill in this branch, and each `Not exercised yet` this
   feature ran is corrected and loses its marker (`.claude/rules/governance.md`).

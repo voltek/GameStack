@@ -26,7 +26,7 @@ under evaluation in #175).
 The gate cannot show that a screen looks right or that a control is reachable. So every
 change that adds or alters a screen is verified on the emulator before a merge is
 requested, covering every state the screen declares, and the PR body says what was
-checked. The procedure is the `verify-on-device` Skill.
+checked. The procedure is the `verify-screen-on-device` Skill.
 
 Any element or state that departs from what the approved exports show is added to
 `docs/project/design/` as both `.html` and `.png`, in that screen's folder, in the

@@ -8,7 +8,7 @@ Supersedes: ADR-0043 — "opened through `.github/ISSUE_TEMPLATE/product.yml`" (
 Supersedes: ADR-0047 — "A harness issue, an app defect among them, opens with one bucket" (Decision)
 Enforced by: test: test-session-start.sh#bugs counted in the product backlog — the hook's product line counts bugs apart
 Enforced by: none (prose only — docs/project/TOOLING.md § 12. Issue form) — the bug form, its labels, the Project's auto-add workflow, no harness Project
-Enforced by: none (prose only — .claude/skills/verify-on-device/SKILL.md § Exploratory pass) — a confirmed defect filed through the bug form
+Enforced by: none (prose only — .claude/skills/verify-screen-on-device/SKILL.md § A defect found) — a confirmed defect filed through the bug form
 Enforced by: none (prose only — docs/project/PRODUCT.md § Backlog) — a bug never a line in the Backlog
 
 ## Context

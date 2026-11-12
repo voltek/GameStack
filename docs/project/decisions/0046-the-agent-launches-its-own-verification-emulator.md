@@ -4,7 +4,7 @@ Status: Accepted
 Date: 2026-10-31
 Backfilled: no
 Supersedes: ADR-0005 — "The emulator is *asked for*, never launched unprompted" (Decision)
-Enforced by: none (prose only — .claude/skills/verify-on-device/SKILL.md § Getting a device) — the dedicated AVD alone, launched headless from wiped data, a window on request and on a procedure's first run, closing it at the end, and closing one left running before launching
+Enforced by: none (prose only — .claude/skills/verify-screen-on-device/SKILL.md § Getting a device) — the dedicated AVD alone, launched headless from wiped data, a window on request and on a procedure's first run, closing it at the end, and closing one left running before launching
 
 ## Context
 ADR 0005 had the agent ask for an emulator rather than launch one, because a

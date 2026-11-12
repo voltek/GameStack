@@ -44,7 +44,7 @@ light theme (DESIGN.md).
 ## Visual consistency check
 Compare the screen's code with the earlier screens' (colours, spacing, component
 reuse), the reference files above and DESIGN.md's tokens. This is a check of code and
-reference files; the device pass (`verify-on-device`) sees the pixels. A disagreement
+reference files; the device pass (`verify-screen-on-device`) sees the pixels. A disagreement
 between an export and a document is settled by ADR 0042. One between two screens is
 not: name it, propose which is right, and wait for the owner.
 

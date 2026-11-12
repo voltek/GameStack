@@ -16,7 +16,7 @@ class FooScreenTest {
 - Drive the `internal` `{Name}Content` with a `UiState`, collecting events into a
   list: no Hilt graph, no ViewModel, no mocks.
 - Cover each state the screen declares, the list the device pass also uses
-  (`verify-on-device`), and Composable-level logic no unit test reaches, such as a
+  (`verify-screen-on-device`), and Composable-level logic no unit test reaches, such as a
   click guard or a `remember`ed derivation; also which controls are enabled and the
   semantics a node carries.
 - A screen test cannot show what TalkBack speaks, gestures, the IME or a real device:

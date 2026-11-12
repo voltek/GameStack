@@ -15,7 +15,7 @@ body:
     id: source
     attributes:
       label: Source
-      description: A verify-on-device pass (branch), a review round (branch and round), the owner (date), or an agent (branch or session).
+      description: A verify-screen-on-device pass (branch), a review round (branch and round), the owner (date), or an agent (branch or session).
     validations:
       required: true
   - type: textarea
