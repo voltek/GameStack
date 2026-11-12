@@ -3,8 +3,8 @@
 Read when the test covers a write-path mapper, an enum Room stores or a
 `@TypeConverter`.
 
-Not exercised yet: no Entity exists. The first in Detail (#106) validates these;
-correct them in that branch from what the code needed.
+Not exercised yet (#106): no Entity exists.
+The first branch to run it corrects it and removes this note.
 
 - **Write-path mapper.** `domain.toEntity().toDomain()` returns the original,
   including each nullable field unset. It proves the mapper's consistency, not how

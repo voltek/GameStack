@@ -37,8 +37,8 @@ Not a Mapper, so not here:
   the data layer knows the format.
 
 ## The write path
-Not exercised yet: no Entity exists. The first `toEntity()` in Detail (#106) validates
-this section; correct it in that branch from what the code needed.
+Not exercised yet (#106): no Entity exists.
+The first branch to run it corrects it and removes this note.
 
 `toEntity()` copies fields and computes nothing that depends on the clock or on the
 stored row: `updatedAt` and `completedAt` are the Repository's (ADR 0002). When the

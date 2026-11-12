@@ -51,9 +51,8 @@ OpenSpec change for the feature's branch (ADR 0041) — minimum behavior as
 requirements and scenarios, open questions under the proposal's
 `## Open Questions`.
 
-Not yet exercised with OpenSpec. Which of this Skill and `openspec-explore` clarifies
-Detail (#106), the pilot's first feature, is #206's question; the pilot's verdict then
-decides whether this Skill retires (TOOLING.md § 13, **Pilot.**).
+Not exercised yet (#106): no feature has run it with OpenSpec.
+The first branch to run it corrects it and removes this note.
 
 ## Quality criteria
 - The "touches existing systems" answer is explicit — never left ambiguous,

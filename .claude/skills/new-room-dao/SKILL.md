@@ -3,8 +3,8 @@ name: new-room-dao
 description: Create a Room Entity, its DAO, any required TypeConverters, and register both on the app Database. Use when a feature needs local persistence, or changes an Entity, its columns or a stored enum, or as part of the new-repository-impl skill.
 ---
 
-Not exercised yet: no Room code exists. The first Entity in Detail (#106) validates
-this Skill; correct it in that branch from what the code needed.
+Not exercised yet (#106): no Room code exists.
+The first branch to run it corrects it and removes this note.
 
 ## Scope
 Everything Room-specific below the Repository: the `@Entity`, the `@Dao`, any

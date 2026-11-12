@@ -49,9 +49,8 @@ A branch that ADR 0041 says carries an OpenSpec change and has no folder
 `openspec/changes/<branch-kebab-name>/` stops here. One that has it runs
 `openspec-verify-change` before the first round and fixes every CRITICAL. Each test a scenario's
 `VERIFIED BY` names exists under that name, and each `device` one joins the device
-pass. Not exercised yet, like § The sequence step 7's delta: no branch has taken
-a change through a round. The first, in Detail (#106), validates both; correct
-them in that branch from what it needed.
+pass. Not exercised yet (#106): no branch has taken a change through a round.
+The first branch to run it corrects it and removes this note.
 
 ## Before each round, ask
 A round starts only on the human's explicit yes. Send *ready for round k* with:
@@ -94,7 +93,8 @@ GitHub bot is a different reviewer: its round says nothing about whether
    `Fix (defect)`; `Fix (cheap)`, only those that pass § A fix no round will read
    if this round ends the rounds; then open or label each Defer's issue. On a
    branch with an OpenSpec change, a fix that changes behaviour, the bot's
-   included, also updates the change's delta.
+   included, also updates the change's delta. Not exercised yet (#106): no delta has
+   been updated. The first branch to run it corrects it and removes this note.
 8. Run the gate, and after the last round on a governance diff the detectors too
    (`open-pr` § 1).
 9. Fold the fixes into the commits that should have been right (`clean-branch`).

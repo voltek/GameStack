@@ -8,8 +8,8 @@ This Skill orders the other GameStack Skills. Do not skip or reorder the steps: 
 layer depends on the one before it. Keep the steps' progress visible to the owner, so
 the checkpoint at step 5 is seen before it is reached.
 
-Not yet exercised end to end: Search was built before OpenSpec and this order, so
-Detail (#106) is the first feature to run it, and step 9 corrects what it disproves.
+Not exercised yet (#106): Search was built before OpenSpec and this order.
+The first branch to run it corrects it and removes this note.
 
 ## Steps
 
@@ -75,7 +75,8 @@ wired into navigation is unreachable.
 - `verify-on-device` for every screen the feature adds or alters, then
   `openspec-verify-change`, both before the reviews.
 - A step this feature repeated that no Skill holds, or a Skill line the work proved
-  wrong, is corrected in that Skill in this branch.
+  wrong, is corrected in that Skill in this branch, and each `Not exercised yet` this
+  feature ran is corrected and loses its marker (`.claude/rules/governance.md`).
 
 ## Quality criteria
 - A step that does not fit the existing structure, such as a model that belongs

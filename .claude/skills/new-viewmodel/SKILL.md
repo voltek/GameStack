@@ -22,8 +22,9 @@ description: Create a ViewModel following the MVI pattern for a GameStack screen
   `UiText` is an Android type, so a UseCase returns no text for the user.
 - A screen with a navigation argument reads it with
   `savedStateHandle.toRoute<Destination.Detail>()`, as Android's type-safe navigation
-  guide does. Not yet exercised, nor how its unit test builds the `SavedStateHandle`:
-  Detail (#106) is the first.
+  guide does. Not exercised yet (#106): no screen takes
+  an argument, and no test builds its `SavedStateHandle`.
+  The first branch to run it corrects it and removes this note.
 
 ## Location and names
 `feature/{name}/presentation/`: `{ScreenName}ViewModel.kt`, and `{ScreenName}Contract.kt`

@@ -40,8 +40,8 @@ description: Create a Repository, its interface in the Domain layer and its impl
   (#130).
 
 ## Writes to `UserGameEntity`
-Not exercised yet: no Room code exists. The first write in Detail (#106) validates
-this section; correct it in that branch from what the code needed.
+Not exercised yet (#106): no Room code exists.
+The first branch to run it corrects it and removes this note.
 
 A write is a read-modify-write, never a blind upsert, because the timestamps depend on
 the stored row (`.claude/rules/data-layer.md`, ADR 0054):

@@ -47,3 +47,13 @@ without making it stronger.
 A reference to a component that does not fully exist is specified in the same edit,
 or marked `(PENDING — not yet defined)`. A vague reference that looks complete hides
 the gap until an agent trips over it mid-task.
+
+## Not exercised yet
+A Skill section that no product code has run yet carries `Not exercised yet (#n):`,
+what does not exist, and "The first branch to run it corrects it and removes this
+note.", #n being the issue of the feature that runs it first. It tells the agent the
+section is unproven, so a step the code contradicts is corrected, not forced. The
+marker carries its own instruction because a Skill run through the Skill tool may
+never load this file, and a section can run after `new-feature` step 9, as a
+review or a merge does. It is not a story about the future: it holds until a branch
+runs the section, which corrects it and removes the note before its merge (ADR 0073).
