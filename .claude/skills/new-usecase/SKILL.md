@@ -1,6 +1,6 @@
 ---
 name: new-usecase
-description: Create a UseCase that calls one or more Repository functions. Use when asked to create a UseCase for GameStack's Domain layer.
+description: Create or change a UseCase in the Domain layer, which calls one or more Repository functions and holds the product rules between them. Use when asked to create a UseCase, or when a ViewModel needs data or an action from a Repository.
 ---
 
 ## Construction

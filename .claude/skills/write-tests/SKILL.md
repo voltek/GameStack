@@ -1,6 +1,6 @@
 ---
 name: write-tests
-description: Write GameStack's JVM tests — UseCases, Repositories, Mappers, Interceptors, ViewModels, Room converters and stored enums, and Compose screens under Robolectric — and see a regression test fail. Use when asked to write, add, or complete tests, when a spec scenario names a test, or to prove a regression test catches its bug.
+description: Write JVM tests — UseCases, Repositories, Mappers, Interceptors, ViewModels, Room converters and stored enums, and Compose screens under Robolectric — and see a regression test fail. Use when asked to write, add, or complete tests, when a spec scenario names a test, or to prove a regression test catches its bug.
 ---
 
 ## Stack and scope

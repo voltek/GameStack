@@ -1,6 +1,6 @@
 ---
 name: new-viewmodel
-description: Create a ViewModel following the MVI pattern for a GameStack screen, or change one. Use when asked to create a ViewModel, to add debounced input or a navigation argument to one, or as part of the new-feature skill.
+description: Create a ViewModel following the MVI pattern for a screen, or change one. Use when asked to create a ViewModel, or to add debounced input or a navigation argument to one.
 ---
 
 ## Construction

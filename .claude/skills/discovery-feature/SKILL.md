@@ -1,6 +1,6 @@
 ---
 name: discovery-feature
-description: Asks a series of guided questions to turn a vague feature idea into the answers its OpenSpec change needs, aware of existing project architecture. Use when adding a feature to a project that already has a PRD and a CLAUDE.md — not for defining a brand-new project from zero.
+description: Ask guided questions that turn a vague feature idea into the answers its OpenSpec change needs, checked against the project's rules. Use when a feature's scope is ambiguous and the project already has a PRD and a CLAUDE.md.
 compatibility: Requires the target project to have a CLAUDE.md.
 ---
 

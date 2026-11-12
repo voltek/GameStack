@@ -1,6 +1,6 @@
 ---
 name: new-mapper
-description: Create a Mapper that converts a DTO or Entity to a domain model (read path), or a domain model to a Room Entity (write path), following GameStack's mapping conventions. Also invoked as part of the new-feature skill.
+description: Create or change a Mapper between a DTO or Entity and a domain model — `toDomain()` on the read path, `toEntity()` on the write path. Use when asked for a Mapper, or when a DTO, an Entity or a domain model gains, loses or renames a field.
 ---
 
 ## What a Mapper is

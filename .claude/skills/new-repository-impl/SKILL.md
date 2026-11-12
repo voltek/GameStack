@@ -1,6 +1,6 @@
 ---
 name: new-repository-impl
-description: Create a Repository, its interface in the Domain layer and its implementation in the Data layer. Use when asked to create a Repository or a RepositoryImpl, or as part of the new-feature skill.
+description: Create or change a Repository — its interface in the Domain layer, its implementation in the Data layer, and its writes to the user's library. Use when asked to create a Repository or a RepositoryImpl, or to add a read or a write to one.
 ---
 
 ## The interface
