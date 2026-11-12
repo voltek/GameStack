@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gamestack.ui.theme.FullyRoundedShape
-import com.gamestack.ui.theme.GameStackTheme
+import com.gamestack.ui.theme.GameStackPreviewTheme
 
 // Shared full-screen message layout for empty/error states, matching the shape
 // approved in docs/project/design/states/ (icon badge + title + description +
@@ -110,10 +110,10 @@ fun MessageState(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun MessageStateWithActionPreview() {
-    GameStackTheme {
+    GameStackPreviewTheme {
         MessageState(
             icon = Icons.Filled.SearchOff,
             title = "No Results Found",
@@ -124,10 +124,10 @@ private fun MessageStateWithActionPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun MessageStateWithoutActionPreview() {
-    GameStackTheme {
+    GameStackPreviewTheme {
         MessageState(
             icon = Icons.Filled.Bookmark,
             title = "Want to Play",

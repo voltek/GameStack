@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.gamestack.ui.theme.GameStackTheme
+import com.gamestack.ui.theme.GameStackPreviewTheme
 
 // Reusable shimmer primitive for any loading skeleton — the box shape/layout
 // that composes these (grid, carousel, list row) is each screen's own concern.
@@ -55,10 +55,10 @@ fun ShimmerPlaceholder(
     )
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun ShimmerPlaceholderPreview() {
-    GameStackTheme {
+    GameStackPreviewTheme {
         ShimmerPlaceholder(modifier = Modifier.width(160.dp).height(200.dp))
     }
 }
