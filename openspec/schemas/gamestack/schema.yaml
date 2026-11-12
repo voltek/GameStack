@@ -284,7 +284,7 @@ artifacts:
       this change needs one, write design.md before tasks.
       One group per layer, in the dependency order of
       `.claude/skills/new-feature/SKILL.md`, each group naming the Skill that
-      builds it (`new-repository-interface`, `new-repository-impl`,
+      builds it (`new-repository-impl`,
       `new-usecase`, `new-viewmodel`, `new-screen`, ...). Each layer Skill
       invokes `write-tests`, and a test a scenario names as its verifier is
       written before its code. A screen's prototype gets its own task that

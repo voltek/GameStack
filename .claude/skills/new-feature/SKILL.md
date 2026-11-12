@@ -32,13 +32,13 @@ Create the pure domain model(s) needed for this feature.
 Location: `core/domain/model/` if shared, `feature/{name}/domain/model/` if feature-specific.
 
 ### 2. Repository interface
-Invoke the `new-repository-interface` skill. Make sure both read and write functions
-are included if the feature needs both.
+Invoke the `new-repository-impl` skill, which writes the interface before the
+implementation.
 
 ### 3. Repository implementation
-Invoke the `new-repository-impl` skill. This step internally:
+Continue with `new-repository-impl`. This step internally:
 - creates the required DTOs, and invokes `new-room-dao` for any local storage
-  (Entity, DAO, TypeConverters, Database registration);
+  (Entity, DAO, converters, Database registration);
 - invokes `new-mapper` for each Data/Domain conversion — `toDomain()` on the read
   path, `toEntity()` on the write path;
 - invokes `new-api-service` for any new IGDB endpoint;
