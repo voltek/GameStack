@@ -1,44 +1,82 @@
 ---
 name: write-tests
-description: Write unit tests for Domain (UseCases), Data (RepositoryImpl, Mappers, Interceptors), and Presentation (ViewModels) layers. Use when asked to write, add, or complete unit tests for GameStack.
-compatibility: Requires `MainDispatcherRule` to exist in `core/testing/` for ViewModel tests.
+description: Write GameStack's JVM tests — UseCases, Repositories, Mappers, Interceptors, ViewModels, Room converters and stored enums, and Compose screens under Robolectric — and see a regression test fail. Use when asked to write, add, or complete tests, when a spec scenario names a test, or to prove a regression test catches its bug.
 ---
 
-## Testing Stack
-Turbine, MockK, TestDispatcher
+## Stack and scope
+JUnit 4, MockK, Turbine and `kotlinx-coroutines-test`, all under `test/` and run by
+`./gradlew test` (`.claude/rules/tests.md`). Robolectric with Compose's test rule only
+for screen tests (ADR 0016): never for a DAO against real SQLite, and never for a
+test that can run without it.
 
-## Scope — JVM only
-Everything this skill writes goes under `test/` and runs on the JVM via
-`./gradlew test`: no emulator, no real database, no real network. That boundary
-is what keeps the suite fast enough to gate every change (`.claude/rules/tests.md`).
+No test here reaches Room: a DAO is covered through Repository tests with a mocked
+DAO, and a converter of a type Room cannot store through direct calls. A wrong
+`@Query`, a converter left unregistered and a missing migration, including one an
+enum rename needs (ADR 0068), pass every test and fail on device; the instrumented
+suite that would catch them is #132. A mocked "DAO test" would only assert the mock,
+and would hide that gap rather than show it.
 
-**Robolectric is permitted for Compose screen tests, and only those** — see
-"Screen tests" below. Not for DAOs against real SQLite, and never as a
-substitute for a test that already runs pure.
+## What a test asserts
+The source of truth is the spec or the Skill that described the task, never the code
+just written. A test a scenario names in its `VERIFIED BY` line asserts that
+scenario's THEN; it is written before its code, under exactly that name, so it can be
+seen to fail first. A test no scenario names says in a one-line comment which
+requirement it holds. A test that still passes once the intended logic is broken is
+tautological: rewrite it against the requirement.
 
-**DAOs are therefore not tested directly here.** A `@Dao` interface has no
-behavior of its own — Room generates the implementation at compile time, and
-exercising it needs real SQLite (an instrumented `androidTest/` suite, currently
-backlog). What this skill covers instead:
-- Repository tests with a **mocked DAO** — proving the Repository calls the right
-  DAO function with the right arguments, and handles what comes back.
-- Write-path mapper tests with a round trip — proving the *mapper's own*
-  field-to-field mapping is consistent (see `new-mapper`). This does NOT exercise
-  how Room stores a column — `toEntity()`/`toDomain()` never reach Room.
-- Direct `@TypeConverter` tests, for a converter of a type Room cannot store — plain
-  JVM calls, no Room/SQLite involved (see "TypeConverter" below). An enum column has
-  none: Room's own converter stores it (ADR 0068).
+## Setup by layer
+- UseCase, Repository, Mapper, Interceptor: no setup; a suspend call runs in
+  `runTest`.
+- ViewModel: `@get:Rule val mainDispatcherRule = MainDispatcherRule()`
+  (`core/testing/`), never `Dispatchers.setMain()` by hand. `runTest` shares the Main
+  dispatcher's scheduler, so its `advanceTimeBy()` and `advanceUntilIdle()` also move
+  the ViewModel's `delay()`s, as `SearchViewModelTest` does.
 
-Be honest about the residual gap: a wrong `@Query` string or a missing migration
-will pass every test in this project and fail on device. Don't write a mocked
-"DAO test" that appears to cover this — it would be tautological (see the Oracle
-Problem below) and would hide the gap rather than flag it.
+## Flows and effects
+A `StateFlow` or a Repository stream: Turbine's `.test { awaitItem() }`. A `UiEffect`
+travels on a `Channel`, which does not replay, so trigger it inside the block:
 
-## Screen tests (Compose, under Robolectric)
-The one exception to "no Robolectric" (ADR 0016). Still under
-`test/`, still `./gradlew test`. Its cost scales with the number of tests, so the
-second screen-test class is the trigger to split the suites into separate Gradle
-tasks (#67).
+```kotlin
+viewModel.uiEffect.test {
+    viewModel.handleEvent(SearchUiEvent.OnGameClicked(1))
+    assertEquals(SearchUiEffect.NavigateToGameDetail(1), awaitItem())
+}
+```
+
+## What each class gets
+- **UseCase.** Happy: the Repository succeeds and the UseCase returns the expected
+  data. Sad: the Repository fails and the failure comes out unchanged.
+- **Mapper.** What `new-mapper` § Tests lists.
+- **Repository.** Happy: each source returns data. Sad: a network failure and an
+  empty response.
+- **ViewModel.** Every `UiEvent` has a test. Happy: the event produces the expected
+  `UiState`. Sad: a UseCase failure reaches `UiState`, or a `UiEffect`.
+- **ViewModel that supersedes work.** A `mapLatest` pipeline (`new-viewmodel`), a
+  debounce or a throttle also gets an interaction test that the superseded call never
+  ran (`coVerify(exactly = 0)`): a cancellation that fails can still leave a
+  correct-looking final state. A request superseded after it reached the UseCase has
+  already run, so its test advances past when its response was due and asserts the
+  result never reached `UiState`, as `SearchViewModelTest` does.
+- **Interceptor.** A mocked `Chain`: what it adds to the request, and when it cannot,
+  that it throws and `chain.proceed()` is never called.
+
+### Room
+Not exercised yet: no Entity exists. The first in Detail (#106) validates these; correct
+them in that branch from what the code needed.
+- **Write-path mapper.** `domain.toEntity().toDomain()` returns the original,
+  including each nullable field unset. It proves the mapper's consistency, not how
+  Room stores a column.
+- **Stored enum.** One test asserting `entries.map { it.name }` equals the names as
+  stored, whose failure message says that renaming or removing a stored constant
+  needs the app's data cleared before the first release, and a version bump and a
+  `Migration` after it (ADR 0068). Room stores the name and no schema check sees a
+  rename, so this test is the only thing that does.
+- **TypeConverter**, only for a type Room cannot store. Call its functions directly,
+  without a `@Database`: value to stored form and back returns the original, and a
+  stored form it cannot read has a documented result the test asserts.
+
+## Screen tests
+Under `test/` with Robolectric, run by `./gradlew test`:
 
 ```kotlin
 @RunWith(RobolectricTestRunner::class)
@@ -46,231 +84,61 @@ class FooScreenTest {
     @get:Rule val composeRule = createComposeRule()
 ```
 
-**No `@Config(sdk = …)`.** The SDK is pinned once in
-`app/src/test/resources/robolectric.properties`, so every screen test runs on
-the API the app ships. A per-class annotation silently *overrides* that pin —
-which is the divergence the pin exists to prevent, not a way to express it.
+- No `@Config(sdk = …)`: the SDK is pinned once in
+  `app/src/test/resources/robolectric.properties`, and a per-class annotation
+  overrides that pin.
+- Drive the `internal` `{Name}Content` with a `UiState`, collecting events into a
+  list: no Hilt graph, no ViewModel, no mocks.
+- Cover each state the screen declares, the list the device pass also uses
+  (`verify-on-device`), and Composable-level logic no unit test reaches, such as a
+  click guard or a `remember`ed derivation; also which controls are enabled and the
+  semantics a node carries.
+- A screen test cannot show what TalkBack speaks, gestures, the IME or a real device:
+  asserting a `liveRegion` is declared is not asserting it is announced, so say which
+  one the test proves.
+- Screen tests cost about a second each, so adding the second screen-test class is
+  the trigger of #67, which splits them into their own Gradle task.
 
-Drive the **stateless** content composable directly, passing a `UiState` and
-collecting events into a list — not the screen that builds its own ViewModel.
-That means marking it `internal` rather than `private`, which is the intended
-trade: no Hilt graph, no ViewModel, no mocks, and every declared state is one
-constructor call away.
-
-What a screen test is *for*, and what it cannot do:
-
-- **For:** which branch renders in each declared state, that a control is
-  enabled or disabled, that a node carries the semantics it should, and
-  Composable-level logic that no unit test can reach — a click guard, a
-  `remember`ed derivation.
-- **Not for:** whether a screen reader actually announces something, gestures,
-  the IME, or anything about a real device. Asserting a `liveRegion` is declared
-  is not the same as asserting TalkBack speaks it — say which one the test proves.
-
-Cover each state the screen declares, the same list the device pass uses
-(`verify-on-device`). Both exist: the test is cheap repetition, the device pass
-is the only thing that sees the pixels.
-
-## Oracle Problem — what "correct" means
-The source of truth for a test is the Skill or spec that described the task —
-never the implementation you just wrote. Before writing assertions, restate
-in a comment what the Skill/spec required, then assert against that, not
-against whatever the generated code currently returns.
-
-Red flag: if a test would still pass after silently breaking the intended
-logic, it's tautological — rewrite it against the actual requirement.
-
-## Setup by layer
-
-### Domain (UseCases)
-No special setup needed. Test directly with `runTest`.
-
-### Data (Repository, Mappers, Interceptors)
-No special setup needed for Mappers (pure functions).
-For Repository tests involving Flow, use `runTest` with a mocked DAO/API service.
-
-### Presentation (ViewModels)
-Use the project's `MainDispatcherRule` (located in `core/testing/`)
-instead of manually calling `Dispatchers.setMain()`/`resetMain()`.
+## Naming
+Backticks and natural language, `{method or event} should {expected result} when
+{condition}`:
 
 ```kotlin
-@get:Rule
-val mainDispatcherRule = MainDispatcherRule()
+fun `invoke should return empty list without calling repository when query is blank`()
+fun `handleEvent OnGameClicked should emit NavigateToGameDetail effect`()
 ```
 
-This rule already wraps `Dispatchers.setMain()` in `starting()`
-and `Dispatchers.resetMain()` in `finished()`, using `UnconfinedTestDispatcher`
-by default.
+## Seeing a regression test fail
+Why a regression test must be seen to fail, and that the commit says how:
+`.claude/rules/tests.md`. A test for brand-new code has no previous behaviour to fail
+against; writing the test first and watching it fail gives the same guarantee more
+cheaply.
 
-## Testing Flow (UiState, Repository streams)
-Use Turbine's `.test { }` block:
-
-```kotlin
-viewModel.uiState.test {
-    val state = awaitItem()
-    assertEquals(expected, state)
-}
-```
-
-## Testing Channel (UiEffect / one-shot events)
-Same Turbine pattern, but wrap the triggering action inside the `.test { }` block,
-since Channel only emits once and does not replay:
-
-```kotlin
-viewModel.uiEffect.test {
-    viewModel.handleEvent(SomeEvent)
-    val effect = awaitItem()
-    assertTrue(effect is ExpectedEffect)
-}
-```
-
-## What counts as Happy/Sad path per class type
-
-### UseCase
-- Happy: repository returns success, UseCase returns/emits the expected data
-- Sad: repository returns failure, UseCase propagates the error correctly
-
-### Mapper
-- Happy: all fields map correctly with valid input
-- Sad: nullable fields produce safe defaults, empty/null lists produce emptyList()
-
-### Repository Impl
-- Happy: remote/local source returns data successfully
-- Sad: network failure, empty response, cache miss
-
-### ViewModel
-- Happy: UiEvent triggers the expected UiState update
-- Sad: UseCase failure updates UiState to error and/or sends UiEffect (Snackbar)
-- Also test: every UiEvent has at least one corresponding test
-
-### ViewModel — cancellation/debounce
-If the ViewModel stores a `Job` and cancels it (debounce, throttle, superseding
-a previous action), the state-based Happy/Sad tests above are not enough —
-add an interaction test confirming the superseded call never fired
-(`coVerify(exactly = 0)`), not just that the final state looks correct. A
-cancellation that silently fails can still produce a correct-looking final
-state by coincidence.
-
-### Interceptor
-- Happy: both `Client-ID` and `Authorization: Bearer {token}` are added to the
-  outgoing request.
-- Sad: when the token source fails, `AuthInterceptor` throws `IOException` and the
-  request does **not** proceed — assert the throw, and assert `chain.proceed()` was
-  never called. This behavior is decided, not open: an unauthenticated request would
-  fail at the server anyway.
-- No Android framework needed — plain JVM unit test, not instrumented.
-
-### Mapper (write path)
-- Round trip: `domainModel.toEntity().toDomain()` returns the original model,
-  including nullable enum fields (rating unset, list status unset). Proves the
-  mapper's internal consistency only, not how Room stores the columns.
-
-### Stored enum
-Each enum Room stores gets one test asserting `entries.map { it.name }` equals the
-names as stored, with a failure message saying that renaming or removing a stored
-constant needs, before the first release, the app's data cleared, and after it, a
-version bump and a `Migration` (ADR 0068). Room's converter stores the name, and no
-schema check sees a rename, so this test is the only thing that does.
-
-### TypeConverter
-Only for a type Room cannot store; an enum column has none (ADR 0068).
-- Happy: call the `@TypeConverter` functions directly (not through Room) — value →
-  stored form → value returns the original. A plain function call: no `@Database`,
-  no SQLite.
-- Sad: a stored form the converter cannot read has a documented result, and the test
-  asserts it.
-
-## Naming convention
-Test function names use backticks with natural language, describing behavior:
-
-```kotlin
-fun `invoke should return success flow with games list when repository is successful`()
-fun `handleEvent OnGameClicked should send NavigateToGameDetail effect`()
-```
-
-Pattern: `{method or event} should {expected result} when {condition}`
-
-## Verifying a regression test actually catches the bug
-A test written after the fix can pass whether or not the fix is present. That
-test is worse than no test: it looks like coverage and proves nothing. Every
-regression test must be *seen* to fail against the code it guards
-(`.claude/rules/tests.md`).
+When the fix came first and the old code still compiles, park the fix:
 
 ```bash
-# 1. Test and fix are both written and green.
-# 2. Park the production change only — never the test.
-git stash push -- app/src/main/java/com/gamestack/<path>/Foo.kt
-
-# 3. Run that test class alone. It MUST fail.
-./gradlew testDebugUnitTest --tests "com.gamestack.<path>.FooTest"
-
-# 4. Restore.
+git stash push -- app/src/main/java/com/gamestack/<path>/Foo.kt   # the fix, never the test
+./gradlew testDebugUnitTest --tests "com.gamestack.<path>.FooTest"  # must fail
 git stash pop
 ```
 
-Three things that decide whether this is worth anything:
+When it does not compile, because the fix removed a `UiEffect`, renamed a field or
+changed a signature, break the fix instead: delete or invert one line the new test
+claims to cover, run the class, and restore the line. Exactly that test must fail: if
+none fails, it proves nothing; if several do, the mutation was too broad to
+attribute. This is hand-run mutation testing; PIT, its automated form, is in #64.
 
-- **Read the failure message, not just the red.** It should describe the bug. A
-  failure from a compile error, an NPE, or MockK's `no answer found for …` is red
-  for the wrong reason and proves nothing. (That last one is common here: `runTest`
-  drains pending work after the body, so a debounced query you never meant to
-  dispatch still reaches the mock — stub it, and say in a comment that the stub
-  exists only for the drain.)
-- **Run the one class, not the suite.** Otherwise you cannot tell your test failed
-  rather than something you disturbed.
-- **This applies to regression tests, not to tests for brand-new code** — those
-  have no previous behaviour to fail against, and would just fail to compile.
-
-### When stashing cannot work: targeted mutation
-The stash recipe assumes the old code still *compiles* against the current
-contract. That holds for a patch and fails for a redesign: if the fix removed a
-`UiEffect`, renamed a field, or changed a signature, restoring the old file
-breaks the build — red for the wrong reason, which the first bullet above already
-rejects.
-
-The equivalent at that scale is to break the fix rather than remove it. Delete or
-invert **one line** that the new test depends on, run the class, and confirm that
-exactly the expected test fails:
-
-```bash
-# e.g. delete `refreshError = null` from the success branch,
-# then run the class and expect exactly one failure.
-./gradlew testDebugUnitTest --tests "com.gamestack.<path>.FooTest"
-```
-
-Then restore the line. Two rules make it worth as much as the stash version:
-
-- **One line, chosen because a specific test claims to cover it.** Mutating
-  several at once, or picking a line at random, only tells you the suite is
-  non-empty.
-- **Exactly the expected test must fail.** If none fails, that test proves
-  nothing. If several fail, the mutation was too broad to attribute.
-
-This is hand-run mutation testing, which is also the automated technique (PIT)
-named in issue #64 — the manual version is what to
-reach for until that lands.
-
-Writing the test first (watch it fail, then fix) gives you the same guarantee and
-is cheaper. This recipe is for when the fix came first, which in practice is
-often. Say in the commit message that it was verified.
-
-The automated generalization of this idea is **mutation testing** (PIT on the
-JVM): mutate production code, assert some test goes red. Not adopted here — its
-Android setup is awkward and slow — but it is the same question asked at scale.
+Either way:
+- Read the failure message: it should describe the bug. A compile error, an NPE or
+  MockK's `no answer found for …` is red for the wrong reason. The last is common
+  here: `runTest` runs pending work after the body, so a debounced query never meant
+  to be dispatched still reaches the mock; stub it, with a comment that the stub
+  exists only for that drain.
+- Run the one class, not the suite, so the failure is the test's and not something
+  disturbed.
 
 ## Quality criteria
-- Every public function/UseCase/ViewModel event has at least one Happy and one Sad path test
-- Mocks use MockK exclusively (`mockk()`, `every {}`, `verify {}`, `coEvery {}`, `coVerify {}`)
-- No real network or database calls — everything mocked
-- Test names follow the naming convention above
-
-## Known gaps (deliberate, not oversights)
-- **Regression pillar.** This skill covers Requirements testing only (new code
-  does what the Skill/spec asked). Regression testing (confirm nothing else
-  broke) is not enforced here — it will be automated via a Hook that runs the
-  affected suite after each agent edit — see issue #65.
-- **Real persistence.** No test in this project touches real SQLite; see
-  "Scope" above. An instrumented `androidTest/` suite covering DAO queries and
-  Room migrations is backlog (issue #132). Until then a `@Query`, a converter's
-  registration and a migration, including one an enum rename needs (ADR 0068), are
-  untested.
+- Mocks are MockK's: `mockk()`, `every`/`coEvery`, `verify`/`coVerify`.
+- No real network or database calls — everything mocked.
+- Every public function and every `UiEvent` has a happy and a sad test where it can
+  fail.

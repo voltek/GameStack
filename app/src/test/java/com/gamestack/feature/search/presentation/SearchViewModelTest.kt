@@ -9,7 +9,9 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -22,12 +24,8 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class SearchViewModelTest {
 
-    // Own dispatcher instance (not the rule's default) so its scheduler can be driven
-    // directly — that's what actually resolves the ViewModel's debounce delay() below.
-    private val testDispatcher = UnconfinedTestDispatcher()
-
     @get:Rule
-    val mainDispatcherRule = MainDispatcherRule(testDispatcher)
+    val mainDispatcherRule = MainDispatcherRule()
 
     private val searchGamesUseCase: SearchGamesUseCase = mockk()
     private val viewModel by lazy { SearchViewModel(searchGamesUseCase) }
@@ -40,9 +38,9 @@ class SearchViewModelTest {
         developer = "FromSoftware"
     )
 
-    private fun advanceDebounce() {
-        testDispatcher.scheduler.advanceUntilIdle()
-    }
+    // runTest shares the Main dispatcher's scheduler, so advancing it here also
+    // resolves the ViewModel's debounce delay().
+    private fun TestScope.advanceDebounce() = advanceUntilIdle()
 
     @Test
     fun `handleEvent OnQueryChanged should not dispatch an intermediate query when the text reverts`() =
@@ -312,7 +310,7 @@ class SearchViewModelTest {
 
             viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
             // Past the debounce: the request is now running, not merely scheduled.
-            testDispatcher.scheduler.advanceTimeBy(PAST_DEBOUNCE_MILLIS)
+            advanceTimeBy(PAST_DEBOUNCE_MILLIS)
 
             viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda "))
 
@@ -393,7 +391,7 @@ class SearchViewModelTest {
 
             viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zelda"))
             // Past the debounce: "zelda" has reached the UseCase but has not returned.
-            testDispatcher.scheduler.advanceTimeBy(PAST_DEBOUNCE_MILLIS)
+            advanceTimeBy(PAST_DEBOUNCE_MILLIS)
 
             // A different character cancels that request, then is deleted again.
             viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zeldax"))
@@ -421,12 +419,12 @@ class SearchViewModelTest {
 
             viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zel"))
             // Debounce elapsed: "zel" is on the network, its response still due.
-            testDispatcher.scheduler.advanceTimeBy(PAST_DEBOUNCE_MILLIS)
+            advanceTimeBy(PAST_DEBOUNCE_MILLIS)
 
             viewModel.handleEvent(SearchUiEvent.OnQueryChanged("zeld"))
             // Well past when the "zel" response would have arrived, and still
             // short of the new query's own debounce.
-            testDispatcher.scheduler.advanceTimeBy(RESPONSE_MILLIS * 2)
+            advanceTimeBy(RESPONSE_MILLIS * 2)
 
             assertTrue(viewModel.uiState.value.games.isEmpty())
             assertTrue(viewModel.uiState.value.isLoading)

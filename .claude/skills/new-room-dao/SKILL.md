@@ -38,7 +38,7 @@ throws, and every query reading that row fails. So renaming or removing a consta
 changes the stored data, and nothing in the schema shows it: before the first release
 clear the app's data, as for a schema change (§ Database); from the first release on,
 bump the version and ship a `Migration` that rewrites the stored values. Each stored
-enum gets the test that pins its names (`write-tests` § Stored enum), so a rename
+enum gets the test that pins its names (`write-tests` § Room), so a rename
 cannot pass unnoticed. A `@TypeConverter` is for a type Room cannot store at all, in
 `core/data/local/converter/{Name}Converters.kt`, registered with `@TypeConverters` on
 the Database.
@@ -74,6 +74,6 @@ feature reads it.
 
 ## Tests
 A DAO is not unit-tested: it needs real SQLite, and the instrumented suite for DAOs
-and migrations is backlog (#132). What covers it until then is in `write-tests` §
-Scope. No business logic goes in a DAO: when a column is written is the Repository's
-rule (ADR 0002).
+and migrations is backlog (#132). What covers it until then is in `write-tests`
+§ Stack and scope. No business logic goes in a DAO: when a column is written is the
+Repository's rule (ADR 0002).
