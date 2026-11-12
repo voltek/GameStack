@@ -5,11 +5,9 @@ description: Update a branch against main and shape its history into claims — 
 
 # Clean a branch
 
-Applies when the work on a branch is done and the gate is green, and again after
-a review round, to fold its fixes. A fold, reword or rebase in the middle of the
-work needs § 3 *Folding*, § 4 and § 5; an ordinary commit needs none of this.
-Next: `review-round`, or `open-pr` once the rounds are done or the branch is
-exempt.
+Starts with the gate green. A fold, reword or rebase in the middle of the work
+needs § 3 *Folding*, § 4 and § 5; an ordinary commit needs none of this. Next:
+`review-round`, or `open-pr` once the rounds are done or the branch is exempt.
 
 ## 1. Update against main
 ```bash
@@ -18,7 +16,7 @@ git merge origin/main
 ```
 Merge, never rebase, a branch that has been pushed: a rebase replays commits that
 never passed the gate, so a `git bisect` can land on one that does not build
-(ADR 0008). Run the gate on the merge.
+(ADR 0008). Run the gate on the merge, unless it brought nothing in.
 
 ## 2. Check the name
 Does the branch name still describe what its commits now contain? The name was a
@@ -46,8 +44,8 @@ of the system, or of your understanding? Only the first earns a commit.
 
 ### Folding
 `git rebase -i` needs an editor no agent session can answer, and
-`git commit --amend` reaches only the tip, and auto mode denies it at times, so
-fold with marker commits, at the tip or below it:
+`git commit --amend` reaches only the tip, so fold with marker commits, at the
+tip or below it:
 - A fix: `git commit --fixup=<the commit it corrects>`.
 - A new message: write the whole new message, and nothing else, to a file, then
   `sh .claude/skills/clean-branch/scripts/reword.sh <commit> <file>`. It makes the
@@ -67,8 +65,7 @@ and the fix, with the scope list when the scope is wrong: rewrite the message,
 never `--no-verify`. What it cannot check:
 - The scope names what the change governs, not where it is written: a commit rule
   is `ship` whether it sits in CLAUDE.md, an ADR or a Skill.
-- The body, 12 lines at most with trailers and blank lines left out, diagnoses
-  the change, not how it was reached. Of each sentence ask:
+- The body diagnoses the change, not how it was reached. Of each sentence ask:
   would a reader in six months need it to see why the change is right? Is it
   already in CLAUDE.md, a rule file, the PRD or an ADR, so a pointer does? Does it
   narrate the process? Cut what fails; of the review, only the PR body's *Review*

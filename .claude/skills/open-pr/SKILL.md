@@ -5,10 +5,8 @@ description: Open a pull request and see it through the GitHub bot — documenta
 
 # Open the pull request
 
-Applies when the review rounds are done or the branch is exempt, before any
-`gh pr create`, and when the GitHub bot has answered on an open PR. If a round is
-still owed or a triage table is not confirmed, go back to `review-round`. Next:
-`merge-pr`.
+A round still owed or a triage not confirmed goes back to `review-round` first.
+Next: `merge-pr`.
 
 ## 1. Detectors, on a governance diff
 `/code-review` judges whether a rule is sound; it does not check one document
@@ -22,22 +20,17 @@ established. The PR body's detector line says what they found.
 ## 2. The body
 Use `.github/pull_request_template.md`: its comments say what each section holds,
 and `commits.yml` checks the form and names the rule when it fails (ADR 0057).
-What the check cannot see:
+What neither says:
 - The body reads in a minute. Point at an ADR or the commits instead of restating
   them, since the copy in the body is the one nobody updates. A *What changed*
   that needs more than three sentences usually means a second claim.
-- *Review* lists every fix made after the last round, from the saved tables. An
-  issue a round deferred goes under `Related:`, and a dismissal proven only by
-  something seen outside the repository goes in `Evidence:`, in one sentence; no
-  other finding takes a line (ADR 0063). A round still to come is not an
-  exemption: the `TODO` stays, and the check stays red, until the section is
-  written.
-- Each issue the branch ships takes its own `Closes #n` under *Issues*, and the
-  branch repoints every document that cites that issue to where its content now
-  lives (ADR 0038).
+- *Review* draws its fixes from the saved tables of the `/code-review` rounds
+  (`review-round` § The table), which outlive a compaction.
+- The branch repoints every document that cites an issue it closes to where that
+  issue's content now lives (ADR 0038).
 - Never replace an open PR's body wholesale with `gh pr edit --body`: it deletes
   the screenshots the human dragged in. Read the body and change only what needs
-  changing (DRIFT-LOG, 2026-08-22).
+  changing.
 
 ## 3. The title
 The title takes the commit subject's form and states the branch's one claim; on a
@@ -50,8 +43,8 @@ No local hook sees the title or the body, so check both before opening:
 `sh .githooks/rules.sh body <file> "<title>"`.
 
 ## 4. Open it
-Every PR action GitHub shows needs the human's yes. Open the PR ready for review,
-never as a draft: the bot's round starts when it opens.
+Open the PR ready for review, never as a draft: the bot's round starts when it
+opens.
 
 Editing a PR's title or body reruns `commits.yml` on the same commit. Until the new
 run ends, `gh pr checks` and `mergeStateStatus` read the old one, so a `BLOCKED`
@@ -60,10 +53,10 @@ then is not a protection fault (#75).
 ## 5. The GitHub bot's round
 The bot is an advisor with one round per PR, the one that starts when the PR
 opens. `docs/project/TOOLING.md` § 9 lists its triggers and signals; never start a
-second round by any of them. Its clock starts when the PR opens: it is unavailable
-once its usage-limit comment appears, or when no result has arrived 30 minutes
-later, whatever else it has posted (ADR 0058). Then go on to `merge-pr`, because an
-external quota must not decide whether work ships.
+second round by any of them. It is unavailable once its usage-limit comment
+appears, or when no result has arrived 30 minutes after the PR opened, whatever
+else it has posted (ADR 0058). Then go on to `merge-pr`, because an external quota
+must not decide whether work ships.
 
 Its findings go through `review-round`'s triage, and no local round reads their
 fixes: each follows *A fix no round will read* there, then gets the gate, and the
@@ -73,8 +66,9 @@ second round runs.
 
 ## 6. Threads
 Reply in each thread saying what was done, then resolve it: the reply is the
-history and the resolve is the filing, while an unanswered thread reads as an
-unnoticed one. `main` requires every conversation resolved, so an open thread
-blocks the merge; a thread that arrives after the 30 minutes is answered and
-resolved too. Reply before a push rewrites the line a thread anchors to: the
-thread survives as outdated and still resolves, but loses its place in the diff.
+record, the only one for a fix to the bot's finding, and the resolve is the
+filing, while an unanswered thread reads as an unnoticed one. `main` requires
+every conversation resolved, so an open thread blocks the merge; a thread that
+arrives after the 30 minutes is answered and resolved too. Reply before a push
+rewrites the line a thread anchors to: the thread survives as outdated and still
+resolves, but loses its place in the diff.

@@ -49,7 +49,9 @@ A branch that ADR 0041 says carries an OpenSpec change and has no folder
 `openspec/changes/<branch-kebab-name>/` stops here. One that has it runs
 `openspec-verify-change` before the first round and fixes every CRITICAL. Each test a scenario's
 `VERIFIED BY` names exists under that name, and each `device` one joins the device
-pass.
+pass. Not exercised yet, like § The sequence step 7's delta: no branch has taken
+a change through a round. The first, in Detail (#106), validates both; correct
+them in that branch from what it needed.
 
 ## Before each round, ask
 A round starts only on the human's explicit yes. Send *ready for round k* with:
@@ -76,7 +78,7 @@ GitHub bot is a different reviewer: its round says nothing about whether
    is not the record. Exit 2 is a usage error, which its message names; on exit
    1, read `references/extractor-failed.md`.
 2. Verify every finding (§ Verifying) and check each `Fix (defect)`'s origin with git.
-3. Write the table to its file, marked proposed, with the verdict.
+3. Write the table to its file, with the verdict.
 4. In `/code-review`'s round 1 only, apply alone every `Fix` row that is not for
    *To decide* (§ The message), a code defect only with its regression test seen
    failing, and a cheap one only if it passes § A fix no round will read, unless
@@ -84,8 +86,8 @@ GitHub bot is a different reviewer: its round says nothing about whether
    opening no issue. Run the gate and commit each row's fix as its own `fixup!`
    commit, so the human can drop one.
 5. Send the message (§ The message) and wait.
-6. Record the human's answer under `Owner decisions` with the date, and mark the
-   table confirmed. Drop the commit of a row the human reopened, wherever it sits:
+6. Record the human's answer and its date on the table's `Owner decisions` line.
+   Drop the commit of a row the human reopened, wherever it sits:
    `git revert --no-commit <its sha>`, then `git commit --fixup=<the commit it
    corrects>`, so the fold cancels it.
 7. Apply what is left, in order: the reverts the stopping rule asks for;
@@ -136,11 +138,14 @@ recurs, dismissed or accepted, is a gap in the text the reviewer reads, since it
 never reads earlier records: fix that text until it answers the question.
 
 ## Verifying
-| Bucket | Before the table | Recorded in Evidence |
+Every check runs before the table; the table records only what a later step
+reads (ADR 0071).
+
+| Bucket | Check | Evidence column |
 |---|---|---|
-| Fix (defect), code | Trace the failure to `file:line`, or run it if that is cheap | The regression test seen failing. If it does not fail, the row goes back to the human: the bucket was wrong |
-| Fix (defect), governance | Quote both clauses, the reference or the step | The quote; then the detectors |
-| Fix (cheap) | The text or code says what the finding claims | Nothing, or in the last round the test that lets it through |
+| Fix (defect), code | Trace the failure to `file:line`, or run it if that is cheap | The regression test, seen failing. If it does not fail, the row goes back to the human: the bucket was wrong |
+| Fix (defect), governance | Quote both clauses, the reference or the step | Empty; the detectors run after the fix |
+| Fix (cheap) | The text or code says what the finding claims | Empty, or in the last round the test that lets it through |
 | Defer | `gh issue view` shows the issue open, or a document defers it | The issue number |
 | Accept | It is valid and no failure scenario exists | Why it is not worth fixing |
 | Dismiss | The claim checked against the repository or `gh api` | The quote or the command |
@@ -148,13 +153,14 @@ never reads earlier records: fix that text until it answers the question.
 ## The table
 Save the raw output and the table outside the repository, in `reviews/<branch>/`
 beside the handoff (the `checkpoint` Skill's § What is kept), as
-`YYYY-MM-DD-r<k>.raw.txt` and `.triage.md`, never only in the conversation, which a
-later session cannot read. The SessionStart hook deletes the folder once the branch
-is gone (ADR 0067). The table is in
-English, because the PR body and the issues draw on it.
+`YYYY-MM-DD-r<k>.raw.txt` and `.triage.md`. The file is what survives a
+compaction or a new session, which lose the conversation, so round 2 reads its
+origins and the PR body its fixes from there. The SessionStart hook deletes the
+folder once the branch is gone (ADR 0067). The table is in English, because the
+PR body and the issues draw on it.
 
 ```markdown
-# <branch> — round <k> triage (proposed | confirmed by the owner YYYY-MM-DD)
+# <branch> — round <k> triage
 Raw: <raw file> · Commit reviewed: <sha> (+ uncommitted changes, if the tree was dirty)
 Reviewer: <model id>, <level>
 
@@ -162,15 +168,18 @@ Reviewer: <model id>, <level>
 |---|---|---|---|---|
 
 Stopping rule: another round | stop, on to open-pr | stop, back to the human, because …
-Owner decisions (YYYY-MM-DD): <confirmed as proposed, or each change>
+Owner decisions: pending | YYYY-MM-DD, confirmed as proposed, or each change
 ```
 - The id is `r<k>-<n>`, `n` in the order the reviewer reports, never renumbered; a
   finding split across buckets takes a letter, `r1-2a`. The id lives in the chat
   and the tables only.
-- A row lets the human judge it without opening the raw file: what the reviewer
-  claims, where, its bucket, and the check that decides it. Origin is filled for
-  `Fix (defect)` only. Labels are written out in full.
+- The claim is the message's: 12 words or fewer, with its `file:line`. Origin is
+  filled for `Fix (defect)` only, Evidence as § Verifying says. Labels are
+  written out in full.
 - `Reviewer:` is the line `save-review.mjs` printed.
+- The GitHub bot's findings stay on the PR, so its round saves no raw file: its
+  table is `YYYY-MM-DD-bot.triage.md`, `Raw:` names the PR and the bot's review,
+  `Reviewer:` the bot, and its ids are `bot-<n>`.
 
 ## The message
 The chat never shows the table; it goes in the human's language. One form for
@@ -211,8 +220,7 @@ Table: <path>
 ## A partial answer
 Rows the human confirmed may be applied, uncommitted, while another row is still
 open, unless they touch the same file and section as the open row. The verdict
-waits for every row, since the open one may be the defect that earns a round, and
-so do commits, except § The sequence step 4's, folds, rounds and the PR.
+waits for every row, since the open one may be the defect that earns a round.
 
 ## A fix no round will read
 Any fix of the round that ends the rounds, and any fix after it.
@@ -222,14 +230,14 @@ Any fix of the round that ends the rounds, and any fix after it.
 - A `Fix (cheap)` is applied only if its row names one of two tests; otherwise it
   goes to Defer, all such rows into one `review-debt` issue, except on a branch
   working `review-debt`, which opens no new debt
-  (`references/review-debt-branch.md`). **Proven by a
-  mechanism:** a test seen failing on a mutation of what it guards, then passing.
-  Plant the mutation with the Edit tool, print the mutated line and check the
-  file still parses (`bash -n` for a script): one that did not land, or broke
-  the syntax, proves nothing. It changes no governing text, since a reader is that
-  text's only proof, and settles no question a deferral left open. **Writes no new rule:** a spelling or wrap fix,
-  a revert, a deletion nothing depends on, text moved unchanged, or a pointer to
-  something that exists.
+  (`references/review-debt-branch.md`). **Proven by a mechanism:** a test seen
+  failing on a mutation of what it guards, then passing; print the mutated line
+  and check the file still parses (`bash -n` for a script), since a mutation that
+  did not land or broke the syntax proves nothing. It changes no governing text,
+  since a reader is that text's only proof, and settles no question a deferral
+  left open. **Writes no new rule:** a spelling or wrap fix, a revert, a deletion
+  nothing depends on, text moved unchanged, or a pointer to something that exists.
 
 Either way, run the gate and the detectors after it, and list it under the PR
-body's *Review*.
+body's *Review*, unless it answers the GitHub bot: its record is the reply in
+that thread (`open-pr` § 6, ADR 0072).

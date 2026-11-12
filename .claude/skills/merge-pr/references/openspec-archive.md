@@ -2,7 +2,9 @@
 
 Read when the branch carries `openspec/changes/<branch-kebab-name>/`, after the bot's
 round on the PR or once the bot is unavailable, and before asking to merge. A
-merged branch leaves no open change on `main`.
+merged branch leaves no open change on `main`. Not exercised yet: no change has
+been archived. The first, in Detail (#106), validates these steps; correct them
+in that branch from what it needed.
 
 1. Run `openspec-verify-change` again, then `openspec validate <change> --strict`.
 2. Archive with `openspec-archive-change`.
