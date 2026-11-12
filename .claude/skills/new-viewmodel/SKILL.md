@@ -1,39 +1,39 @@
 ---
 name: new-viewmodel
-description: Create a ViewModel following the MVI pattern for a GameStack screen. Use when asked to create a ViewModel, or as part of the new-feature skill.
+description: Create a ViewModel following the MVI pattern for a GameStack screen, or change one. Use when asked to create a ViewModel, to add debounced input or a navigation argument to one, or as part of the new-feature skill.
 ---
 
 ## Construction
-- Annotated with `@HiltViewModel`, constructor injected with the required UseCase(s) via `@Inject`.
-- Defines three contracts, the only way UI and ViewModel communicate:
-  - `UiState` — data class exposed as `StateFlow`, private `MutableStateFlow` backing it.
-    Use a sealed class only when states are truly mutually exclusive, otherwise use data classes:
-    loading, content and error often coexist, as when a refresh fails over stale content (ADR 0017).
-  - `UiEvent` — sealed class with all actions the UI can send.
-  - `UiEffect` — sealed class for one-shot events, exposed via `Channel`/`receiveAsFlow()`.
+- `@HiltViewModel`, with its UseCase(s) injected through an `@Inject` constructor.
+- Three contracts are the only way the UI and the ViewModel communicate, all in
+  `{ScreenName}Contract.kt`:
+  - `UiState`, a data class exposed as `StateFlow` over a private `MutableStateFlow`.
+    A sealed hierarchy only for states that truly exclude each other: loading,
+    content and error often coexist, as when a refresh fails over results still on
+    screen (ADR 0017).
+  - `UiEvent`, a sealed class of everything the UI can send, each named for what the
+    user did: `OnQueryChanged`, `OnRefresh`, `OnGameClicked`.
+  - `UiEffect`, a sealed class of one-shot events, sent on a `Channel` and exposed
+    with `receiveAsFlow()` (ADR 0011, under evaluation in #175).
+- One public entry point, `fun handleEvent(event: UiEvent)`, whose `when` routes to
+  private handlers.
+- Change state with `.update { }`.
+- Text for the user is `UiText` in `UiState` and `UiEffect`, never a raw string.
+  `UiText` is an Android type, so a UseCase returns no text for the user.
+- A screen with a navigation argument reads it with
+  `savedStateHandle.toRoute<Destination.Detail>()`, as Android's type-safe navigation
+  guide does. Not yet exercised, nor how its unit test builds the `SavedStateHandle`:
+  Detail (#106) is the first.
 
-  All three go in `feature/{name}/presentation/{ScreenName}Contract.kt`, not in
-  the ViewModel file — see Location below.
-- Single public entry point: `fun handleEvent(event: UiEvent)`, using a `when` to route to
-  private handler functions.
-- Use `.update { }` on the StateFlow to mutate state immutably.
-- Use `UiText` (never raw strings) for any text exposed in UiState or UiEffect. It is an
-  Android type, so a UseCase returns no text for the user.
+## Location and names
+`feature/{name}/presentation/`: `{ScreenName}ViewModel.kt`, and `{ScreenName}Contract.kt`
+holding `{ScreenName}UiState`, `{ScreenName}UiEvent` and `{ScreenName}UiEffect`, as
+Search does.
 
-## Location
-- ViewModel: `feature/{feature-name}/presentation/{ScreenName}ViewModel.kt`
-- Contracts: `feature/{feature-name}/presentation/{ScreenName}Contract.kt`
-  (all three in one file)
-
-## Naming convention
-`{ScreenName}ViewModel`, `{ScreenName}UiState`, `{ScreenName}UiEvent`, `{ScreenName}UiEffect`
-Example: `PopularGamesViewModel`, `PopularGamesUiState`, `PopularGamesUiEvent`, `PopularGamesUiEffect`
-
-## Debounced input (search-style screens)
-Never hand-roll this with a `Job` plus fields remembering which query was last
-dispatched. `SearchViewModel` was written that way and produced four defects in
-review, each one a disagreement between a remembered query and what was actually
-on screen. Build it as a flow pipeline instead:
+## Debounced input
+Input that waits for the user to stop typing is a flow pipeline, never a `Job` plus
+fields remembering which query was last dispatched: such a field drifts from what
+the screen shows. `SearchViewModel` is the worked example:
 
 ```kotlin
 merge(typedQuery.map { it.trim() }.distinctUntilChanged().map { Request(it, isRefresh = false) },
@@ -45,28 +45,26 @@ merge(typedQuery.map { it.trim() }.distinctUntilChanged().map { Request(it, isRe
     .launchIn(viewModelScope)
 ```
 
-`distinctUntilChanged` after `trim` means a whitespace-only edit is not a new
-query, so it neither restarts a search nor disturbs one in flight. `mapLatest`
-cancels whatever the previous request was doing — waiting out its debounce, or
-already awaiting a response. Let the empty query travel the pipeline; reaching
-`mapLatest` is what cancels work for text the user just deleted.
-
-**Put the wait inside `mapLatest`, never in a `debounce()` operator upstream of
-it.** With the operator, a new keystroke is held for its own timeout *before*
-`mapLatest` ever sees it, so the previous request keeps running and its response
-can still land — painting settled results, or flashing the error card, for the
-whole debounce window after the query changed. That is the same user-visible
-failure the `runCatching` rule in `.claude/rules/code.md` exists to prevent, arriving by a different
-route. It was caught in review; the pipeline reads almost identically either way,
-which is exactly why it is worth stating.
-
-Set `isLoading` optimistically in the event handler, so the skeleton appears
-during the debounce rather than after it, and clear `errorMessage` there too —
-only when the effective query actually changed, so a whitespace edit disturbs
-nothing.
+- `distinctUntilChanged` after `trim`: a whitespace-only edit is not a new query, so
+  it neither restarts a search nor disturbs one in flight.
+- `mapLatest` cancels the previous request, whether it is waiting out its debounce
+  or awaiting a response. The empty query travels the pipeline too, so deleting the
+  text cancels its search.
+- The wait goes inside `mapLatest`, not in a `debounce()` upstream of it. `debounce`
+  emits a value only once its timeout passes with no newer one, so until then
+  `mapLatest` has not seen the new text and the previous search keeps running; its
+  response can still land and paint results or the error for text already replaced.
+- When the trimmed query changes, no state of the previous query remains (results,
+  errors, the refresh flag), and `isLoading` is true if and only if the new query is
+  non-empty, since its search is now pending. The event handler sets both at once:
+  the skeleton then shows during the debounce, and an emptied field runs no search
+  that would reset them. `SearchViewModel.onQueryChanged` is the worked example, with
+  one branch for an emptied field, one for a new query, and one for a whitespace-only
+  edit, which updates only the text shown.
 
 ## Quality criteria
-- No business logic — the ViewModel only orchestrates UseCase calls and maps results to UiState.
-- Every UiEvent has a corresponding handler.
-- Every error path from a UseCase updates UiState and/or triggers a UiEffect.
-- After creating the ViewModel, invoke the `write-tests` skill to generate its corresponding unit tests.
+- No product rules: the ViewModel calls UseCases and maps their results to
+  `UiState` (`.claude/rules/code.md`).
+- Every `UiEvent` has a handler, and every failure a UseCase returns reaches
+  `UiState`, or a `UiEffect` when it is a one-shot event.
+- Invoke `write-tests` for its unit tests.
