@@ -239,4 +239,5 @@ Any fix of the round that ends the rounds, and any fix after it.
   nothing depends on, text moved unchanged, or a pointer to something that exists.
 
 Either way, run the gate and the detectors after it, and list it under the PR
-body's *Review*.
+body's *Review*, unless it answers the GitHub bot: its record is the reply in
+that thread (`open-pr` § 6, ADR 0072).

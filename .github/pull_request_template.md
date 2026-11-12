@@ -18,7 +18,7 @@ Related: #n, PR #n
 Evidence: none
 
 ## Review
-<!-- The rounds run, then each fix made after the last round, one item each in plain words, never a triage id. None: Fixed after the last: none. A branch exempt from review writes only: Not run — exempt: <reason> -->
+<!-- The /code-review rounds run, then each fix made after the last of them, one item each in plain words, never a triage id; a fix to the GitHub bot's finding is recorded in its thread. None: Fixed after the last: none. A branch exempt from review writes only: Not run — exempt: <reason> -->
 TODO rounds. Fixed after the last:
 - TODO what changed
 

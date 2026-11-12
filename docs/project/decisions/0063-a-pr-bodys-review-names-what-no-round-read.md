@@ -1,11 +1,12 @@
 # ADR 0063 — A PR body's review names what no round read
 
 Status: Accepted
+Status: Superseded by ADR-0072 — "followed by one list item per fix no round read" (Decision), for a fix to the GitHub bot's finding
 Date: 2026-11-10
 Backfilled: no
 Supersedes: ADR-0057 — "then one review record collapsed under a summary of its counts. A branch exempt from review writes its exemption in one line instead. A `TODO` left there fails the check." (Decision)
 Enforced by: commits.yml — *Review* after *Verification*, its first line as the rounds run or an exemption, something after an open first line, none of the template's samples left, no triage id anywhere in the body
-Enforced by: none (prose only — .claude/skills/open-pr/SKILL.md § 2. The body) — that the list holds every fix made after the last round, a deferred issue under `Related:`, a dismissal proven only outside the repository under `Evidence:`
+Enforced by: none (prose only — .github/pull_request_template.md § Review, § Issues and § Verification) — that the list holds every fix made after the last round, a deferred issue under `Related:`, a dismissal proven only outside the repository under `Evidence:`
 Enforced by: none (prose only — .claude/skills/review-round/SKILL.md § Buckets) — a `review-debt` issue describing each finding rather than citing its id
 
 ## Context
