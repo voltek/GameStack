@@ -569,6 +569,12 @@ files follow, what else is kept beside them, and the steps to rewrite them
 prints only what a session acts on at its start and Claude Code does not
 inject already.
 
+**The next session's model.** The checkpoint's closing report names the model and
+effort for the next action, read from a table of kinds of session in the Skill, and
+the owner sets them when that session starts, since a switch mid-session rewrites
+the prompt cache. The rows are checked once, by a pilot at one triage (#214), and
+stay as they are after it (ADR 0076).
+
 **Replaces.** A 64 KB append-only handoff that every session re-read, mixing
 state with rules, design and history, reached through an agent-memory pointer
 that was itself stale.
@@ -603,6 +609,10 @@ by `commits.yml`; `.claude/skills/checkpoint/`. The files are read from
   records in place.
 - *The hook deleting plans.* Whether a plan can go is a judgement on what it
   still holds, so the owner runs the command the checkpoint gives.
+- *A log of each session's tokens for the triage to tune the model table.* At one
+  person's volume the task set the cost far more than the model, so it could not
+  confirm a row for many cycles. Claude Code's own `cost-state` record was no
+  shortcut: it carries over a `/clear` and resets on a resume (ADR 0076).
 
 **Known limit.** The cycle is one machine's file, so on a team nobody else sees
 it. With a second person or machine keeping cycles, each cycle is a milestone:
