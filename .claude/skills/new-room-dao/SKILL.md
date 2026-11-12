@@ -38,10 +38,10 @@ throws, and every query reading that row fails. So renaming or removing a consta
 changes the stored data, and nothing in the schema shows it: before the first release
 clear the app's data, as for a schema change (§ Database); from the first release on,
 bump the version and ship a `Migration` that rewrites the stored values. Each stored
-enum gets the test that pins its names (`write-tests` § Room), so a rename
-cannot pass unnoticed. A `@TypeConverter` is for a type Room cannot store at all, in
-`core/data/local/converter/{Name}Converters.kt`, registered with `@TypeConverters` on
-the Database.
+enum gets the test that pins its names (`write-tests`, `references/room-tests.md`),
+so a rename cannot pass unnoticed. A `@TypeConverter` is for a type Room cannot store
+at all, in `core/data/local/converter/{Name}Converters.kt`, registered with
+`@TypeConverters` on the Database.
 
 ## Database
 - One class: `core/data/local/GameStackDatabase.kt`, abstract, extending
