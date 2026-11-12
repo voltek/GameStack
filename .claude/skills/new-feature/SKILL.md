@@ -1,101 +1,82 @@
 ---
 name: new-feature
-description: Start any feature that adds or changes what the user sees, however small, from the OpenSpec change first, then build it from Domain models to UI, following Clean Architecture and MVI. Use before writing code for a new feature, screen or visible behaviour, whichever layer it starts in.
+description: Start any feature that adds or changes what the user sees, however small, from the OpenSpec change first, then build it from Domain models to UI and close it, following Clean Architecture and MVI. Use before writing code for a new feature, screen or visible behaviour, whichever layer it starts in.
 ---
 
 ## Overview
-This skill orchestrates the other GameStack skills in the correct dependency order.
-Do not skip steps or reorder them — each layer depends on the previous one.
+This Skill orders the other GameStack Skills. Do not skip or reorder the steps: each
+layer depends on the one before it. Keep the steps' progress visible to the owner, so
+the checkpoint at step 5 is seen before it is reached.
 
-If the agent has a native task-tracking tool available (e.g., Claude Code's
-TodoWrite/TaskCreate, depending on version), use it to track progress through
-the 10 steps below (0–9) — this makes the pending human checkpoint (step 5)
-visible. Otherwise, list progress in plain text at each step.
+Not yet exercised end to end: Search was built before OpenSpec and this order, so
+Detail (#106) is the first feature to run it, and step 9 corrects what it disproves.
 
 ## Steps
 
-### 0. Confirm scope is clear (conditional)
+### 0. Scope and the OpenSpec change
 Check if the feature's scope is already unambiguous from its capability spec
 in `openspec/specs/`, if one exists, the PRD
 (`docs/project/PRODUCT.md`) and, if applicable, an existing
 approved design reference (`docs/project/design/{screen-name}/`). If every
 state and behaviour is written down, skip discovery. The PRD's section for a
-capability whose *Spec* column says none yet does not reach that bar. If
-genuine ambiguity remains, invoke the `discovery-feature` skill first.
+capability whose *Spec* column says none yet does not reach that bar. If anything
+is ambiguous, clarify it first with `discovery-feature`, or `openspec-explore` if
+#206 adopts it instead.
 
-Then a feature that adds or changes what the user sees opens its OpenSpec
-change (`openspec-propose`, ADR 0041), and the owner approves its proposal and
-delta spec before step 1. That approval is an ask-first decision, like step 5's.
+Then open the feature's OpenSpec change with `openspec-propose` (ADR 0041). The
+owner approves its proposal and delta spec before step 1, an ask-first decision like
+step 5's. Its `tasks.md` turns steps 1–8 into tasks, one group per layer; build them
+with `openspec-apply-change`, which ticks each task. In every step, each layer Skill
+invokes `write-tests`, and a test a scenario names as its verifier is written before
+its code.
 
 ### 1. Domain models
-Create the pure domain model(s) needed for this feature.
-Location: `core/domain/model/` if shared, `feature/{name}/domain/model/` if feature-specific.
+The pure domain model(s) the feature needs, beside the Repository that returns them:
+`core/domain/model/` for a Repository in `core/`, which is the default
+(`new-repository-impl` § The interface), the feature's own `domain/model/` otherwise.
 
-### 2. Repository interface
-Invoke the `new-repository-impl` skill, which writes the interface before the
-implementation.
+### 2. Repository
+Invoke `new-repository-impl`: the interface, then its implementation and its Hilt
+binding in this same step (`new-repository-impl` § The implementation), bringing in
+`new-room-dao`, `new-mapper` and `new-api-service` as it needs them.
 
-### 3. Repository implementation
-Continue with `new-repository-impl`. This step internally:
-- creates the required DTOs, and invokes `new-room-dao` for any local storage
-  (Entity, DAO, converters, Database registration);
-- invokes `new-mapper` for each Data/Domain conversion — `toDomain()` on the read
-  path, `toEntity()` on the write path;
-- invokes `new-api-service` for any new IGDB endpoint;
-- invokes `new-hilt-module` to bind the Impl to its interface and provide anything
-  new it depends on. A Repository that isn't bound compiles nowhere — do not defer this.
+### 3. UseCases
+Invoke `new-usecase` for each thing the screen asks of the domain (`new-usecase`
+§ Location and name).
 
-### 4. UseCases
-Invoke the `new-usecase` skill once for each Repository function the feature needs to expose.
+### 4. Prototype
+Generate a visual prototype (Stitch or Claude Design) from the approved change. If
+`docs/project/design/{screen-name}/` already holds an approved export, ask the owner
+whether it still applies instead of generating a new one.
 
-### 5. Screen prototype
-Generate a visual prototype (Stitch or Claude Design) based on the
-spec/discovery-feature output.
-
-STOP HERE. Do not proceed to ViewModel/Screen until the human explicitly
-approves the prototype. Visual/UX judgment is not mechanical — this is an
-ask-first decision (CLAUDE.md § Working here). The agent proposes, the human
-decides. Running this Skill in Plan Mode enforces the pause mechanically
-(read-only until approved).
-
-Note: the four MVP screens (Home, Search, Library, Detail) already have approved
-exports in `docs/project/design/`, and the shared loading/empty/error states in
-`docs/project/design/states/`. If this feature is one of those, the approval
-already happened — confirm the existing design still applies rather than
-generating a new prototype (see the paragraph below).
-
-Note for the human: consider running this entire skill in Claude Code's
-Plan Mode — it enforces this pause mechanically (read-only until you
-approve), rather than relying solely on the agent following this instruction.
-
-If a project-wide design pass already exists and covers this screen, confirm
-with the human whether that existing design still applies, rather than
-silently reusing or silently regenerating a new one.
+### 5. Owner approval
+Stop until the owner approves the prototype. A visual or UX choice is an ask-first
+decision (CLAUDE.md § Working here): the agent proposes, the owner decides.
 
 ### 6. ViewModel
-Invoke the `new-viewmodel` skill, using the approved prototype's fields to
-shape UiState accurately, injecting the UseCase(s) created in step 4.
+Invoke `new-viewmodel`, shaping `UiState` from the approved prototype and the spec's
+states, with the UseCases from step 3.
 
 ### 7. Screen
-Invoke the `new-screen` skill, implementing the approved prototype's layout.
+Invoke `new-screen`, implementing the approved prototype's layout.
 
-### 8. Navigation wiring
-Register the new screen in `navigation/`: add its type-safe route to
-`Destination`, and place the `composable<>` inside the correct tab's nested
-graph (`.claude/rules/navigation.md`). Then wire up the
-navigation call from wherever it's launched (e.g. tapping a game card
-navigates to Detail with the gameId as a typed argument). A screen built
-but never wired into navigation is unreachable — do not skip this step.
+### 8. Navigation
+Add the screen's type-safe route to `Destination` and its `composable<>` to the tab
+graph that opens it, or to every tab graph when any tab can, as Detail is
+(`.claude/rules/navigation.md`). Then wire the navigation call from where it is
+launched, such as a game card navigating to Detail with the `gameId`. A screen not
+wired into navigation is unreachable.
 
-### 9. Tests
-`write-tests` is invoked automatically by each skill above as it completes.
-Do not skip or batch this — each skill is responsible for its own test coverage.
+### 9. Close
+- A feature that writes data also shows it, and one that shows data the user sets
+  also writes it: rating a game saves the rating and shows the current one.
+  `openspec-verify-change` checks only what the spec states, so a half the spec left
+  out is caught here.
+- `verify-on-device` for every screen the feature adds or alters, then
+  `openspec-verify-change`, both before the reviews.
+- A step this feature repeated that no Skill holds, or a Skill line the work proved
+  wrong, is corrected in that Skill in this branch.
 
 ## Quality criteria
-- Every step above must be completed before moving to the next.
-- If a step doesn't fit the existing structure (e.g. a model doesn't clearly belong
-  to `core` or a `feature`), stop and ask before proceeding.
-- No layer imports from a layer above it — see `.claude/rules/code.md`.
-- Before finalizing, confirm the feature supports both reading and writing data
-  if the feature's purpose requires both (e.g. rating a game requires saving AND
-  displaying the current rating).
+- A step that does not fit the existing structure, such as a model that belongs
+  clearly to neither `core` nor a feature, stops for the owner.
