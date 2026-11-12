@@ -14,7 +14,22 @@ done
 [ -n "${SDK:-}" ] || { echo 'SDK not found: take its path from sdk.dir in local.properties'; return 1; }
 ADB="$SDK/platform-tools/adb"
 EMULATOR="$SDK/emulator/emulator"
+tap() {
+  [ $# -eq 2 ] || { echo 'tap: x y' >&2; return 1; }
+  "$ADB" emu event mouse "$@" 0 1 >/dev/null; "$ADB" emu event mouse "$@" 0 0 >/dev/null
+}
+drag() {   # x, from y, to y: a vertical drag, such as a pull or a scroll
+  [ $# -eq 3 ] || { echo 'drag: x from-y to-y' >&2; return 1; }
+  local x=${@:1:1} from=${@:2:1} to=${@:3:1} i
+  "$ADB" emu event mouse "$x" "$from" 0 1 >/dev/null
+  for i in 1 2 3 4 5 6 7 8 9 10; do "$ADB" emu event mouse "$x" $(( from + (to - from) * i / 10 )) 0 1 >/dev/null; done
+  "$ADB" emu event mouse "$x" "$to" 0 0 >/dev/null
+}
 ```
+
+`drag` reads its arguments as `${@:1:1}` and the device loop below uses
+`grep -oE`, not `awk`: a `$` followed by a digit in a Skill is replaced with a
+word of the Skill's arguments before the agent reads it.
 
 **Each Bash call starts a fresh shell**, so nothing set in one reaches the
 next. Write these lines to a `device.env` in your scratchpad, add the
@@ -59,9 +74,6 @@ for s in $("$ADB" devices | grep -oE '^emulator-[0-9]+'); do
   for i in $(seq 30); do "$ADB" devices | grep -q "^$s" || break; sleep 1; done
 done
 ```
-
-(Not `awk`: a `$` followed by a digit in a Skill is replaced with a word of the
-Skill's arguments before the agent reads it, so field references break.)
 
 **Then launch it**, headless by default, from a background shell (`&` dies with
 the command that started it). A fixed port fixes its serial, `emulator-5580`,
@@ -120,9 +132,29 @@ and removes this note.
 
 ```bash
 "$ADB" shell input tap 540 425
-"$ADB" shell input text 'the%switcher'     # %s is a space
+"$ADB" shell input swipe 540 700 540 1600 500   # a pull to refresh
+"$ADB" shell input text 'the%switcher'          # %s is a space
 "$ADB" shell input keyevent KEYCODE_BACK
 ```
+
+`input` injects its touches past the emulator's touchscreen: a swipe flings as
+a finger does, and nothing on screen shows the touch.
+
+### Touches the human can see
+When the emulator has a window or a recording runs, turn on Show taps, which
+the wipe resets, and touch with `tap` and `drag` from `device.env`, which go
+through the touchscreen as the human's mouse does, so Show taps draws them:
+
+```bash
+"$ADB" shell settings put system show_touches 1
+tap 540 425
+drag 540 700 1600                               # x, from y, to y
+```
+
+Show taps draws a touch only while it is held, so a capture taken after it
+shows nothing of it. `drag` moves its distance less the touch slop and stops:
+the console delivers its moves about 36 ms apart, too far apart for a fling. A
+check that needs a fling uses `input swipe`, which is not drawn.
 
 `input text` types ASCII only: one character outside it fails the whole
 command, and nothing is typed.
