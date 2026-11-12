@@ -80,9 +80,8 @@ $bmp.Save($out, [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose(); $src.Dispose()
 ```
 
-For emulator verification specifically, see the `verify-on-device`
-Skill: `Grep` over a `uiautomator dump` answers pre-stated questions for
-a fraction of a screenshot's cost, but never anything involving the keyboard.
+For emulator captures, the `verify-on-device` Skill says when a window
+dump answers the question for a fraction of a screenshot's cost.
 
 ## Coverage gap
 

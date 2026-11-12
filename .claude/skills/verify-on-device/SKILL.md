@@ -1,16 +1,7 @@
 ---
 name: verify-on-device
-description: Verify a UI change on an emulator — getting a device, installing and driving the app, choosing between a uiautomator dump and a screenshot, and covering every device scenario and every state a screen declares. Use whenever a change adds or alters a screen, before asking for a merge.
+description: Verify a screen on an emulator — launching the agent's own emulator, installing and driving the app, choosing between a window dump and a screenshot, covering every device scenario and every state the screen declares, and opening an issue for a defect found. Use whenever a change adds or alters a screen, before asking for a merge, and for an exploratory pass over a merged screen.
 ---
-
-## Why this exists
-`build`/`test`/`lint` proves the code compiles and that the logic does what a
-test asserts. It never proves a screen looks right or that a control is
-reachable. Every UI defect in this project so far — a premature empty state, a
-keyboard covering a button, clipped genre text, a banner's contrast — was
-invisible to that gate. No UI change is done without this pass.
-
-Data or domain work with no UI change does not need this pass.
 
 ## Before you start
 Find the SDK. `adb` is rarely on PATH; these are Android Studio's default
@@ -51,8 +42,8 @@ pass clears app data and changes the network and the system's night mode, so
 never select it, never close it.
 
 If `GameStack_Verify` does not exist, ask the human to create it once (Android
-Studio → Device Manager, any phone profile, API ≥ `minSdk`). Never fall back to
-another AVD.
+Studio → Device Manager, any phone profile, API 30 or later, which
+`uiautomator dump --windows` needs). Never fall back to another AVD.
 
 ```bash
 "$EMULATOR" -list-avds | tr -d '\r' | grep -qx GameStack_Verify || echo 'GameStack_Verify does not exist'
@@ -81,9 +72,9 @@ whatever else is attached:
 ```
 
 Add `export ANDROID_SERIAL=emulator-5580` to `device.env` before anything else
-talks to the device: every `adb` command and `installDebug` read it, so the
-human's emulator or a phone attached at the same time is never picked. Then
-wait for the boot, about a minute:
+talks to the device: `adb` and `installDebug` both read it, and without it
+`installDebug` installs on every attached device, the human's emulator or phone
+included. Then wait for the boot, about a minute:
 
 ```bash
 for i in $(seq 180); do
@@ -91,7 +82,11 @@ for i in $(seq 180); do
   sleep 1
 done
 "$ADB" shell getprop sys.boot_completed   # anything but 1: it did not boot
+[ "$("$ADB" shell getprop ro.build.version.sdk | tr -d '\r')" -ge 30 ] || echo 'below API 30: ask the human to recreate GameStack_Verify'
 ```
+
+Below API 30, `uiautomator` ignores `--windows`, and the dump never shows the
+keyboard: close the emulator and ask, as for a missing AVD.
 
 If it did not boot in those three minutes, read the background shell's output
 rather than waiting again. A busy port: launch on another even port from 5554
@@ -114,6 +109,13 @@ run it with a window and look.
 "$ADB" shell am start -W -n com.gamestack/.MainActivity
 ```
 
+The app's data lives as long as the launch: `installDebug` reinstalls over it,
+keeping it, so a fix can be installed onto the state a pass built. A state that
+needs stored data, such as a library with games in it, is built in the pass
+through the UI, since the next launch starts wiped. Not exercised yet (#106):
+no screen shows data the user stored. The first branch to run it corrects it
+and removes this note.
+
 ## Driving the app
 
 ```bash
@@ -122,39 +124,46 @@ run it with a window and look.
 "$ADB" shell input keyevent KEYCODE_BACK
 ```
 
+`input text` types ASCII only: one character outside it fails the whole
+command, and nothing is typed.
+
 ### Two tools, two questions
-**`Grep` over a `uiautomator dump`** — for assertions that can be stated in
-advance: which tab is `selected="true"`, whether a text or node exists, what a
-node's bounds are. Only matching lines enter context, so it is by far the
-cheaper path.
+**`Grep` over a window dump** — for assertions that can be stated in advance:
+which tab is `selected="true"`, whether a text or node exists, what a node's
+bounds are, whether the keyboard is up. Only matching lines enter context, so
+it is by far the cheaper path.
 
 ```bash
-MSYS_NO_PATHCONV=1 "$ADB" shell uiautomator dump /sdcard/d.xml
-MSYS_NO_PATHCONV=1 "$ADB" shell cat /sdcard/d.xml | tr '>' '\n' | grep -oE 'text="[^"]+"'
+MSYS_NO_PATHCONV=1 "$ADB" shell uiautomator dump --windows /sdcard/d.xml
+MSYS_NO_PATHCONV=1 "$ADB" shell cat /sdcard/d.xml | tr '>' '\n' | grep 'package="com.gamestack"' | grep -oE 'text="[^"]+"'
 ```
 
-A dump is one instant: a node still animating in is missing from it. Dump again
-before concluding that something is absent.
+`--windows` dumps every window on screen; without it the dump holds only the
+app's, and reports as visible the controls the keyboard covers. The status
+bar's clock and the keyboard's keys are text nodes too, so an assertion about
+the app keeps only the lines of its package. A dump is one instant: a node
+still animating in is missing from it. Dump again before concluding that
+something is absent.
 
 **`"$ADB" exec-out screencap -p > <file>.png`**, read as an image — when the
 criterion is visual (clipping, spacing, contrast, alignment).
 
 ### The keyboard
-The dump contains only the app window, never the IME. It reports as visible
-controls the keyboard is actually covering, so taps aimed from dump coordinates
-land on keyboard keys. **Before tapping from dump coordinates while a text
-field may hold focus, ask the window manager:**
+While the keyboard is up, the dump holds a window of type `TYPE_INPUT_METHOD`,
+and its bounds are what it covers: a tap aimed at a node inside them lands on a
+key. **Before tapping from dump coordinates while a text field may hold focus,
+dump again and look for it:**
 
 ```bash
-"$ADB" shell dumpsys window InputMethod | grep -m1 -oE 'isVisible=(true|false)'
+MSYS_NO_PATHCONV=1 "$ADB" shell uiautomator dump --windows /sdcard/d.xml
+MSYS_NO_PATHCONV=1 "$ADB" shell cat /sdcard/d.xml | tr '>' '\n' | grep -oE 'bounds="[^"]+"[^>]*TYPE_INPUT_METHOD|type="TYPE_APPLICATION"'
 ```
 
-Anything but `false`, no output included, counts as visible: take a screenshot.
-If `true`, `KEYCODE_BACK` hides the keyboard without navigating. Never send it
-unless the probe says `true`: with the keyboard hidden it navigates, and twice
-leaves the app. Use this probe, not `dumpsys input_method`, which reported the
-keyboard hidden while it was up. When what the keyboard covers *is* the
-question, take a screenshot.
+`TYPE_APPLICATION` alone: the keyboard is hidden. A line of bounds as well: it
+is up, over those bounds. No output: the dump failed, so dump once more; still
+nothing, take a screenshot. Only while the keyboard is up does `KEYCODE_BACK` hide it
+without navigating; with it hidden, Back navigates, and twice leaves the app.
+When how the keyboard covers a control is the question, take a screenshot.
 
 ### The network
 Force network-dependent states, then restore the network before going on: it
@@ -173,12 +182,10 @@ before calling it offline.
 
 ### Recording
 For a run the human will review afterwards instead of watching. It works
-headless, records only frames that change, and stops at 180 seconds per file.
-Start it from a background shell and wait until
-`"$ADB" shell pgrep screenrecord` finds it: stopped before its first frame, the
-file is empty. Drive the app, then stop it
-with an interrupt, which finalises the file (killing the shell leaves it
-unplayable), and pull it:
+headless and stops at 180 seconds per file. Start it from a background shell
+and wait until `"$ADB" shell pgrep screenrecord` finds it: stopped before its
+first frame, the file is empty. Drive the app, then stop it with an interrupt,
+which finalises the file (killing the shell leaves it unplayable), and pull it:
 
 ```bash
 MSYS_NO_PATHCONV=1 "$ADB" shell screenrecord --time-limit 180 /sdcard/pass-1.mp4   # background shell
@@ -203,45 +210,46 @@ MSYS_NO_PATHCONV=1 "$ADB" pull /sdcard/pass-1.mp4 .
    sees the pixels.
 3. **A state with no deterministic way to reach it on the device** is asserted
    by a Compose screen test (`write-tests`); a `@Preview` lets the human look.
+4. **A screen the branch adds** also gets the exploratory pass below (ADR 0075).
 
 **Close every verification with at least one screenshot.** The dump cannot find
 what nobody thought to assert, and a purely visual defect is the common case.
 
+A commit after the pass that alters a screen, such as a review's fix or a merge
+of `main` that touches it, repeats the pass for the states it changed before
+the merge is requested: what was verified is what merges (ADR 0075).
+
 ## Exploratory pass
-A pass over a merged screen, for what no scenario names. Cover what the
-section above covers, then what has found defects before:
+For what no scenario names: over a screen a branch adds, and over a merged
+screen. Cover what the section above covers, then what has found defects
+before:
 
 - **The system in light mode** (`"$ADB" shell cmd uimode night no`): the app
   is dark-only, but whatever it leaves to the system follows the system.
 - **A configuration change.** The app is portrait-only (ADR 0019), so toggle
   `cmd uimode night yes` and back: the Activity is recreated and the screen's
   state must survive it.
-- **Process death.** Home, `"$ADB" shell am kill com.gamestack`, then reopen
-  from Recents (`KEYCODE_APP_SWITCH`, tap the card). Not from a launcher
-  intent: a task started with `am start -n` has another root intent, so the
-  launcher opens a new task and nothing looks restored.
+- **Process death.** Home, `"$ADB" shell am kill com.gamestack`, which kills
+  only a process in the background, then reopen from Recents
+  (`KEYCODE_APP_SWITCH`, tap the card). Not from a launcher intent: a task
+  started with `am start -n` has another root intent, so the launcher opens a
+  new task and nothing looks restored.
 - **From every state:** offline and back, Back, a tab switch and return, two
   rapid taps, a tap while the keyboard is up.
 - **Every way to retry** (the Retry button, a pull, the keyboard's action key),
   both still offline and once the network is back: a retry that changes nothing
   on screen reads as a broken app.
-- **Input at the edges:** whitespace only, quotes, a long string. `input text`
-  types ASCII only.
+- **Input at the edges:** whitespace only, quotes, a long string.
 - **Wrong data is not yet a defect.** Send IGDB the same query (token from
   `id.twitch.tv/oauth2/token` with the `local.properties` credentials, never
   printed) to tell IGDB's own data from a mapping bug.
 
-Each confirmed defect becomes an issue in the shape of
-`.github/ISSUE_TEMPLATE/bug.yml` (ADR 0048), opened with `--label product
---label bug`, since `gh issue create` applies no form's labels, its Horizon
-proposed under the form's heading, with the capture that shows it,
-saying whether a spec covers the behaviour: if none does, its fix carries a
-scenario (ADR 0041).
-
-## Cost
-Screenshot cost is set by **aspect ratio, not AVD resolution** — the long edge is
-clamped before billing. Shrinking the AVD saves nothing. See
-`docs/project/design/README.md`.
+## A defect found
+One the branch's own change causes is fixed in the branch. Any other confirmed
+defect becomes an issue with every heading of `.github/ISSUE_TEMPLATE/bug.yml`
+in its body (ADR 0048), opened with `--label product --label bug`, since
+`gh issue create` applies no form's labels. `gh` cannot attach the capture that
+shows it: hand its path to the human with the pass's other captures.
 
 ## Finishing
 - **Close `GameStack_Verify`**: `"$ADB" emu kill`. The next launch wipes it, so
