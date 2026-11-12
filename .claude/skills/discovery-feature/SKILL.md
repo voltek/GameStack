@@ -1,7 +1,7 @@
 ---
 name: discovery-feature
-description: Asks a series of guided questions to turn a vague feature idea into a feature-scoped spec draft for its OpenSpec change, aware of existing project architecture. Use when adding a feature to a project that already has a PRD and a CLAUDE.md — not for defining a brand-new project from zero.
-compatibility: Requires the target project to have a CLAUDE.md (or equivalent Constitution document).
+description: Asks a series of guided questions to turn a vague feature idea into the answers its OpenSpec change needs, aware of existing project architecture. Use when adding a feature to a project that already has a PRD and a CLAUDE.md — not for defining a brand-new project from zero.
+compatibility: Requires the target project to have a CLAUDE.md.
 ---
 
 ## Questions
@@ -18,32 +18,26 @@ compatibility: Requires the target project to have a CLAUDE.md (or equivalent Co
 - Don't ask all questions at once.
 - Prefer closed/multiple-choice questions when the ambiguity is concrete;
   open questions when genuine exploration is needed.
-- If the agent has a native structured-question tool available (e.g., Claude
-  Code's AskUserQuestion), prefer it for closed/multiple-choice questions.
-  Otherwise, ask directly in the conversation — this is a preference, not a
-  hard requirement, so the skill works on any tool.
+- Ask a closed question with the agent's structured-question tool where it has one
+  (Claude Code's AskUserQuestion), otherwise in the conversation.
 - Cross-check answers against the project's CLAUDE.md and `.claude/rules/` — if
   something conflicts with an existing rule, surface that conflict explicitly before proceeding.
 
 ## Beyond the list
-The questions above are the required minimum — never skip them. But they are
-a floor, not a ceiling. If something about this specific feature surfaces a real
-ambiguity or risk not covered by the list, ask about it too. Note explicitly
-why you're asking beyond the standard list, so it's clear this is a deliberate
-addition, not an inconsistent process.
+The questions above are a floor, not a ceiling: ask each, and ask about any other
+ambiguity or risk this feature raises, saying what prompted it.
 
 ## When to stop
-- Stop once there's enough clarity to move directly to implementation
-  (invoking `new-feature`). There is no architecture/blueprinting phase here —
-  the project's stack and layering already exist and are governed by CLAUDE.md.
-  This skill decides *what* the feature is, never *how* it's built.
+- Stop once the answers can fill the feature's OpenSpec change (`openspec-propose`,
+  `new-feature` step 0). This Skill decides what the feature is, never how it is
+  built: the stack and layering are CLAUDE.md's.
 - A capability with a spec in `openspec/specs/` is settled by it; reopen
   nothing it answers. One whose *Spec* column in the PRD says none yet is not
   settled by its PRD section and mockups: check both, and turn every gap into
   minimum behavior or an open question.
 
 ## Result
-A feature-scoped spec draft with this structure:
+The answers, for `openspec-propose`:
 - What it is (one phrase)
 - Minimum behavior
 - What it is NOT
@@ -55,9 +49,11 @@ A feature-scoped spec draft with this structure:
 Behaviour a user sees is never appended to the PRD: it goes into an
 OpenSpec change for the feature's branch (ADR 0041) — minimum behavior as
 requirements and scenarios, open questions under the proposal's
-`## Open Questions`. In the pilot on Detail's spec, `openspec-propose` writes
-the change and these answers feed it; whether this Skill survives is the
-pilot's verdict (TOOLING.md § 13, **Pilot.**).
+`## Open Questions`.
+
+Not yet exercised with OpenSpec. Which of this Skill and `openspec-explore` clarifies
+Detail (#106), the pilot's first feature, is #206's question; the pilot's verdict then
+decides whether this Skill retires (TOOLING.md § 13, **Pilot.**).
 
 ## Quality criteria
 - The "touches existing systems" answer is explicit — never left ambiguous,
