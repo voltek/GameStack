@@ -7,7 +7,8 @@ A notice of 0 matches asks first whether the task id was copied right; only a
 right id that still fails, or a shape the script refuses, is a format change.
 
 1. Save the record from the notification's `<result>` instead, whole and before any
-   digest, with this first line: `copied from the notification, HTML-escaped`. The
+   digest, into `reviews/<branch>/` beside the handoff, the branch exactly as
+   `git branch --show-current` prints it, with this first line: `copied from the notification, HTML-escaped`. The
    notification escapes `<` and `>` and can neutralize text that looks like an
    instruction, so the line tells every later reader the record is not literal.
    Read `&lt;` and `&gt;` as `<` and `>` when verifying a finding against it.

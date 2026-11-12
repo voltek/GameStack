@@ -129,7 +129,7 @@ if [ -f "$handoff" ]; then
   extra=$(grep '^## ' "$handoff" | sed 's/[[:space:]]*$//' | grep -vxE "## ($sections)" | tr '\n' ' ')
   [ -n "$extra" ] && warn+="WARNING: HANDOFF.md has a section the checkpoint Skill does not allow: ${extra% }. It holds only ${sections//|/, }."$'\n'
 fi
-# A plan outlives its item when nothing cites it; the deletion stays a checkpoint step, after its decisions are checked.
+# A plan outlives its item when nothing cites it; the owner deletes it, once the checkpoint has checked what it holds.
 # A citation is the path segment plans/<name>, whole: plans/a.md and oldplans/a do not cite plans/a, while
 # ~/x/plans/a, plans/a/b and a sentence's "plans/a." do. Names go through ENVIRON, since -v reads backslash escapes.
 uncited() {
@@ -148,8 +148,37 @@ uncited() {
 if [ -d "$plans" ] && { [ -f "$handoff" ] || [ -f "$cycle" ]; }; then
   stale=$({ cat "$handoff"; echo; cat "$cycle"; } 2>/dev/null \
           | uncited "$(for p in "$plans"/*; do [ -e "$p" ] && printf '%s\n' "${p##*/}"; done)")
-  [ -n "$stale" ] && warn+="WARNING: neither CYCLE.md nor HANDOFF.md cites ${stale% }. Delete each once its decisions are in an ADR, an issue or TOOLING.md (checkpoint Skill)."$'\n'
+  [ -n "$stale" ] && warn+="WARNING: neither CYCLE.md nor HANDOFF.md cites ${stale% }. Once its decisions and the measures an open item needs are in an ADR, an issue or TOOLING.md, give the owner the command that deletes it (checkpoint Skill)."$'\n'
 fi
+# A branch's review records and captures live in reviews/<branch>/ and captures/<branch>/, deleted here
+# once the branch is neither local nor on a remote: a hook is outside auto mode's classifier, which
+# refuses an agent's rm there. Without a readable repository nothing is deleted, and with no records git is not run.
+# A name below the folder's also keeps it, so a branch deeper than two levels keeps its folder.
+alive() {
+  local n
+  while IFS= read -r n; do case "$n" in "$1" | "$1"/*) return 0 ;; esac; done <<<"$branches"
+  return 1
+}
+gone=""; misfiled=""
+if [ -n "$(find "$dir/reviews" "$dir/captures" -mindepth 1 -maxdepth 1 2>/dev/null | head -1)" ] \
+   && branches=$(git -C "$repo" for-each-ref --format='%(refname)' refs/heads refs/remotes 2>/dev/null); then
+  branches=$(printf '%s\n' "$branches" | sed -e 's|^refs/heads/||' -e 's|^refs/remotes/[^/]*/||')
+  for sub in reviews captures; do
+    for top in "$dir/$sub"/*; do
+      [ -e "$top" ] || continue
+      # Branches are <type>/<name> (ADR 0034), so a branch's folder is two levels down; a file above it is warned about alone.
+      [ -d "$top" ] || { misfiled+="$sub/${top##*/} "; continue; }
+      for b in "$top"/*; do
+        [ -e "$b" ] || continue
+        [ -d "$b" ] || { misfiled+="$sub/${top##*/}/${b##*/} "; continue; }
+        alive "${top##*/}/${b##*/}" || { rm -rf "$b" && gone+="$sub/${top##*/}/${b##*/} "; }
+      done
+      rmdir "$top" 2>/dev/null
+    done
+  done
+fi
+[ -n "$gone" ] && warn+="Deleted, their branch gone (checkpoint Skill): ${gone% }."$'\n'
+[ -n "$misfiled" ] && warn+="WARNING: not under a <type>/<name> branch folder, so never deleted: ${misfiled% }. Move or delete each (checkpoint Skill)."$'\n'
 owed=$(triage)
 size=$((${#warn} + ${#owed} + ${#body} + 2))
 [ $size -gt $((cap - 1000)) ] && warn+="WARNING: this hook output is $size chars; above $cap Claude Code shows only a 2,000-char preview."$'\n'

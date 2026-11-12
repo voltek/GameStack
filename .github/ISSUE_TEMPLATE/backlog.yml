@@ -52,7 +52,7 @@ body:
     id: trigger
     attributes:
       label: Trigger
-      description: Only for an item gated on an event — the event, and how to check whether it has fired.
+      description: Only for an item gated on an event — the event, and who or what will see it fire, a command or "a triage asks the owner"; a triage checks every gated Trigger (ADR 0038).
   - type: textarea
     id: lands
     attributes:

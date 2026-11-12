@@ -60,7 +60,9 @@ beside the handoff; a shared home for a team's cycle is #159's question.
   issues (ADR 0047).
 - **Breakers.** A third insertion in one cycle stops it, and so does the file
   growing past 30 lines. An item that overruns — a third review round, the rule
-  of three — goes back to the pool at the next triage.
+  of three — goes back to the pool at the next triage. Before proposing an
+  insertion, say whether it would be the third, and offer the open item's plan
+  instead when the work fits there.
 - **Closed whole** when the exit condition holds, or **stopped** when a breaker
   fires: either way, move the file to `archive/cycles/YYYY-MM-cycle-N.md`, the
   month it closed and its number, and a triage chooses the next cycle from the
@@ -123,16 +125,21 @@ already show those.
 2. Update `CYCLE.md`'s statuses; close the cycle if its exit holds, or stop it
    if a breaker fired. Either way a triage is now owed (§ Triage). For an item
    marked done, and for each plan the hook says nothing cites, check that every
-   decision the plan holds is in an ADR, an issue or TOOLING.md, then delete
-   the plan, never the item's row (§ What is kept).
+   decision the plan holds and every measure an open item needs is in an ADR,
+   an issue or TOOLING.md. Then give the owner the command that deletes the
+   plan, and record it under *Owed by the owner* until it runs: auto mode's
+   classifier refuses the agent's `rm` there. Never delete the item's row
+   (§ What is kept).
 3. Read `HANDOFF.md` with the Read tool, then rewrite it whole with Write.
 4. Check the bounds on the handoff at the path the hook's
    `== HANDOFF.md (<path>) ==` header prints: `wc -l` and `wc -c` within 40
    and 3,000, and no hash or next ADR number anywhere:
    `grep -E '\b[0-9a-f]{7,40}\b|next (free )?ADR' "<path>"`.
-5. Route what the session learned, never into the handoff: a preference to
-   agent memory, a rule change proposed to the owner, a decision to an ADR, an
-   incident to the commit body, pending work to an issue.
+5. Route what the session learned, never into the handoff: what is personal to
+   the owner or about this machine to agent memory, a rule change proposed to
+   the owner, a decision to an ADR, an incident to the commit body, pending work
+   to an issue. What would serve a clone or another person never goes to memory
+   (ADR 0066).
 6. At session end, stop. Report in three lines or fewer: what changed, the next
    action, anything owed by the owner.
 
@@ -140,12 +147,15 @@ already show those.
 Beside the two files, in the same folder, only what a later session reads
 (ADR 0065):
 - **Plans** in `plans/`, cited from the cycle or the handoff by their `plans/`
-  path while their item is open. A plan is deleted once every decision it holds
-  is in an ADR, an issue or TOOLING.md (§ Steps 2); there is no plan archive.
-  The hook warns about the plans neither file cites: the first ten by name,
-  and a count of the rest.
-- **Review records** in `reviews/`, while their branch is open; deleted at its
-  merge. `reviews-tally.csv` is frozen: no row is added.
+  path while their item is open. The owner deletes a plan once every decision
+  it holds and every measure an open item needs is in an ADR, an issue or
+  TOOLING.md (§ Steps 2); there is no plan archive. The hook warns about the
+  plans neither file cites: the first ten by name, and a count of the rest.
+- **A branch's records** in a folder named for the branch: `reviews/<branch>/`
+  for review rounds, `captures/<branch>/` for device captures and a pull
+  request's screenshots. The hook deletes the folder once the branch is neither
+  local nor on a remote, names it, and warns about any record outside such a
+  folder (ADR 0067). `reviews-tally.csv` is frozen: no row is added.
 - **Closed cycles** in `archive/cycles/`, the only record of what each cycle
   chose and why it ended, and the marker the hook reads for the machine that
   keeps the cycles. Kept until the cycle has a shared home, #159.

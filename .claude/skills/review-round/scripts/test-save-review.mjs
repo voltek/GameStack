@@ -21,16 +21,25 @@ const entry = (id, blocks, stop, extra = {}) => ({
 const thinking = { type: "thinking", thinking: SECRET };
 const text = (t) => ({ type: "text", text: t });
 
-function run(entries, { id = "abc123", arg = id, raw } = {}) {
+// A repository on branch docs/a-branch, whose reviews/docs/a-branch/ folder does not exist yet.
+function run(entries, { id = "abc123", arg = id, raw, name = "r1.raw.txt", handoff = true, branch = "docs/a-branch", git = true } = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "save-review-"));
   const dir = path.join(root, "projects", "C--repo", "session-1", "subagents");
   fs.mkdirSync(dir, { recursive: true });
   const body = raw ?? entries.map((e) => JSON.stringify(e)).join("\n") + "\n";
-  fs.writeFileSync(path.join(dir, `agent-${id}.jsonl`), body);  const out = path.join(root, "r1.raw.txt");
-  const r = spawnSync(process.execPath, [script, arg, out], {
-    env: { ...process.env, CLAUDE_CONFIG_DIR: root },
-    encoding: "utf8",
-  });
+  fs.writeFileSync(path.join(dir, `agent-${id}.jsonl`), body);
+  const repo = path.join(root, "Repo");
+  if (git) spawnSync("git", ["init", "-q", "-b", branch, repo]);
+  else fs.mkdirSync(repo);
+  // Unset, the handoff folder is ~/Documents/<main checkout's folder name>, as the hook reads it.
+  const home = path.join(root, "home");
+  // HOME is what the hook reads; on Windows os.homedir() reads USERPROFILE, set apart here.
+  const env = { ...process.env, CLAUDE_CONFIG_DIR: root, HOME: home, USERPROFILE: path.join(root, "profile") };
+  if (handoff) env.CLAUDE_HANDOFF_DIR = path.join(root, "handoff");
+  else delete env.CLAUDE_HANDOFF_DIR;
+  const out = path.join(handoff ? env.CLAUDE_HANDOFF_DIR : path.join(home, "Documents", "Repo"),
+    "reviews", ...branch.split("/"), "r1.raw.txt");
+  const r = spawnSync(process.execPath, [script, arg, name], { cwd: repo, env, encoding: "utf8" });
   const saved = fs.existsSync(out) ? fs.readFileSync(out, "utf8") : null;
   fs.rmSync(root, { recursive: true, force: true });
   return { ...r, saved };
@@ -94,6 +103,27 @@ const cases = {
     const r = run([entry("m2", [thinking], null), entry("m2", [text(REVIEW)], null)]);
     assert.equal(r.status, 0, r.stderr);
     assert.equal(r.saved, REVIEW);
+  },
+  "saves under ~/Documents/<checkout> when CLAUDE_HANDOFF_DIR is unset"() {
+    const r = run([entry("m2", [text(REVIEW)], "end_turn")], { handoff: false });
+    assert.equal(r.status, 0, r.stderr);
+    assert.equal(r.saved, REVIEW);
+  },
+  "refuses a path where the file name goes"() {
+    const r = run([entry("m2", [text(REVIEW)], "end_turn")], { name: "elsewhere/r1.raw.txt" });
+    assert.equal(r.status, 2);
+    assert.equal(r.saved, null);
+  },
+  "refuses . and .. where the file name goes"() {
+    for (const name of [".", ".."]) {
+      const r = run([entry("m2", [text(REVIEW)], "end_turn")], { name });
+      assert.equal(r.status, 2, `${name}: ${r.stderr}`);
+    }
+  },
+  "exits 2, not a format change, when git cannot name the branch"() {
+    const r = run([entry("m2", [text(REVIEW)], "end_turn")], { git: false, handoff: false });
+    assert.equal(r.status, 2, r.stderr);
+    assert.equal(r.saved, null);
   },
   "fails when the last message holds no text"() {
     failsLoudly(run([entry("m2", [thinking], "end_turn"), entry("m2", [text("  \n")], "end_turn")]), "blocks");

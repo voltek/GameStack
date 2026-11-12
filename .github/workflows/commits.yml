@@ -35,6 +35,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: sh .claude/hooks/test-session-start.sh
 
+      - name: Test the memory gate hook
+        if: ${{ !cancelled() }}
+        run: sh .claude/hooks/test-memory-gate.sh
+
       # Node comes from the runner image; the script needs 20.11 or later (import.meta.dirname).
       - name: Test the review extractor
         if: ${{ !cancelled() }}
