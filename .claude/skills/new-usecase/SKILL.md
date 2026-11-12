@@ -1,41 +1,35 @@
 ---
 name: new-usecase
-description: Create a new UseCase that invokes a Repository function. Use when asked to create a UseCase for GameStack's Domain layer.
+description: Create a UseCase that calls one or more Repository functions. Use when asked to create a UseCase for GameStack's Domain layer.
 ---
 
 ## Construction
-- Must receive a Repository instance (e.g. `GamesRepository`) via constructor, injected using Hilt.
-- Always uses `operator fun invoke()`, where the main logic is placed.
-- Must return `Flow<Result<T>>` for observable data, or be a `suspend operator fun invoke()`
-  for one-shot write operations (e.g. saving a rating).
-- Utility/private functions can live inside the class to keep `invoke()` clean,
-  for operations that support the main logic without cluttering it.
+- `class {Name}UseCase @Inject constructor(private val repository: {Name}Repository)`,
+  with its logic in `operator fun invoke(...)`.
+- A one-shot call, read or write, is `suspend operator fun invoke(...)` returning
+  `Result<T>`, as `SearchGamesUseCase` does. Data the screen keeps observing is a plain
+  `operator fun invoke(...)` returning `Flow<Result<T>>`.
+- Pass the Repository's failure on unchanged. A UseCase that turns a failure into
+  success, or into another error, hides from the screen what went wrong.
 
-## Location
-- Feature-specific UseCase (used only within one feature):
-  `feature/{feature-name}/domain/usecase/`
-  Example: `feature/home/domain/usecase/GetPopularGamesUseCase.kt` — popular
-  games are a Home concern per the PRD; Search owns `SearchGamesUseCase`.
+## What belongs here
+Product rules: deriving a value, normalising input before it reaches a Repository
+(`SearchGamesUseCase` trims the query and never sends a blank one), combining the
+results of several Repository calls, such as a game from `GamesRepository` with the
+user's rating from `UserGameRepository` (PENDING — not yet defined; Detail, #106).
+A rule about how a write changes stored data, such as stamping `completedAt` when a
+game becomes Completed, needs the stored row to compare against, and Entities never
+leave the data layer (ADR 0003), so it is the Repository's (ADR 0054).
 
-- Shared UseCase (used across multiple features):
-  `core/domain/usecase/`
-  Example: a UseCase that fetches or updates the user's rating for a game,
-  used both in the detail screen and in the library screen.
+A UseCase that only forwards to its Repository is still written: the ViewModel takes
+a UseCase, never a Repository (`.claude/rules/code.md`).
 
-When in doubt, start feature-specific. Move to `core/domain/usecase/`
-only once a second feature actually needs it.
+## Location and name
+`feature/{feature}/domain/usecase/` while one feature uses it; it moves to
+`core/domain/usecase/` when a second feature needs it, not before. A UseCase calling
+one Repository function takes its name, in PascalCase with `UseCase`: `searchGames()`
+→ `SearchGamesUseCase`. One joining several is named for what it gives the screen:
+`GetGameDetailUseCase`.
 
-## Naming convention
-Follows the name of the Repository function it invokes, in PascalCase, with the `UseCase` suffix.
-Example: repository function `getPopularGames()` → `GetPopularGamesUseCase`
-
-## Quality criteria
-- Errors from the Repository must be propagated, not swallowed or transformed silently.
-- Must use only Domain models — never DTOs, Entities, or Android framework types (except Hilt's `javax.inject`).
-- The UseCase orchestrates; it does not coordinate data sources itself. Business
-  logic lives here — deriving values, applying product rules, combining results
-  from several Repository calls. What does NOT live here: persistence invariants
-  that require reading stored state to decide (e.g. stamping `completedAt` on a
-  list-status transition). Those are the Repository's, because Entities never
-  leave the Data layer (ADR 0002).
-- After creating the UseCase, invoke the `write-tests` skill to generate its corresponding unit tests.
+## Tests
+Invoke `write-tests` for its unit tests.
