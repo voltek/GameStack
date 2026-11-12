@@ -47,11 +47,12 @@ gets a round except:
 
 An exempt branch writes `Not run — exempt: <which>` under the PR body's *Review*.
 
-A branch that ADR 0041 says carries an OpenSpec change and has no folder
-`openspec/changes/<branch-kebab-name>/` stops here. One that has it runs
-`openspec-verify-change` before the first round and fixes every CRITICAL. Each test a scenario's
-`VERIFIED BY` names exists under that name, and each `device` one joins the device
-pass. Not exercised yet (#106): no branch has taken a change through a round.
+A branch that ADR 0041 says carries an OpenSpec change, exempt or not, and has
+no folder `openspec/changes/<branch-kebab-name>/` stops here. One that has it runs
+`openspec-verify-change` before its first round, or before `open-pr` when it is
+exempt, and fixes every CRITICAL. Each test a scenario's `VERIFIED BY` names
+exists under that name, and each `device` one is among those the device pass
+checked (`verify-on-device`). Not exercised yet (#106): no branch has taken a change through a round.
 The first branch to run it corrects it and removes this note.
 
 ## Before each round, ask
