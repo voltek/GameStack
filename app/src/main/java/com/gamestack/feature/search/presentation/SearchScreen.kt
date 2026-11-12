@@ -66,7 +66,7 @@ import com.gamestack.core.presentation.UiText
 import com.gamestack.core.presentation.rememberSingleClick
 import com.gamestack.core.presentation.components.MessageState
 import com.gamestack.core.presentation.components.ShimmerPlaceholder
-import com.gamestack.ui.theme.GameStackTheme
+import com.gamestack.ui.theme.GameStackPreviewTheme
 import kotlinx.coroutines.flow.collectLatest
 
 private const val GameCoverAspectRatio = 3f / 4f
@@ -389,18 +389,26 @@ private fun SearchLoadingGrid(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
+@Composable
+private fun SearchContentInitialPreview() {
+    GameStackPreviewTheme {
+        SearchContent(uiState = SearchUiState(), onEvent = {})
+    }
+}
+
+@Preview
 @Composable
 private fun SearchContentLoadingPreview() {
-    GameStackTheme {
+    GameStackPreviewTheme {
         SearchContent(uiState = SearchUiState(query = "Elden Ring", isLoading = true), onEvent = {})
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SearchContentResultsPreview() {
-    GameStackTheme {
+    GameStackPreviewTheme {
         SearchContent(
             uiState = SearchUiState(
                 query = "Elden Ring",
@@ -414,20 +422,20 @@ private fun SearchContentResultsPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SearchContentEmptyPreview() {
-    GameStackTheme {
+    GameStackPreviewTheme {
         SearchContent(uiState = SearchUiState(query = "asdkjhaksjd"), onEvent = {})
     }
 }
 
 // The one state that cannot be reached deterministically on device without
 // dropping the network mid-session — the others are all a query away.
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SearchContentRefreshErrorPreview() {
-    GameStackTheme {
+    GameStackPreviewTheme {
         SearchContent(
             uiState = SearchUiState(
                 query = "Elden Ring",
@@ -442,10 +450,10 @@ private fun SearchContentRefreshErrorPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SearchContentErrorPreview() {
-    GameStackTheme {
+    GameStackPreviewTheme {
         SearchContent(
             uiState = SearchUiState(
                 query = "Elden Ring",

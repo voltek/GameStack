@@ -123,9 +123,9 @@ class SearchViewModel @Inject constructor(
         // State stays consistent without this (mapLatest cancels the predecessor);
         // it exists only to stop repeat Retry taps burning IGDB's finite quota.
         if (_uiState.value.isRefreshing) return
-        // Must be synchronous: PullToRefreshBox reads this flag when the pull is
-        // released and retracts the indicator if it is still false, so a
-        // coroutine hop makes the spinner bounce back on every pull.
+        // Synchronous: PullToRefreshBox starts hiding its indicator on release and
+        // shows it again only when it recomposes with this flag true, so a
+        // coroutine hop lets the indicator visibly retract first.
         _uiState.update { it.copy(isRefreshing = true) }
         refreshRequests.tryEmit(Unit)
     }
