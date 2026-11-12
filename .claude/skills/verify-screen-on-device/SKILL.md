@@ -1,5 +1,5 @@
 ---
-name: verify-on-device
+name: verify-screen-on-device
 description: Verify a screen on an emulator — launching the agent's own emulator, installing and driving the app, choosing between a window dump and a screenshot, covering every device scenario and every state the screen declares, and opening an issue for a defect found. Use whenever a change adds or alters a screen, before asking for a merge, and for an exploratory pass over a merged screen.
 ---
 

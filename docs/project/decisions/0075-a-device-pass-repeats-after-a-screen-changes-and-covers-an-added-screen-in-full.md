@@ -3,8 +3,8 @@
 Status: Accepted
 Date: 2026-11-12
 Backfilled: no
-Enforced by: none (prose only — .claude/skills/verify-on-device/SKILL.md § What to cover) — the pass repeated for the states a later commit changed, and an added screen's exploratory pass
-Enforced by: none (prose only — .claude/skills/verify-on-device/SKILL.md § A defect found) — a defect the branch caused fixed in it, any other opened as an issue
+Enforced by: none (prose only — .claude/skills/verify-screen-on-device/SKILL.md § What to cover) — the pass repeated for the states a later commit changed, and an added screen's exploratory pass
+Enforced by: none (prose only — .claude/skills/verify-screen-on-device/SKILL.md § A defect found) — a defect the branch caused fixed in it, any other opened as an issue
 
 ## Context
 ADR 0005 had every change that adds or alters a screen verified on the emulator before

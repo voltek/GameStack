@@ -80,7 +80,7 @@ $bmp.Save($out, [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose(); $src.Dispose()
 ```
 
-For emulator captures, the `verify-on-device` Skill says when a window
+For emulator captures, the `verify-screen-on-device` Skill says when a window
 dump answers the question for a fraction of a screenshot's cost.
 
 ## Coverage gap

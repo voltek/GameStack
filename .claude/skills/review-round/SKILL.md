@@ -52,8 +52,9 @@ no folder `openspec/changes/<branch-kebab-name>/` stops here. One that has it ru
 `openspec-verify-change` before its first round, or before `open-pr` when it is
 exempt, and fixes every CRITICAL. Each test a scenario's `VERIFIED BY` names
 exists under that name, and each `device` one is among those the device pass
-checked (`verify-on-device`). Not exercised yet (#106): no branch has taken a change through a round.
-The first branch to run it corrects it and removes this note.
+checked (`verify-screen-on-device`). Not exercised yet (#106): no branch has taken
+a change through a round. The first branch to run it corrects it and removes this
+note.
 
 ## Before each round, ask
 A round starts only on the human's explicit yes. Send *ready for round k* with:
