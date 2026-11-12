@@ -4,19 +4,17 @@ description: Rewrite the session handoff (HANDOFF.md) and the open cycle (CYCLE.
 ---
 
 ## Why this exists
-A session starts cold. The SessionStart hook (`.claude/hooks/session-start.sh`)
-injects two small files and the repository facts it derives live, so a `/clear`
-costs a few thousand tokens instead of re-reading the governance. Those files
-only stay small and true if every checkpoint follows the same rules, and those
-rules are here rather than in the files' own headers, which the hook paid for
-on every session (ADR 0045).
+The SessionStart hook (`.claude/hooks/session-start.sh`) starts every session
+from two small files and the repository facts it derives live. The files stay
+small and true only if every checkpoint follows these rules, kept here rather
+than in the files, which every session would pay for (ADR 0045).
 
 ## Where the files live
-Outside the repository, in `$CLAUDE_HANDOFF_DIR`, or `~/Documents/<main
-checkout's folder name>` when it is unset, shared by every worktree; the hook
-prints the path it read. They are one person's live state: inside the
-repository every pull request diff would carry it. A clone with neither file
-still gets the derived facts, and a line saying no handoff exists. The cycles
+Outside the repository, since they are one person's live state and every pull
+request diff would carry them: at the path the hook prints, in its
+`== HANDOFF.md (<path>) ==` header or, with no handoff yet, its
+`No handoff at <path>.` line: `$CLAUDE_HANDOFF_DIR`, or `~/Documents/<main
+checkout's folder name>` when it is unset, shared by every worktree. The cycles
 are kept on one machine, the one with a `CYCLE.md` or an `archive/cycles/`
 beside the handoff; a shared home for a team's cycle is #159's question.
 
@@ -33,8 +31,9 @@ beside the handoff; a shared home for a team's cycle is #159's question.
   a GitHub issue (ADR 0038).
 - **Rewritten whole at each checkpoint, never appended.** A done item leaves:
   its record is the commit, the ADR or the issue.
-- **Bound: 40 lines and 3,000 bytes.** The hook warns when it is over, and its
-  whole output is cut to a 2,000-character preview past 10,000 characters.
+- **Bound: 40 lines and 3,000 bytes.** The hook warns when it is over. Past
+  10,000 characters, Claude Code replaces the hook's whole output with a file
+  path and a 2,000-character preview, and does not ask the agent to read the file.
 - **Nothing derivable:** branches, hashes, the next ADR number, counts. The hook
   prints those live, and a stored copy goes stale.
 - **If it contradicts the repository, the repository wins.** Flag the
@@ -93,8 +92,8 @@ beside the handoff; a shared home for a team's cycle is #159's question.
   `product` issue the `GameStack Product` Project lacks (its auto-add workflow
   adds an older one only once it is next updated), then confirm or change each
   one's Horizon: Now for the new cycle's product issues, Next or Later for the
-  rest. The owner
-  and number, the Project's items against the open product issues, and the add:
+  rest. The commands find the Project's owner and number, list its items and the
+  open product issues to compare, and add one:
   ```bash
   o=$(gh repo view --json owner --jq .owner.login)
   n=$(gh project list --owner "$o" --format json --jq '.projects[] | select(.title == "GameStack Product") | .number')
@@ -110,9 +109,8 @@ beside the handoff; a shared home for a team's cycle is #159's question.
 ## One task per session
 A task is one branch, and its session runs it to the merge or the abandonment:
 evaluation, review rounds and their findings' triage, pull request, merge. The
-session ends there — checkpoint and stop, even when told to continue. Never
-start a second branch: a handoff that chained two tasks led an agent to start
-the second in the same session, filling its context with unrelated work.
+session ends there: checkpoint and stop, even when told to continue. Never
+start a second branch, which fills the context with unrelated work.
 
 ## When to checkpoint
 When a `CYCLE.md` status changes (a merge, a branch abandoned, an insertion,
@@ -155,8 +153,8 @@ Beside the two files, in the same folder, only what a later session reads
   for review rounds, `captures/<branch>/` for device captures and a pull
   request's screenshots. The hook deletes the folder once the branch is neither
   local nor on a remote, names it, and warns about any record outside such a
-  folder (ADR 0067). `reviews-tally.csv` is frozen: no row is added.
+  folder (ADR 0067). `reviews-tally.csv` is frozen: no row is added,
+  and it goes with #100's README, which is its last reader.
 - **Closed cycles** in `archive/cycles/`, the only record of what each cycle
   chose and why it ended, and the marker the hook reads for the machine that
   keeps the cycles. Kept until the cycle has a shared home, #159.
-- **Former handoffs:** none; the handoff is rewritten whole.
