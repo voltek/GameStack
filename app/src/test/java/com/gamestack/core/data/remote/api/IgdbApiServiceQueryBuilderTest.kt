@@ -29,6 +29,14 @@ class IgdbApiServiceQueryBuilderTest {
         assertTrue(text.contains("search \"The \\\"Best\\\" Game\";"))
     }
 
+    // A trailing backslash, left unescaped, would escape the closing quote and leave the literal open.
+    @Test
+    fun `buildSearchGamesQuery should escape a backslash in the query`() {
+        val text = bodyText("foo\\")
+
+        assertTrue("expected the backslash escaped in: $text", text.contains("search \"foo\\\\\";"))
+    }
+
     // Spec: IGDB rejects `search` combined with `sort` — the query must never add one.
     @Test
     fun `buildSearchGamesQuery should never include a sort clause`() {
