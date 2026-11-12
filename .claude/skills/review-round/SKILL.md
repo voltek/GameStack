@@ -1,14 +1,16 @@
 ---
 name: review-round
-description: Run a code review round — launch /code-review on the human's yes, save its raw output, triage every finding in a table, apply alone in round 1 what needs no decision, the rest once the human confirms, apply the stopping rule and the cap. Use when a branch is ready for review, when /code-review or the GitHub bot returns findings, or to decide whether another round is owed.
+description: Run a local /code-review round on the human's yes, triage its findings, and decide whether another is owed. Use when a branch is ready for review before its PR, when /code-review returns findings, or to triage the GitHub bot's findings.
 ---
 
 # Run a review round
 
-Starts on a clean branch with a green gate. Every local round runs before the PR
-exists (ADR 0014): a PR opened early anchors threads to commits the fixes rewrite,
-and its body goes stale. The bot's findings take the same triage, and their fixes follow
-§ A fix no round will read. Next: another round or `open-pr`.
+Starts on a clean branch with a green gate. A round here is a local `/code-review`
+round, and every one runs before the PR exists (ADR 0014): a PR opened early anchors
+threads to commits the fixes rewrite, and its body goes stale. The GitHub bot's round
+is external: it runs on the PR (`open-pr` § 5), neither counts as a local round nor
+replaces one, and borrows only this triage; its fixes follow § A fix no round will
+read. Next: another round or `open-pr`.
 
 ## Stopping rule
 Every `Fix (defect)` row names its origin, checked with git against the commits
@@ -64,9 +66,7 @@ A round starts only on the human's explicit yes. Send *ready for round k* with:
 On a yes, invoke `/code-review <level> --max-findings default` through the Skill
 tool, on the session's model (#187 holds cheaper ones). Always pass both: a level
 or a cap typed earlier is reused otherwise. An answer that carries a question or a request is not a yes:
-handle it and ask again. Note the commit the round reads, for the table. The
-GitHub bot is a different reviewer: its round says nothing about whether
-`/code-review` ran.
+handle it and ask again. Note the commit the round reads, for the table.
 
 ## The sequence
 1. Save the raw output verbatim, before any digest of it:
