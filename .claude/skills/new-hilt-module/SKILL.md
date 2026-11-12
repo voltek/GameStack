@@ -3,98 +3,56 @@ name: new-hilt-module
 description: Create or extend a Hilt module to bind an interface to its implementation or provide a constructed dependency. Use when a new Repository, DAO, Database, API service, or interceptor needs to enter the DI graph.
 ---
 
-## When to invoke
-Whenever something new must be injectable and Hilt cannot figure it out on its own:
-- An interface → implementation binding (Repository, DataSource).
-- A type this project does not construct itself (Retrofit, OkHttp, Room's
-  `RoomDatabase`, a DAO obtained from the Database).
-- Anything needing a qualifier because two instances of the same type exist.
+## When a module is needed
+- An interface bound to its implementation, such as a Repository.
+- A type this project does not construct itself: OkHttp, Retrofit, the Room
+  Database, a DAO obtained from it.
+- Two instances of one type, which need qualifiers.
 
-**Not needed** when a class is constructor-injectable and depended on by its own
-concrete type — `@Inject constructor` alone is enough (e.g. `AuthInterceptor`,
-UseCases, ViewModels with `@HiltViewModel`). Adding a redundant `@Provides` for
-these widens the graph for nothing.
+A class with an `@Inject constructor` that is injected as itself (`AuthInterceptor`,
+a UseCase, a `@HiltViewModel`) needs no module, and a `@Provides` for it only adds a
+second way to build it.
 
-The initial project scaffold deliberately created no modules up front; this
-skill owns their creation, at the moment a real binding is needed.
+## Which module
+A module is named for what it holds, never for a layer or a lifetime (`AppModule`,
+`CommonModule`, `SingletonModule`), in `core/data/di/{Concern}Module.kt`:
 
-## Choosing the module
-Name modules after **what they represent**, never a catch-all "CommonModule" or
-"AppModule". Current modules:
-
-| Module | Owns |
+| Module | Holds |
 |---|---|
-| `NetworkModule` | OkHttp clients, Retrofit instances, API services, the AuthRepository binding |
-| `DatabaseModule` (PENDING — not yet created) | The Room Database, DAOs, and their bindings. Create this file the first time `new-room-dao` needs a Database/DAO binding — do not assume it already exists. |
+| `NetworkModule` | OkHttp clients, Retrofit instances, API services, and the binding of `AuthRepository`, the token the clients use |
+| `RepositoryModule` | The binding of each Repository in `core/`, whatever sources it reads |
+| `DatabaseModule` (PENDING — not yet defined) | The Room Database and its DAOs |
 
-Extend an existing module when the new binding belongs to its concern; create a
-new one when it clearly doesn't. Hilt's graph is flat, so a dependency provided
-in one module is injectable everywhere — a shared type (e.g. `Json`) can get its
-own module without any hierarchy concerns.
+Extend the module whose concern the binding is; create a new one when none fits. A
+binding of a type one feature owns goes in a module under that feature's
+`data/di/`, so `core/` never imports a feature.
 
 ## Construction
-- `@Module` + `@InstallIn(SingletonComponent::class)` for app-lifetime
-  dependencies (all current cases). Use a narrower component only when the
-  dependency genuinely should not outlive a screen — and say why.
-- Prefer `@Binds` (abstract) over `@Provides` for interface→impl bindings:
-  it generates less code and cannot accidentally hold state.
-- A module mixing both is an `abstract class` with `@Binds` functions and a
-  `companion object` holding the `@Provides` ones — this is the existing
-  `NetworkModule` shape; follow it.
-- `@Singleton` on anything expensive or stateful (OkHttp, Retrofit, Room
-  Database, in-memory caches). Room's Database in particular **must** be a
-  singleton — multiple instances open competing connections to one file.
-- Room Database needs `@ApplicationContext context: Context`; never pass an
-  Activity context (leaks the Activity for the app's lifetime).
+- `@Module @InstallIn(SingletonComponent::class)`. A narrower component only for a
+  dependency that must not outlive a screen, with the reason in a comment.
+- `@Binds` for an interface bound to its implementation, `@Provides` for a type built
+  by hand. A module with both is an `abstract class` holding the `@Binds`, with the
+  `@Provides` in its `companion object`, as `NetworkModule` does.
+- `@Singleton` on what is expensive or holds state: OkHttp, Retrofit, the Room
+  Database. Room's guide asks for one Database instance, since each is expensive.
+- The Database takes `@ApplicationContext`; an Activity context would be held for the
+  app's lifetime.
 
 ## Qualifiers
-When two instances of the same type coexist, both need a qualifier — an
-unqualified one silently becomes the default and the wrong client gets injected.
-The live example: the IGDB OkHttp client carries `AuthInterceptor`, the Twitch
-auth client must not (fetching the token cannot depend on already having one).
-Define qualifiers as `@Qualifier @Retention(AnnotationRetention.BINARY)`
-annotations in `core/data/di/NetworkQualifiers.kt` (or the matching file for
-another concern), one file per module's worth of qualifiers.
+When two instances of a type coexist, every one of them carries a qualifier: an
+unqualified one becomes the default and is injected where the other was meant. The
+IGDB `OkHttpClient` carries `AuthInterceptor` and the Twitch one must not, since
+fetching the token cannot need a token. Qualifiers are
+`@Qualifier @Retention(AnnotationRetention.BINARY)` annotations in one file per
+module, such as `NetworkQualifiers.kt`.
 
 ## Visibility
-Only expose a value via `@Provides`/`@Binds` if something outside the module
-genuinely injects it directly. Otherwise keep it a private helper function —
-the `Json` converter factory in `NetworkModule` is the reference case: used
-only to build the Retrofit instances in that same file, so it is private rather
-than a binding (ADR 0004).
+A value nothing outside the module injects stays a private function, as the `Json`
+converter factory in `NetworkModule` does — unless it must be a single instance. A
+private function runs again at every call, so an `OkHttpClient` demoted to one would
+give each Retrofit its own connection pool; those stay `@Provides @Singleton` even
+though only the module uses them (ADR 0004).
 
-**Exception — anything that must be `@Singleton` stays a binding**, even when
-only consumers inside the same module inject it. Scoping is a property of the
-DI graph: a private helper function is re-executed at every call site, so
-demoting a `@Singleton @Provides` to a private function silently produces one
-instance per consumer. `NetworkModule`'s two `OkHttpClient`s and two `Retrofit`s
-are exactly this case — nothing outside the module injects them, but each must
-be a single shared instance (the OkHttp connection pool and thread pool are the
-whole point of reusing a client). Keep them as `@Provides @Singleton`.
-
-The dividing line is whether a duplicate instance would be harmful, not whether
-the value escapes the module. `Json` is cheap and stateless, so a second one
-costs nothing and it can be private; an `OkHttpClient` is neither.
-
-If two modules both need a helper, extract it to its own named module rather
-than duplicating it or widening one module's responsibility.
-
-## Location
-`core/data/di/{Name}Module.kt` for data-layer bindings. A binding used by exactly
-one feature may live in `feature/{name}/data/di/` — but prefer `core/data/di/`
-unless the isolation is obvious.
-
-## Naming convention
-`{Concern}Module` — `NetworkModule`, `DatabaseModule`.
-
-## Quality criteria
-- No module named for a layer or lifetime instead of a concern
-  (`AppModule`, `CommonModule`, `SingletonModule` are all wrong).
-- No `@Provides` for a class that is already constructor-injectable.
-- Every duplicated type has a qualifier on **all** of its instances.
-- Room Database and network clients are `@Singleton`.
-- No unscoped binding exposed that nothing outside the module injects — those
-  become private helpers. `@Singleton` ones stay bindings (see Visibility).
-- Hilt errors surface at compile time: run `./gradlew build` (not just `test`)
-  after adding bindings — a missing binding or duplicate provider fails KSP
-  codegen, and unit tests alone won't catch it.
+## Check
+A missing or duplicate binding fails Hilt's code generation, which `./gradlew build`
+and `./gradlew test` both run.
