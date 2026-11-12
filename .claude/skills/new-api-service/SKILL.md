@@ -3,48 +3,49 @@ name: new-api-service
 description: Create a Retrofit interface for the IGDB API using Apicalypse query syntax. Use when asked to create or add an endpoint to the IGDB API service.
 ---
 
-## Critical context
-IGDB does NOT use standard REST. It uses Apicalypse: every request is a POST
-with the query written as plain text in the request body — not GET with query params.
+## How IGDB differs from REST
+IGDB uses Apicalypse: every request is a POST whose body is the query as plain text,
+never a GET with query parameters.
 
-Example real request:
 ```
 POST https://api.igdb.com/v4/games
-Body: fields id, name, rating; where platforms=48; limit 10;
+Body: fields id, name, cover.url; where id = 1942;
 ```
 
-IMPORTANT — search does not support sorting: the `search "query";` keyword
-cannot be combined with `sort` in the same query. IGDB returns search results
-ordered by its own relevance ranking. Do not attempt to add `sort` to a query
-that also uses `search` — it will not behave as expected.
+A response is always a JSON array, even for one id, so every function returns
+`List<{Dto}>` and the Repository takes the element it needs.
+
+Search does not combine with sorting: a query using `search "…";` carries no `sort`,
+and the results come in IGDB's relevance order (the Search spec, checked by
+`IgdbApiServiceQueryBuilderTest`).
 
 ## Construction
-- Interface annotated for Retrofit, using `@POST("{endpoint}")` — never `@GET`.
-- The Apicalypse query string goes in the request body via `@Body` (as plain text/RequestBody,
-  not a JSON object).
-- Every function is `suspend fun` returning `List<{Dto}>`.
-- **Do NOT declare authentication headers on the function.** IGDB requires
-  `Client-ID` and `Authorization: Bearer {token}` on every call, but `AuthInterceptor`
-  attaches both automatically to every request on the IGDB OkHttp client. Adding
-  `@Header("Client-ID") clientId: String` (or `@Headers(...)`) is wrong here: it
-  duplicates the header, forces every caller to thread a credential it shouldn't
-  know about, and bypasses the one place that fetches the token. Functions take
-  query parameters only.
+- Add the function to the existing `IgdbApiService`
+  (`core/data/remote/api/IgdbApiService.kt`). Its Retrofit instance sits on the OkHttp
+  client that carries `AuthInterceptor`, so a second IGDB service would send requests
+  with no credentials.
+- `@POST("{endpoint}") suspend fun name(@Body query: RequestBody): List<{Dto}>`. No
+  `@Header` for `Client-ID` or `Authorization`: `AuthInterceptor` adds both.
+- Build the query in an `internal` top-level function beside the interface,
+  `build{Name}Query(...)`, returning `String.toApicalypseRequestBody()`. It is
+  `internal` rather than private so its test can read the body it builds.
+- Text the user typed goes into an Apicalypse string literal, so escape `\` first and
+  then `"`, as `buildSearchGamesQuery` does; otherwise a quote ends the literal and
+  rewrites the query. A number, such as an id, needs no escaping.
+- Name the function for what the query asks, not the endpoint: `searchGames`,
+  `getGameDetails`.
 
-## Location
-`core/data/remote/api/IgdbApiService.kt` (shared — all features consume the same IGDB API).
+## The DTO
+`@Serializable` in `core/data/remote/dto/`, one class per object the response nests
+(`GameDto`, `GameCoverDto`). A field IGDB may leave out is nullable with `= null`:
+deserialization fails on a missing field that has no default, and one such game fails
+the whole list. Only a game's `id` and `name` are required, since a game without a
+name is not one the app can show; whether a nested object's `name` may be missing is
+#203. `@SerialName` maps a snake_case field (`involved_companies`).
+Request only the fields the DTO declares: `fields` decides what comes back, and
+`Json { ignoreUnknownKeys = true }` (in `NetworkModule`) skips the rest.
 
-## Naming convention
-Function name describes the query intent, not the endpoint mechanically.
-Example: `searchGames(query: String)`, `getPopularGames()`.
-
-## Quality criteria
-- Never use `@GET` or standard query annotations (`@Query`) for IGDB calls.
-- No `@Header`/`@Headers` annotation for auth anywhere in the interface.
-- New endpoints are added to the existing `IgdbApiService` — do not create a
-  second IGDB service interface. Its Retrofit instance is already bound to the
-  authenticated OkHttp client; a new one would silently bypass `AuthInterceptor`.
-- The Apicalypse query string itself can be built as a constant or a small
-  private builder function — do not inline complex queries repeatedly.
-- After creating or modifying the API service, invoke the `write-tests` skill
-  if any query-building logic was added (pure Retrofit interfaces don't need tests themselves).
+## Tests
+A query builder gets a test in `IgdbApiServiceQueryBuilderTest` (`write-tests`): the
+clauses it must hold, the escaping if it takes text, and what it must never contain.
+The Retrofit interface itself needs none.

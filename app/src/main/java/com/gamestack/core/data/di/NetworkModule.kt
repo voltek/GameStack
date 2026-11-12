@@ -4,9 +4,7 @@ import com.gamestack.core.data.remote.api.IgdbApiService
 import com.gamestack.core.data.remote.api.TwitchAuthApiService
 import com.gamestack.core.data.remote.interceptor.AuthInterceptor
 import com.gamestack.core.data.repository.AuthRepositoryImpl
-import com.gamestack.core.data.repository.GamesRepositoryImpl
 import com.gamestack.core.domain.repository.AuthRepository
-import com.gamestack.core.domain.repository.GamesRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -27,11 +25,9 @@ private const val TWITCH_AUTH_BASE_URL = "https://id.twitch.tv/"
 @InstallIn(SingletonComponent::class)
 abstract class NetworkModule {
 
+    // The token is network plumbing, so its binding stays with the clients that use it.
     @Binds
     abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
-
-    @Binds
-    abstract fun bindGamesRepository(impl: GamesRepositoryImpl): GamesRepository
 
     companion object {
 

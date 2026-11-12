@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.room)
 }
 
 val localProperties = Properties().apply {
@@ -68,6 +69,11 @@ android {
             isIncludeAndroidResources = true
         }
     }
+}
+
+// Every schema version is committed: a migration starts from the released one (ADR 0069).
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {

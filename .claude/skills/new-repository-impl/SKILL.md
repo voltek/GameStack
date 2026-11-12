@@ -1,90 +1,64 @@
 ---
 name: new-repository-impl
-description: Create a RepositoryImpl that implements a Repository interface. Use when asked to create a RepositoryImpl, or as part of the new-feature skill.
+description: Create a Repository, its interface in the Domain layer and its implementation in the Data layer. Use when asked to create a Repository or a RepositoryImpl, or as part of the new-feature skill.
 ---
 
-## Construction
-- Receives DAO and/or API service as `private val`, injected via Hilt constructor.
-  Register the binding via the `new-hilt-module` skill — a RepositoryImpl with no
-  `@Binds` is invisible to the DI graph and fails at compile time.
-- Implements the corresponding Repository interface — must override every declared function.
-- Create the DTOs (remote) needed to match what the API returns. For local storage,
-  invoke the `new-room-dao` skill — it owns the Entity, the DAO, the TypeConverters,
-  and the Database registration.
-- Invoke the `new-mapper` skill for each conversion across the Data/Domain boundary:
-  `.toDomain()` on the read path, `.toEntity()` on the write path.
-- Inside every overridden function: call the required DAO/API function, then use the
-  corresponding Mapper — `toDomain()` when returning data outward, `toEntity()` when
-  persisting inward. Never a direct DTO → Entity conversion (see `new-mapper`).
-- If a function needs both local and remote data (cache-first pattern): emit cached data
-  first if available, then fetch remote data and update the cache.
-- Data-layer-only transformations (e.g. building an updated copy of an Entity to persist,
-  merging a partial update into an existing row) are NOT Mappers — implement them as
-  private helper functions inside the RepositoryImpl itself.
+## The interface
+- In `core/domain/repository/`. A feature's own `domain/repository/` only for data
+  that, per the PRD, no other feature reads: the app's data is shared (the user's
+  library feeds Detail, Library and Home), and a Repository placed in the first
+  feature to need it would move when the second arrives. Named `{Name}Repository`:
+  `GamesRepository`, `UserGameRepository` (PENDING — not yet defined; Detail, #106).
+- A one-shot call is `suspend fun` returning `Result<T>`; data the UI keeps observing
+  returns `Flow<Result<T>>`, so a failure reaches the UseCase as a value it passes on
+  (`new-usecase`). Only Domain types in its signatures.
+- Name each function for what it gives the caller (`searchGames`), not how
+  (`fetchFromApiOrCache`).
+- The read and the write of the same data, such as a rating, belong to one
+  Repository, so the rules about how that data changes have one home.
 
-## Returning `Result` — never `runCatching`
-A suspend function returning `Result` must build it with `try`/`catch`, rethrowing
-`CancellationException` before catching `Exception`:
+## The implementation
+- `{Name}RepositoryImpl @Inject constructor(...)`, beside its interface's choice:
+  `core/data/repository/`, or that feature's `data/repository/`. It takes its API
+  services and DAOs as `private val`, and the Database when it writes (§ Writes).
+- Bind it to its interface (`new-hilt-module`): in `RepositoryModule`, or for a
+  feature's own Repository in a module under that feature's `data/di/`. Without the
+  `@Binds`, Hilt fails the build.
+- A new IGDB endpoint and its DTOs: `new-api-service`. Local storage (Entity, DAO,
+  converters, Database): `new-room-dao`. Every conversion across the Data/Domain
+  boundary: `new-mapper`.
+- A suspend function returning `Result` uses `try`/`catch` with `CancellationException`
+  rethrown, never `runCatching` (`.claude/rules/code.md`); `GamesRepositoryImpl` is
+  the reference. An observed `Flow` maps each value to `Result.success` and ends with
+  `.catch { emit(Result.failure(it)) }`, so a failed read, such as Room meeting a
+  stored value it cannot read, reaches the screen as a value instead of crashing it.
+- A Repository combines the sources of its own data only (ADR 0054). A model that
+  joins two kinds of data, such as a game from IGDB with the user's rating from Room,
+  is joined by a UseCase from both Repositories (`new-usecase`), so each kind keeps
+  its read and its write in one Repository.
+- An IGDB response is not cached: offline mode is a Repository redesign of its own
+  (#130).
 
-```kotlin
-override suspend fun searchGames(query: String): Result<List<Game>> =
-    try {
-        Result.success(api.searchGames(buildQuery(query)).map { it.toDomain() })
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        Result.failure(e)
-    }
-```
+## Writes to `UserGameEntity`
+Not exercised yet: no Room code exists. The first write in Detail (#106) validates
+this section; correct it in that branch from what the code needed.
 
-`runCatching` catches `Throwable`, so it swallows `CancellationException` too and
-reports a merely-cancelled coroutine as a genuine failure — the caller then shows
-an error for work nobody was waiting on any more (ADR 0009).
+A write is a read-modify-write, never a blind upsert, because the timestamps depend on
+the stored row (`.claude/rules/data-layer.md`, ADR 0054):
+1. Read the row for that `gameId`; it may not exist yet.
+2. Build the new row: the change, `updatedAt` stamped on every write, and
+   `completedAt` stamped only when `listStatus` becomes `COMPLETED` from something
+   else.
+3. Upsert it.
 
-## Write operations — read-modify-write and persistence invariants
-Writes to `UserGameEntity` are never blind upserts. The Repository:
-1. Loads the existing row for that `gameId` (may be absent — first interaction).
-2. Produces the updated copy: the incoming change, plus `updatedAt` stamped on
-   every write, plus `completedAt` stamped **only** when `listStatus` is becoming
-   COMPLETED and the stored value was not already COMPLETED.
-3. Upserts the result.
+Rating and list status share the row, so one private helper runs this cycle for
+every write and the two cannot drift apart. The helper runs the three steps inside
+`database.withTransaction { }`, so the Repository also takes the Database: two quick
+writes, a rating and then a list status, would otherwise both read the old row, and
+the second upsert would drop the first change. The Repository decides when a column is
+written, never what it means to the user: "Completed on [date]" and the order of a
+list are Domain or UI work. A rule that needs more than the old and new row is a
+product rule: stop and ask.
 
-These timestamp rules are **persistence invariants and belong here** (ADR 0054). They live here because detecting a *transition* requires comparing
-against stored state, and Entities never leave the Data layer, so no UseCase can see it.
-Nor is it the DAO's job: the rule spans a read *and* a write, and a DAO method is one
-statement.
-
-The boundary that still applies: the Repository decides *when a timestamp column is
-written*, never *what it means to the user*. Formatting "Completed on [date]" or
-ordering "Recently Interacted" is Domain/UI work. If a rule ever needs more than
-comparing old and new persisted state, it is real business logic — stop and ask.
-
-Because rating and list-status writes touch the same row, keep this cycle in one
-private helper rather than duplicating it per write function, so the copies cannot
-drift apart.
-
-## Local Data Conventions (Room)
-- Entities, DAOs, TypeConverters and Database registration are owned by the
-  `new-room-dao` skill — invoke it rather than hand-rolling them here. (Reminder
-  of the constraint it handles: Kotlin enums need a `TypeConverter`, since Room
-  cannot persist them natively.)
-- When a function needs to merge data from multiple sources into one domain model
-  (e.g. remote game info + local user rating), fetch both, then combine them into the
-  domain model inside the Repository — never expose the two sources separately to the
-  UseCase/ViewModel layer.
-
-## Location
-`core/data/repository/` if shared, `feature/{name}/data/repository/` if feature-specific.
-
-## Naming convention
-`{RepositoryName}Impl`
-Example: `GamesRepositoryImpl`, `UserGameRepositoryImpl`
-
-## Quality criteria
-- A Repository holds the rules of its own data; product rules live in UseCases (ADR 0054).
-- Every function from the interface is overridden — no partial implementations.
-- Never expose DTO/Entity types outside the Repository — only Domain models leave this class.
-- Read and write paths for the same data (e.g. rating, list status) live in the same
-  Repository — do not split them across two Repositories unless they are genuinely
-  unrelated concerns.
-- After creating the RepositoryImpl and its Mappers, invoke the `write-tests` skill.
+## Tests
+Invoke `write-tests` once the implementation and its mappers exist.

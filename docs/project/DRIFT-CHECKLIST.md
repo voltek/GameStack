@@ -134,13 +134,14 @@ and items it read, so a silent skip shows.
 - [ ] Is the personal rating/list data (Room) ever being sent to or merged
       with IGDB's community rating anywhere in the code?
       Verified by: subagent (interpretive)
-- [ ] Does any Room enum column lack a `TypeConverter`, or does a converter
-      persist the enum's **ordinal** rather than its name?
+- [ ] Does any Room enum column have a hand-written `@TypeConverter`, or, after
+      the first release (PRODUCT.md § First release), was a constant of a stored
+      enum renamed or removed without a version bump and a `Migration` (ADR 0068)?
       Verified by: human
-- [ ] Was an Entity's schema changed without bumping the Database `version`?
+- [ ] After the first release, was an Entity's schema changed without bumping the
+      Database `version` and adding a `Migration` (ADR 0069)?
       Verified by: human
-- [ ] Is `fallbackToDestructiveMigration()` still present now that the app has
-      shipped to real users? (Fine pre-release; data loss after.)
+- [ ] Is `fallbackToDestructiveMigration()` called anywhere (ADR 0069)?
       Verified by: human
 
 ## Code Conventions
