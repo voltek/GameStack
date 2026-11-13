@@ -37,7 +37,7 @@ next. Write these lines to a `device.env` in your scratchpad, add the
 with `. <scratchpad>/device.env`.
 
 **Check the IGDB credentials.** `local.properties` must hold non-empty
-`IGDB_CLIENT_ID` and `IGDB_CLIENT_SECRET` (README → Running the project).
+`IGDB_CLIENT_ID` and `IGDB_CLIENT_SECRET` (README § Running the app).
 Without them the build falls back to empty values, installs, and every search
 lands on the error state — that is setup, not a defect. If they are missing, ask.
 
