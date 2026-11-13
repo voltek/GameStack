@@ -103,6 +103,9 @@ beside the handoff; a shared home for a team's cycle is #159's question.
   ```
   These need the token's `project` scope, granted only through a browser: if
   they fail, ask the owner to run `! gh auth refresh -h github.com -s project`.
+- **The README** (ADR 0079): read it against the repository; where it no longer
+  describes it, or states a count of what the repository holds, propose an issue. Its dated *Measured results* section is never
+  refreshed, so it is not checked.
 - **Recorded** once the owner decides: rewrite the `Triage log` issue's body as
   ADR 0038 shapes it, never appending; then write the new `CYCLE.md`.
 
