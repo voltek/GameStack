@@ -32,7 +32,8 @@ is a cost.
   `--force-with-lease` may clean your own feature branch until it merges.
 - Never change branch protection or repository settings.
 - Touching the same code a third time for the same class of defect means the design
-  is the problem: stop patching and redesign.
+  is the problem: stop patching and redesign as `review-round`'s
+  `references/past-the-cap.md` says.
 - Ask first: any decision the documents or an existing code pattern do not settle,
   such as a visual or UX choice, product scope, the name of a user-facing concept, or a trade-off with no
   single answer. Propose it and wait for approval, even when the request looks small.

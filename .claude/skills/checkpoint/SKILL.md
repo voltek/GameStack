@@ -112,6 +112,33 @@ evaluation, review rounds and their findings' triage, pull request, merge. The
 session ends there: checkpoint and stop, even when told to continue. Never
 start a second branch, which fills the context with unrelated work.
 
+## The next session's model
+The closing report names the model and effort for the next action, read from this
+table by the kind of session, never weighed task by task (ADR 0076). The owner sets
+them when the next session starts: a switch mid-session rewrites the prompt cache,
+which belongs to the model that wrote it. The rows are a hypothesis from Anthropic's
+guidance (ADR 0076), not a measure. The first row that fits, read from the top,
+applies.
+
+| The next session is | Model and effort |
+|---|---|
+| Wide migration or refactor | Opus · `high`; the most capable model if it is major |
+| Triage, or an analysis or plan without a branch | Opus · `high` |
+| Harness branch whose rule is born or changes and spreads across files | Opus · `high` |
+| Harness branch contained in one or two files | Opus · `medium` |
+| Discovery or a spec for a feature | Opus · `high` |
+| Product feature from an OpenSpec change | Sonnet · `medium` |
+| App bug, cause known | Sonnet · `medium` |
+| App bug, cause unknown | Opus · `high` |
+| Tests over existing code | Sonnet · `medium` |
+| Device verification as the main task | Opus · `medium` |
+| A document drawn from a lot of material | Opus · `medium` |
+| None of these | Opus · `medium` |
+
+Whether a harness branch spreads is read from its issue's *Where it lands when
+shipped*; with no such section, take the higher of the two rows. The rows are
+checked once, by the pilot in #214, and stay as they are after it.
+
 ## When to checkpoint
 When a `CYCLE.md` status changes (a merge, a branch abandoned, an insertion,
 the cycle closing) and at session end. Not per commit: `git log` and the hook
@@ -139,7 +166,8 @@ already show those.
    to an issue. What would serve a clone or another person never goes to memory
    (ADR 0066).
 6. At session end, stop. Report in three lines or fewer: what changed, the next
-   action, anything owed by the owner.
+   action with its model and effort (§ The next session's model), anything owed
+   by the owner.
 
 ## What is kept
 Beside the two files, in the same folder, only what a later session reads
