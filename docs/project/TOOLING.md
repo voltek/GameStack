@@ -669,6 +669,14 @@ temporary folder, or `$CLAUDE_MEMORY_GATE_DIR`, for two days.
   spellings than a pattern reads (§ 10), so a memory written through the shell
   is not asked about.
 
+**Known limit.** The gate asks only before a write, so nothing checks a memory
+again once it is written: a file it names can be deleted, or a later decision
+can contradict it. Each machine reviews its own memory by hand, when it
+chooses. A scheduled review is not built: the memory lives on each machine,
+outside the repository, so any trigger splits a rule kept here from state kept
+there, and each split fails on its own, a new machine with no reminder never
+starting and a reminder under another name never found.
+
 ---
 
 ## Running on Windows
