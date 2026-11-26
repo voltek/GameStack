@@ -110,6 +110,10 @@ row. A feature not finished has no block. -->
 
 ### 🔍 Search
 
+<p align="center">
+  <img src="docs/project/screenshots/search/search-demo.gif" width="270" alt="Search, a query loads results with covers and scrolls through them; a query with no matches shows the empty state">
+</p>
+
 <table>
   <tr>
     <td align="center" width="25%">
@@ -255,7 +259,7 @@ from others are not expected.
 
 - **Code and documents:** [MIT](LICENSE)
   ([ADR 0078](docs/project/decisions/0078-the-repository-is-mit-licensed.md)).
-- **Not covered:** the game images in the screenshots, which belong to their
+- **Not covered:** the game images in the screenshots and the video, which belong to their
   owners, and the game data and images the app shows, which come from
   [IGDB.com](https://www.igdb.com/) under
   [Twitch's Developer Services Agreement](https://legal.twitch.com/en/legal/developer-agreement/)
